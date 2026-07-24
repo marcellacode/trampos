@@ -22,6 +22,25 @@ export const MOCK_DISCOVERY: DiscoveryData = {
       company: "Nubank",
       role: "Engenheiro(a) Frontend Sênior",
       compatibility: 97,
+      approvalProbability: {
+        level: "alta",
+        stars: 5,
+        reasons: [
+          "Poucos candidatos.",
+          "Empresa costuma responder.",
+          "Perfil muito parecido com os últimos contratados.",
+          "Currículo excelente.",
+          "GitHub atualizado.",
+        ],
+        simulation: {
+          stages: [
+            { id: "s1", label: "Triagem", status: "pass" },
+            { id: "s2", label: "RH", status: "pass" },
+            { id: "s3", label: "Técnico", status: "warning" },
+          ],
+          suggestion: "Treine Docker antes.",
+        },
+      },
       salary: "R$ 18.000 – R$ 24.000",
       salaryMin: 18000,
       salaryMax: 24000,
@@ -52,6 +71,25 @@ export const MOCK_DISCOVERY: DiscoveryData = {
       company: "Stripe",
       role: "Software Engineer — Payments",
       compatibility: 94,
+      approvalProbability: {
+        level: "alta",
+        stars: 4,
+        reasons: [
+          "Stack muito alinhada ao perfil.",
+          "Empresa responde em até 6 dias.",
+          "Processo estruturado e previsível.",
+          "Experiência relevante com pagamentos.",
+        ],
+        simulation: {
+          stages: [
+            { id: "s1", label: "Triagem", status: "pass" },
+            { id: "s2", label: "RH", status: "pass" },
+            { id: "s3", label: "Técnico", status: "pass" },
+            { id: "s4", label: "System Design", status: "warning" },
+          ],
+          suggestion: "Pratique system design de APIs de pagamento.",
+        },
+      },
       salary: "US$ 140k – US$ 180k",
       salaryMin: 140000,
       salaryMax: 180000,
@@ -81,6 +119,24 @@ export const MOCK_DISCOVERY: DiscoveryData = {
       company: "iFood",
       role: "Desenvolvedor(a) Full Stack Pleno",
       compatibility: 89,
+      approvalProbability: {
+        level: "media",
+        stars: 3,
+        reasons: [
+          "Muitos candidatos (67 est.).",
+          "Kotlin é diferencial não presente.",
+          "Modelo híbrido pode ser barreira.",
+          "React e Node atendem bem.",
+        ],
+        simulation: {
+          stages: [
+            { id: "s1", label: "Triagem", status: "pass" },
+            { id: "s2", label: "RH", status: "warning" },
+            { id: "s3", label: "Técnico", status: "warning" },
+          ],
+          suggestion: "Revise conceitos de Kotlin e Kubernetes.",
+        },
+      },
       salary: "R$ 12.000 – R$ 16.000",
       salaryMin: 12000,
       salaryMax: 16000,
@@ -109,6 +165,24 @@ export const MOCK_DISCOVERY: DiscoveryData = {
       company: "Vercel",
       role: "Developer Advocate — Next.js",
       compatibility: 91,
+      approvalProbability: {
+        level: "alta",
+        stars: 4,
+        reasons: [
+          "Next.js é sua stack principal.",
+          "Poucos candidatos qualificados.",
+          "Open source alinhado ao perfil.",
+          "Empresa valoriza conteúdo técnico.",
+        ],
+        simulation: {
+          stages: [
+            { id: "s1", label: "Triagem", status: "pass" },
+            { id: "s2", label: "RH", status: "pass" },
+            { id: "s3", label: "Técnico", status: "pass" },
+          ],
+          suggestion: "Prepare um talk ou artigo sobre Next.js.",
+        },
+      },
       salary: "US$ 120k – US$ 155k",
       salaryMin: 120000,
       salaryMax: 155000,

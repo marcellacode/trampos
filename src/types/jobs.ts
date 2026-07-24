@@ -15,11 +15,34 @@ export interface JobStats {
   candidates: number;
 }
 
+export type ApprovalLevel = "baixa" | "media" | "alta";
+
+export type SimulationStageStatus = "pass" | "warning" | "fail";
+
+export interface SimulationStage {
+  id: string;
+  label: string;
+  status: SimulationStageStatus;
+}
+
+export interface ApprovalSimulation {
+  stages: SimulationStage[];
+  suggestion: string;
+}
+
+export interface ApprovalProbability {
+  level: ApprovalLevel;
+  stars: number;
+  reasons: string[];
+  simulation: ApprovalSimulation;
+}
+
 export interface JobRecommendation {
   id: string;
   company: string;
   role: string;
   compatibility: number;
+  approvalProbability: ApprovalProbability;
   salary: string;
   salaryMin: number;
   salaryMax: number;

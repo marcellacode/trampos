@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { CompatibilityBar } from "@/components/dashboard/jobs/compatibility-bar";
+import { ApprovalProbabilityCard } from "@/components/dashboard/jobs/approval-probability-card";
 import { HIDE_REASONS } from "@/lib/jobs/constants";
 import type { HideReason, JobRecommendation } from "@/types/jobs";
 import { cn } from "@/lib/utils";
@@ -115,6 +116,10 @@ export function RecommendationCard({
 
       <div className="relative mt-5">
         <CompatibilityBar value={job.compatibility} />
+      </div>
+
+      <div className="relative mt-4">
+        <ApprovalProbabilityCard data={job.approvalProbability} />
       </div>
 
       {/* Por que essa vaga? */}
