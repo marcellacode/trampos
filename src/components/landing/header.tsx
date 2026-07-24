@@ -60,10 +60,19 @@ export function Header() {
 
           {/* Desktop actions */}
           <div className="hidden items-center gap-3 lg:flex">
-            <Button variant="ghost" className="text-[#9CA3AF] hover:text-white">
+            <Button
+              variant="ghost"
+              className="text-[#9CA3AF] hover:text-white"
+              render={<Link href="/login" />}
+              nativeButton={false}
+            >
               Entrar
             </Button>
-            <Button className="bg-[#4F7CFF] px-5 hover:bg-[#4F7CFF]/90 hover:shadow-lg hover:shadow-[#4F7CFF]/25">
+            <Button
+              className="bg-[#4F7CFF] px-5 hover:bg-[#4F7CFF]/90 hover:shadow-lg hover:shadow-[#4F7CFF]/25"
+              render={<Link href="/onboarding" />}
+              nativeButton={false}
+            >
               Começar grátis
             </Button>
           </div>
@@ -108,10 +117,19 @@ export function Header() {
                 ))}
               </ul>
               <div className="mt-4 flex flex-col gap-2 border-t border-white/8 pt-4">
-                <Button variant="ghost" className="w-full justify-center text-[#9CA3AF]">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center text-[#9CA3AF]"
+                  render={<Link href="/login" onClick={() => setMobileOpen(false)} />}
+                  nativeButton={false}
+                >
                   Entrar
                 </Button>
-                <Button className="w-full justify-center bg-[#4F7CFF] hover:bg-[#4F7CFF]/90">
+                <Button
+                  className="w-full justify-center bg-[#4F7CFF] hover:bg-[#4F7CFF]/90"
+                  render={<Link href="/onboarding" onClick={() => setMobileOpen(false)} />}
+                  nativeButton={false}
+                >
                   Começar grátis
                 </Button>
               </div>

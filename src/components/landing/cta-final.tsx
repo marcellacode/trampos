@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -59,6 +60,8 @@ export function CtaFinal() {
               <Button
                 size="lg"
                 className="group h-14 bg-[#4F7CFF] px-10 text-lg hover:bg-[#4F7CFF]/90 hover:shadow-xl hover:shadow-[#4F7CFF]/30"
+                render={<Link href="/onboarding" />}
+                nativeButton={false}
               >
                 Começar gratuitamente
                 <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true" />

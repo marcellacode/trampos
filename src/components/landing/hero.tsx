@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { motion } from "framer-motion";
 import { ArrowRight, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -67,6 +68,8 @@ export function Hero() {
               <Button
                 size="lg"
                 className="group h-12 bg-[#4F7CFF] px-8 text-base hover:bg-[#4F7CFF]/90 hover:shadow-lg hover:shadow-[#4F7CFF]/25"
+                render={<Link href="/onboarding" />}
+                nativeButton={false}
               >
                 Começar grátis
                 <ArrowRight className="ml-1 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
