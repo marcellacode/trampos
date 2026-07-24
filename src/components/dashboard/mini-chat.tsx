@@ -50,7 +50,7 @@ export function MiniChat({
           id: `a-${Date.now()}`,
           role: "assistant",
           content:
-            "Perfeito. Estou analisando e preparo a resposta em instantes. Enquanto isso, a vaga da Nubank continua com 97% de match.",
+            "Recebi sua mensagem. Assim que a integração com a IA estiver ativa, responderei com base no seu perfil e nas suas vagas.",
           timestamp: new Date().toLocaleTimeString("pt-BR", {
             hour: "2-digit",
             minute: "2-digit",

@@ -18,11 +18,13 @@ import {
   SmartFilters,
 } from "@/components/dashboard/jobs";
 import { sortByCompatibility } from "@/lib/jobs/sort";
-import { MOCK_DASHBOARD } from "@/lib/dashboard/constants";
+import { isDiscoveryEmpty } from "@/lib/jobs/empty-data";
+import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { useDiscovery } from "@/lib/jobs/hooks";
 import type { HideReason, SmartFilter } from "@/types/jobs";
 
 export function JobsDiscoveryPage() {
+  const { shell } = useDashboardShell();
   const { data, isLoading, isError, refetch } = useDiscovery();
   const [filters, setFilters] = useState<SmartFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
@@ -87,21 +89,22 @@ export function JobsDiscoveryPage() {
     });
   }
 
-  const chatMessages = data?.chat ?? MOCK_DASHBOARD.chat;
+  const chatMessages = data?.chat ?? shell.chat;
+  const isEmpty = data ? isDiscoveryEmpty(data) : false;
 
   return (
     <DashboardLayout
-      user={MOCK_DASHBOARD.user}
-      notifications={MOCK_DASHBOARD.notifications}
-      unreadNotifications={MOCK_DASHBOARD.unreadNotifications}
-      unreadMessages={MOCK_DASHBOARD.unreadMessages}
+      user={shell.user}
+      notifications={shell.notifications}
+      unreadNotifications={shell.unreadNotifications}
+      unreadMessages={shell.unreadMessages}
       chatMessages={chatMessages}
       chatPanel={({ open, onClose }) => (
         <MiniAIChat
           open={open}
           onClose={onClose}
           messages={chatMessages}
-          userName={MOCK_DASHBOARD.user.firstName}
+          userName={shell.user.firstName}
           onCompare={
             compareIds.length === 2 ? handleCompareOpen : undefined
           }
@@ -115,7 +118,22 @@ export function JobsDiscoveryPage() {
         <DiscoveryState state="error" onAction={() => refetch()} />
       )}
 
-      {data && !isLoading && !isError && (
+      {data && !isLoading && !isError && isEmpty && (
+        <div className="space-y-8">
+          <div>
+            <h1 className="text-2xl font-semibold tracking-tight text-white">
+              Descobrir oportunidades
+            </h1>
+            <p className="mt-1.5 text-sm leading-relaxed text-[#9CA3AF]">
+              Encontramos vagas baseadas no seu perfil, não apenas nas suas
+              pesquisas.
+            </p>
+          </div>
+          <DiscoveryState state="empty" />
+        </div>
+      )}
+
+      {data && !isLoading && !isError && !isEmpty && (
         <div className="space-y-8">
           <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
             <div className="max-w-lg shrink-0">
@@ -213,14 +231,24 @@ export function JobsDiscoveryPage() {
             )}
           </section>
 
-          <CompanyCarousel companies={data.companies} />
+          {data.companies.length > 0 && (
+            <CompanyCarousel companies={data.companies} />
+          )}
 
-          <div className="grid gap-5 lg:grid-cols-2">
-            <OpportunityMap regions={data.regions} />
-            <SalaryRadar data={data.salaryRadar} />
-          </div>
+          {(data.regions.length > 0 || data.salaryRadar.length > 0) && (
+            <div className="grid gap-5 lg:grid-cols-2">
+              {data.regions.length > 0 && (
+                <OpportunityMap regions={data.regions} />
+              )}
+              {data.salaryRadar.length > 0 && (
+                <SalaryRadar data={data.salaryRadar} />
+              )}
+            </div>
+          )}
 
-          <MarketInsights insights={data.marketInsights} />
+          {data.marketInsights.length > 0 && (
+            <MarketInsights insights={data.marketInsights} />
+          )}
         </div>
       )}
 

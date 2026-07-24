@@ -17,18 +17,17 @@ import {
   NewUserState,
 } from "@/components/dashboard/empty-states";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
-import { useDashboard } from "@/lib/dashboard/hooks";
-import { MOCK_DASHBOARD } from "@/lib/dashboard/constants";
+import { useDashboardShell } from "@/lib/dashboard/hooks";
+import { isDashboardEmpty } from "@/lib/dashboard/empty-data";
 import type { DashboardViewState } from "@/types/dashboard";
 
 interface DashboardPageProps {
-  /** Override for demos / empty states */
   viewState?: DashboardViewState;
 }
 
 export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
-  const { data, isLoading, isError } = useDashboard();
-  const shell = data ?? MOCK_DASHBOARD;
+  const { shell, data, isLoading, isError } = useDashboardShell();
+  const isEmpty = data ? isDashboardEmpty(data) : true;
 
   if (isLoading || viewState === "loading") {
     return (
@@ -37,7 +36,7 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
         notifications={[]}
         unreadNotifications={0}
         unreadMessages={0}
-        chatMessages={shell.chat}
+        chatMessages={[]}
       >
         <LoadingSkeletons />
       </DashboardLayout>
@@ -54,7 +53,7 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
     );
   }
 
-  if (viewState === "new-user") {
+  if (viewState === "new-user" || isEmpty) {
     return (
       <DashboardLayout
         user={data.user}
@@ -79,37 +78,49 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
       <div className="space-y-8">
         <Timeline items={data.timeline} />
 
-        <KPIGrid metrics={data.kpis} />
+        {data.kpis.length > 0 && <KPIGrid metrics={data.kpis} />}
 
-        <RecommendationCard recommendation={data.recommendation} />
+        {data.recommendation.title && (
+          <RecommendationCard recommendation={data.recommendation} />
+        )}
 
         <div className="grid gap-4 lg:grid-cols-2">
           <GoalCard goal={data.goal} />
           {viewState === "empty-messages" ? (
             <EmptyMessagesState />
-          ) : (
+          ) : data.companies.length > 0 ? (
             <CompaniesCard companies={data.companies} />
+          ) : (
+            <EmptyMessagesState />
           )}
         </div>
 
-        {viewState === "empty-jobs" ? (
+        {viewState === "empty-jobs" || data.jobs.length === 0 ? (
           <EmptyJobsState />
         ) : (
           <JobsRanking jobs={data.jobs} />
         )}
 
-        <EmployabilityMap skills={data.employability} compact />
+        {data.employability.length > 0 && (
+          <EmployabilityMap skills={data.employability} compact />
+        )}
 
-        <div className="grid gap-4 lg:grid-cols-5">
-          <MarketRadar trends={data.market} className="lg:col-span-3" />
-          <div className="space-y-4 lg:col-span-2">
-            {viewState === "empty-interviews" ? (
-              <EmptyInterviewsState />
-            ) : (
-              <AISuggestions suggestions={data.suggestions} stacked />
+        {(data.market.length > 0 || data.suggestions.length > 0) && (
+          <div className="grid gap-4 lg:grid-cols-5">
+            {data.market.length > 0 && (
+              <MarketRadar trends={data.market} className="lg:col-span-3" />
             )}
+            <div className="space-y-4 lg:col-span-2">
+              {viewState === "empty-interviews" ? (
+                <EmptyInterviewsState />
+              ) : (
+                data.suggestions.length > 0 && (
+                  <AISuggestions suggestions={data.suggestions} stacked />
+                )
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </DashboardLayout>
   );

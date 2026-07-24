@@ -11,11 +11,23 @@ export function RotatingTestimonials() {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
+    if (LOGIN_TESTIMONIALS.length === 0) return;
+
     const timer = window.setInterval(() => {
       setIndex((prev) => (prev + 1) % LOGIN_TESTIMONIALS.length);
     }, INTERVAL_MS);
     return () => window.clearInterval(timer);
   }, []);
+
+  if (LOGIN_TESTIMONIALS.length === 0) {
+    return (
+      <div className="w-full max-w-md min-h-[168px] rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-6">
+        <p className="text-sm leading-relaxed text-[#9CA3AF]">
+          Depoimentos de usuários aparecerão aqui quando estiverem disponíveis.
+        </p>
+      </div>
+    );
+  }
 
   const current = LOGIN_TESTIMONIALS[index];
 

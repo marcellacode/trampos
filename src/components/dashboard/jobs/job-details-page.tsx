@@ -1,0 +1,163 @@
+"use client";
+
+import { useState } from "react";
+import Link from "next/link";
+import { AlertCircle, RefreshCw } from "lucide-react";
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import {
+  ApplySidebar,
+  CompanyAnalysis,
+  CultureRadar,
+  GithubProjects,
+  HiringTimeline,
+  InterviewQuestions,
+  JobFAQSection,
+  JobHero,
+  JobSections,
+  MobileApplySheet,
+  PortfolioHighlights,
+  RelatedJobs,
+  ResumeSuggestions,
+  SalaryComparison,
+  SimilarCompanies,
+  TechComparison,
+  WhyMatch,
+} from "@/components/dashboard/jobs/details";
+import { JobDetailsSkeleton } from "@/components/dashboard/jobs/details/job-details-skeleton";
+import { MiniAIChat } from "@/components/dashboard/jobs/mini-ai-chat";
+import { Button } from "@/components/ui/button";
+import { useDashboardShell } from "@/lib/dashboard/hooks";
+import { useJob } from "@/lib/jobs/hooks";
+
+interface JobDetailsPageProps {
+  jobId: string;
+}
+
+export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
+  const { data: job, isLoading, isError, refetch } = useJob(jobId);
+  const [saved, setSaved] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+
+  const { shell } = useDashboardShell();
+
+  function handleShare() {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      void navigator.share({
+        title: job?.role,
+        text: `Confira esta vaga: ${job?.role} na ${job?.company}`,
+        url: window.location.href,
+      });
+    }
+  }
+
+  return (
+    <DashboardLayout
+      user={shell.user}
+      notifications={shell.notifications}
+      unreadNotifications={shell.unreadNotifications}
+      unreadMessages={shell.unreadMessages}
+      chatMessages={shell.chat}
+      contentClassName="max-w-[1400px]"
+      chatPanel={({ open, onClose }) => (
+        <MiniAIChat
+          open={open}
+          onClose={onClose}
+          messages={shell.chat}
+          userName={shell.user.firstName}
+          className="xl:fixed xl:inset-y-0 xl:right-0 xl:w-[340px]"
+        />
+      )}
+    >
+      {isLoading && <JobDetailsSkeleton />}
+
+      {isError && (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-16 text-center">
+          <AlertCircle
+            className="mb-4 h-10 w-10 text-[#EF4444]"
+            aria-hidden="true"
+          />
+          <h2 className="text-lg font-semibold text-white">
+            Erro ao carregar o dossiê
+          </h2>
+          <p className="mt-2 text-sm text-[#9CA3AF]">
+            Não conseguimos gerar o relatório desta vaga. Tente novamente.
+          </p>
+          <Button onClick={() => refetch()} className="mt-6 gap-2">
+            <RefreshCw className="h-4 w-4" aria-hidden="true" />
+            Tentar novamente
+          </Button>
+        </div>
+      )}
+
+      {!isLoading && !isError && !job && (
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-16 text-center">
+          <h2 className="text-lg font-semibold text-white">
+            Vaga não encontrada
+          </h2>
+          <p className="mt-2 text-sm text-[#9CA3AF]">
+            O dossiê desta oportunidade ainda não está disponível.
+          </p>
+          <Button
+            render={<Link href="/dashboard/vagas" />}
+            nativeButton={false}
+            className="mt-6"
+          >
+            Voltar para vagas
+          </Button>
+        </div>
+      )}
+
+      {job && (
+        <>
+          <div className="space-y-6 pb-24 lg:pb-8">
+            <JobHero
+              job={job}
+              saved={saved}
+              onSave={() => setSaved((s) => !s)}
+              onShare={handleShare}
+            />
+
+            <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
+              {/* Main column ~70% */}
+              <div className="min-w-0 space-y-6">
+                <WhyMatch job={job} />
+                <JobSections sections={job.sections} stack={job.stack} />
+                <TechComparison data={job.techComparison} />
+                <CompanyAnalysis
+                  company={job.company}
+                  logo={job.logo}
+                  color={job.color}
+                  profile={job.companyProfile}
+                  stats={job.stats}
+                />
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <CultureRadar data={job.culture} />
+                  <SalaryComparison data={job.salaryComparison} />
+                </div>
+                <HiringTimeline stages={job.hiringTimeline} />
+                <JobFAQSection faqs={job.faqs} />
+                <InterviewQuestions questions={job.interviewQuestions} />
+                <GithubProjects projects={job.githubProjects} />
+                <div className="grid gap-6 lg:grid-cols-2">
+                  <ResumeSuggestions suggestions={job.resumeSuggestions} />
+                  <PortfolioHighlights projects={job.portfolioProjects} />
+                </div>
+                <SimilarCompanies companies={job.similarCompanies} />
+                <RelatedJobs jobs={job.relatedJobs} />
+              </div>
+
+              {/* Right panel ~30% — desktop only */}
+              <ApplySidebar job={job} className="hidden lg:block" />
+            </div>
+          </div>
+
+          <MobileApplySheet
+            job={job}
+            open={sheetOpen}
+            onToggle={() => setSheetOpen((v) => !v)}
+          />
+        </>
+      )}
+    </DashboardLayout>
+  );
+}

@@ -7,11 +7,21 @@ import { DailyMissions } from "@/components/dashboard/daily-missions";
 import { EmployabilityMap } from "@/components/dashboard/employability-map";
 import { MarketRadar } from "@/components/dashboard/market-radar";
 import { AISuggestions } from "@/components/dashboard/ai-suggestions";
-import { MOCK_DASHBOARD } from "@/lib/dashboard/constants";
+import { EmptyJobsState } from "@/components/dashboard/empty-states";
+import { useDashboardShell } from "@/lib/dashboard/hooks";
 
 function EmployabilityContent() {
   const searchParams = useSearchParams();
   const skill = searchParams.get("skill") ?? undefined;
+  const { shell, data } = useDashboardShell();
+  const employability = data?.employability ?? shell.employability;
+  const overview = data?.employabilityOverview ?? shell.employabilityOverview;
+  const market = data?.market ?? shell.market;
+  const suggestions = data?.suggestions ?? shell.suggestions;
+
+  if (employability.length === 0) {
+    return <EmptyJobsState />;
+  }
 
   return (
     <div className="space-y-6">
@@ -26,40 +36,48 @@ function EmployabilityContent() {
         </p>
       </div>
 
-      <DailyMissions overview={MOCK_DASHBOARD.employabilityOverview} />
+      {overview.missions.length > 0 && <DailyMissions overview={overview} />}
 
       <EmployabilityMap
-        skills={MOCK_DASHBOARD.employability}
+        skills={employability}
         initialSkillId={skill ?? undefined}
       />
 
-      <div className="grid gap-4 lg:grid-cols-5">
-        <MarketRadar trends={MOCK_DASHBOARD.market} className="lg:col-span-3" />
-        <AISuggestions
-          suggestions={MOCK_DASHBOARD.suggestions}
-          stacked
-          className="lg:col-span-2"
-        />
-      </div>
+      {(market.length > 0 || suggestions.length > 0) && (
+        <div className="grid gap-4 lg:grid-cols-5">
+          {market.length > 0 && (
+            <MarketRadar trends={market} className="lg:col-span-3" />
+          )}
+          {suggestions.length > 0 && (
+            <AISuggestions
+              suggestions={suggestions}
+              stacked
+              className="lg:col-span-2"
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
 export function EmployabilityPage() {
+  const { shell, isLoading } = useDashboardShell();
+
   return (
     <DashboardLayout
-      user={MOCK_DASHBOARD.user}
-      notifications={MOCK_DASHBOARD.notifications}
-      unreadNotifications={MOCK_DASHBOARD.unreadNotifications}
-      unreadMessages={MOCK_DASHBOARD.unreadMessages}
-      chatMessages={MOCK_DASHBOARD.chat}
+      user={shell.user}
+      notifications={shell.notifications}
+      unreadNotifications={shell.unreadNotifications}
+      unreadMessages={shell.unreadMessages}
+      chatMessages={shell.chat}
     >
       <Suspense
         fallback={
           <div className="h-64 animate-pulse rounded-2xl bg-white/[0.03]" />
         }
       >
-        <EmployabilityContent />
+        {!isLoading && <EmployabilityContent />}
       </Suspense>
     </DashboardLayout>
   );

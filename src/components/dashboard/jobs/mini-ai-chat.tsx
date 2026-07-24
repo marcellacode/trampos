@@ -57,7 +57,7 @@ export function MiniAIChat({
           id: `a-${Date.now()}`,
           role: "assistant",
           content:
-            "Analisando seu perfil contra 12.483 vagas. Encontrei 4 oportunidades muito compatíveis — deseja que eu compare as duas melhores?",
+            "Recebi sua mensagem. Quando a busca de vagas estiver conectada, responderei com recomendações baseadas no seu perfil.",
           timestamp: new Date().toLocaleTimeString("pt-BR", {
             hour: "2-digit",
             minute: "2-digit",

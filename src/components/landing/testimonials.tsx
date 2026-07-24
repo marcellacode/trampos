@@ -9,6 +9,14 @@ import { TESTIMONIALS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export function Testimonials() {
+  if (TESTIMONIALS.length === 0) {
+    return null;
+  }
+
+  return <TestimonialsCarousel />;
+}
+
+function TestimonialsCarousel() {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
 

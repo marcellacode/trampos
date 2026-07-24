@@ -1,48 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useSpring, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { SUCCESS_STATS } from "@/lib/onboarding/constants";
 import { cn } from "@/lib/utils";
 
 interface SuccessScreenProps {
   onEnterDashboard: () => void;
   className?: string;
-}
-
-function AnimatedCounter({
-  value,
-  label,
-  delay = 0,
-}: {
-  value: number;
-  label: string;
-  delay?: number;
-}) {
-  const spring = useSpring(0, { stiffness: 60, damping: 20 });
-  const display = useTransform(spring, (current) =>
-    Math.round(current).toLocaleString("pt-BR")
-  );
-  const [text, setText] = useState("0");
-
-  useEffect(() => {
-    const timeout = window.setTimeout(() => spring.set(value), delay);
-    const unsubscribe = display.on("change", (v) => setText(v));
-    return () => {
-      window.clearTimeout(timeout);
-      unsubscribe();
-    };
-  }, [delay, display, spring, value]);
-
-  return (
-    <div className="rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-5 text-center backdrop-blur-sm">
-      <p className="text-2xl font-semibold tabular-nums text-white sm:text-3xl">
-        {text}
-      </p>
-      <p className="mt-1 text-xs text-[#9CA3AF] sm:text-sm">{label}</p>
-    </div>
-  );
 }
 
 export function SuccessScreen({
@@ -94,47 +58,15 @@ export function SuccessScreen({
         transition={{ delay: 0.25 }}
         className="mt-4 max-w-md text-sm leading-relaxed text-[#9CA3AF] sm:text-base"
       >
-        Sua IA já começou a procurar oportunidades.
+        Seu perfil foi salvo. A IA começará a procurar oportunidades assim que a
+        busca de vagas estiver conectada.
       </motion.p>
-
-      <motion.p
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.35 }}
-        className="mt-8 text-xs font-medium uppercase tracking-[0.2em] text-white/40"
-      >
-        Enquanto isso...
-      </motion.p>
-
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-3"
-        aria-label="Estatísticas em tempo real"
-      >
-        <AnimatedCounter
-          value={SUCCESS_STATS.jobsAnalyzed}
-          label="vagas analisadas"
-          delay={500}
-        />
-        <AnimatedCounter
-          value={SUCCESS_STATS.matches}
-          label="compatíveis"
-          delay={700}
-        />
-        <AnimatedCounter
-          value={SUCCESS_STATS.verifiedCompanies}
-          label="empresas verificadas"
-          delay={900}
-        />
-      </motion.div>
 
       <motion.button
         type="button"
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.55 }}
+        transition={{ delay: 0.4 }}
         whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
         onClick={onEnterDashboard}

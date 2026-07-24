@@ -7,19 +7,17 @@ export const NAV_LINKS = [
 ] as const;
 
 export const HERO_STATS = [
-  { value: "+12.000", label: "vagas monitoradas diariamente" },
-  { value: "95%", label: "média de compatibilidade" },
-  { value: "100%", label: "empresas verificadas" },
+  { value: "IA", label: "busca contínua de vagas" },
+  { value: "100%", label: "currículo personalizado por vaga" },
+  { value: "24/7", label: "acompanhamento automático" },
 ] as const;
 
 export const TERMINAL_ACTIONS = [
   { text: "Analisando perfil...", delay: 0 },
   { text: "Buscando vagas...", delay: 1.2 },
-  { text: "Compatibilidade 97%", delay: 2.4 },
-  { text: "Currículo personalizado", delay: 3.6 },
-  { text: "Carta de apresentação criada", delay: 4.8 },
-  { text: "Empresa visualizou candidatura", delay: 6.0 },
-  { text: "Entrevista agendada", delay: 7.2 },
+  { text: "Calculando compatibilidade...", delay: 2.4 },
+  { text: "Personalizando currículo...", delay: 3.6 },
+  { text: "Preparando candidatura...", delay: 4.8 },
 ] as const;
 
 export const COMPANIES = [
@@ -126,49 +124,21 @@ export const COMPARISON_FEATURES = [
   { label: "Monitoramento diário", indeed: false, linkedin: true, trampos: true },
 ] as const;
 
-export const TESTIMONIALS = [
-  {
-    name: "Ana Carolina Silva",
-    role: "Desenvolvedora Frontend",
-    company: "Nubank",
-    avatar: "AC",
-    text: "Em 3 semanas a IA conseguiu 4 entrevistas para mim. Eu nem sabia que essas vagas existiam. Mudou completamente minha busca por emprego.",
-  },
-  {
-    name: "Rafael Mendes",
-    role: "Product Manager",
-    company: "iFood",
-    avatar: "RM",
-    text: "O currículo adaptado para cada vaga fez toda diferença. Passei de 0 respostas para 60% de taxa de retorno em candidaturas.",
-  },
-  {
-    name: "Juliana Costa",
-    role: "Data Scientist",
-    company: "Mercado Livre",
-    avatar: "JC",
-    text: "A simulação de entrevistas me preparou para perguntas que nunca imaginei. Consegui minha vaga dos sonhos em menos de um mês.",
-  },
-  {
-    name: "Pedro Almeida",
-    role: "Engenheiro de Software",
-    company: "Google",
-    avatar: "PA",
-    text: "Trabalhava 12h por dia e não tinha tempo de procurar vagas. O Trampos AI fez tudo enquanto eu dormia. Incrível.",
-  },
-  {
-    name: "Mariana Santos",
-    role: "UX Designer",
-    company: "Spotify",
-    avatar: "MS",
-    text: "O dashboard mostra exatamente onde estou no processo. Nunca me senti tão no controle da minha carreira.",
-  },
-] as const;
+export type TestimonialItem = {
+  name: string;
+  role: string;
+  company: string;
+  avatar: string;
+  text: string;
+};
+
+export const TESTIMONIALS: TestimonialItem[] = [];
 
 export const FAQ_ITEMS = [
   {
     question: "Como a IA encontra vagas compatíveis com meu perfil?",
     answer:
-      "Nossa IA analisa seu currículo, experiências, skills e objetivos de carreira. Em seguida, monitora mais de 12.000 vagas diariamente em centenas de fontes, calculando um score de compatibilidade para cada oportunidade.",
+      "Nossa IA analisa seu currículo, experiências, skills e objetivos de carreira. Em seguida, monitora vagas em múltiplas fontes e calcula um score de compatibilidade para cada oportunidade.",
   },
   {
     question: "A IA realmente envia candidaturas por mim?",

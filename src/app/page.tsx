@@ -6,7 +6,6 @@ import { DemoSection } from "@/components/landing/demo-section";
 import { Features } from "@/components/landing/features";
 import { DashboardPreview } from "@/components/landing/dashboard-preview";
 import { Comparison } from "@/components/landing/comparison";
-import { Testimonials } from "@/components/landing/testimonials";
 import { FAQ } from "@/components/landing/faq";
 import { CtaFinal } from "@/components/landing/cta-final";
 import { Footer } from "@/components/landing/footer";
@@ -23,7 +22,6 @@ export default function HomePage() {
         <Features />
         <DashboardPreview />
         <Comparison />
-        <Testimonials />
         <FAQ />
         <CtaFinal />
       </main>

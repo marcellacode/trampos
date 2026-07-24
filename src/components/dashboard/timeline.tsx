@@ -45,13 +45,15 @@ export function Timeline({ items: seed, className }: TimelineProps) {
       <div className="relative p-6 sm:p-8">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
-            <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#22C55E]/25 bg-[#22C55E]/10 px-3 py-1 text-xs font-medium text-[#22C55E]">
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22C55E] opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
-              </span>
-              Ao vivo
-            </div>
+            {items.length > 0 && (
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-[#22C55E]/25 bg-[#22C55E]/10 px-3 py-1 text-xs font-medium text-[#22C55E]">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22C55E] opacity-60" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#22C55E]" />
+                </span>
+                Ao vivo
+              </div>
+            )}
             <h2
               id="timeline-heading"
               className="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
@@ -59,19 +61,31 @@ export function Timeline({ items: seed, className }: TimelineProps) {
               Linha do Tempo Viva
             </h2>
             <p className="mt-2 text-sm text-[#9CA3AF] sm:text-base">
-              Eventos chegam em tempo real — sem precisar recarregar.
+              {items.length > 0
+                ? "Eventos chegam em tempo real — sem precisar recarregar."
+                : "Quando houver atividade, os eventos aparecerão aqui automaticamente."}
             </p>
           </div>
-          <motion.div
-            animate={{ opacity: [1, 0.55, 1] }}
-            transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
-            className="hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 sm:flex"
-          >
-            <Bot className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
-            <span className="text-xs text-[#9CA3AF]">IA trabalhando</span>
-          </motion.div>
+          {items.length > 0 && (
+            <motion.div
+              animate={{ opacity: [1, 0.55, 1] }}
+              transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut" }}
+              className="hidden items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 sm:flex"
+            >
+              <Bot className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
+              <span className="text-xs text-[#9CA3AF]">IA trabalhando</span>
+            </motion.div>
+          )}
         </div>
 
+        {items.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-white/[0.1] px-4 py-10 text-center">
+            <p className="text-sm text-[#9CA3AF]">
+              Nenhuma atividade registrada ainda. Complete seu perfil para a IA
+              começar a buscar oportunidades.
+            </p>
+          </div>
+        ) : (
         <ol
           ref={listRef}
           className="relative max-h-[min(28rem,60vh)] space-y-0 overflow-y-auto pr-1"
@@ -183,6 +197,7 @@ export function Timeline({ items: seed, className }: TimelineProps) {
             })}
           </AnimatePresence>
         </ol>
+        )}
       </div>
     </section>
   );

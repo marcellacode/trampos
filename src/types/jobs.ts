@@ -137,3 +137,136 @@ export type HideReason =
   | "tech"
   | "company"
   | "other";
+
+export type TechLevel = "básico" | "intermediário" | "avançado";
+
+export interface TechRequirement {
+  name: string;
+  requiredLevel: TechLevel;
+  userLevel: TechLevel;
+  weight: number;
+}
+
+export interface CultureIndicator {
+  id: string;
+  label: string;
+  score: number;
+  description: string;
+}
+
+export interface CompanyProfile {
+  segment: string;
+  employees: string;
+  marketYears: number;
+  rating: number;
+  verified: boolean;
+}
+
+export interface SalaryComparisonData {
+  jobMin: number;
+  jobMax: number;
+  marketMin: number;
+  marketMax: number;
+  userExpectation: number;
+  insight: string;
+}
+
+export interface HiringStage {
+  id: string;
+  label: string;
+  avgDays: number;
+}
+
+export interface JobFAQ {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export interface InterviewQuestion {
+  id: string;
+  tech: string;
+  question: string;
+}
+
+export interface GithubProject {
+  id: string;
+  name: string;
+  description: string;
+  relevance: string;
+}
+
+export interface ResumeSuggestion {
+  id: string;
+  text: string;
+  type: "add" | "move" | "highlight";
+}
+
+export interface PortfolioProject {
+  id: string;
+  name: string;
+  description: string;
+  highlight: boolean;
+}
+
+export interface SimilarCompany {
+  id: string;
+  name: string;
+  logo: string;
+  color: string;
+  compatibility: number;
+  href: string;
+}
+
+export interface RelatedJob {
+  id: string;
+  company: string;
+  role: string;
+  compatibility: number;
+  salary: string;
+  logo: string;
+  color: string;
+  href: string;
+}
+
+export interface ApplyChecklistItem {
+  id: string;
+  label: string;
+  status: "done" | "pending" | "auto";
+}
+
+export interface WeightFactor {
+  label: string;
+  weight: number;
+}
+
+export interface JobSections {
+  summary: string[];
+  responsibilities: string[];
+  requirements: string[];
+  differentials: string[];
+  benefits: string[];
+}
+
+export interface JobDetail extends JobRecommendation {
+  publishedAt: string;
+  verified: boolean;
+  whyMatchSummary: string;
+  weightFactors: WeightFactor[];
+  sections: JobSections;
+  techComparison: TechRequirement[];
+  companyProfile: CompanyProfile;
+  culture: CultureIndicator[];
+  salaryComparison: SalaryComparisonData;
+  hiringTimeline: HiringStage[];
+  faqs: JobFAQ[];
+  interviewQuestions: InterviewQuestion[];
+  githubProjects: GithubProject[];
+  resumeSuggestions: ResumeSuggestion[];
+  portfolioProjects: PortfolioProject[];
+  similarCompanies: SimilarCompany[];
+  relatedJobs: RelatedJob[];
+  applyChecklist: ApplyChecklistItem[];
+  aiSummary: string;
+  aiSummaryReasons: string[];
+}

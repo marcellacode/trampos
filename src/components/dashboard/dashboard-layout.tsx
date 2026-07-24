@@ -19,6 +19,7 @@ interface DashboardLayoutProps {
   chatMessages: ChatMessage[];
   children: ReactNode;
   className?: string;
+  contentClassName?: string;
   chatPanel?: (props: { open: boolean; onClose: () => void }) => ReactNode;
 }
 
@@ -30,6 +31,7 @@ export function DashboardLayout({
   chatMessages,
   children,
   className,
+  contentClassName,
   chatPanel,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -70,7 +72,9 @@ export function DashboardLayout({
         />
 
         <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-          <div className="mx-auto max-w-6xl">{children}</div>
+          <div className={cn("mx-auto max-w-6xl", contentClassName)}>
+            {children}
+          </div>
         </main>
       </div>
 

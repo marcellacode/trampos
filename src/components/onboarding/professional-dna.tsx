@@ -14,6 +14,10 @@ interface ProfessionalDnaProps {
 }
 
 function formatSalary(range: SalaryRange): string {
+  if (range.min === 0 && range.max === 0) {
+    return "A definir";
+  }
+
   const formatter = new Intl.NumberFormat(
     range.currency === "BRL" ? "pt-BR" : "en-US",
     {

@@ -18,11 +18,10 @@ import { AvailabilityStep } from "@/components/onboarding/steps/availability-ste
 import {
   EMPTY_PROFILE,
   ERROR_MESSAGES,
-  MOCK_AI_SUGGESTIONS,
-  MOCK_PROFESSIONAL_DNA,
   ONBOARDING_TOTAL_STEPS,
   STEP_META,
 } from "@/lib/onboarding/constants";
+import { buildProfessionalDnaFromProfile } from "@/lib/onboarding/build-dna";
 import {
   persistOnboardingProfile,
   resolveImport,
@@ -205,26 +204,20 @@ export function OnboardingFlow() {
       let profile = { ...prev.profile };
 
       if (suggestion.type === "skill") {
-        const extras = ["Accessibility", "Performance"];
         profile = {
           ...profile,
-          skills: Array.from(new Set([...profile.skills, ...extras])),
+          skills: Array.from(
+            new Set([...profile.skills, suggestion.title.replace(/^Adicionar /i, "")])
+          ),
         };
       }
 
       if (suggestion.type === "github" || suggestion.type === "project") {
         const extraProject = {
           id: `proj-auto-${suggestion.id}`,
-          name:
-            suggestion.type === "github"
-              ? "Portfolio GitHub (14 projetos)"
-              : "Design System Atlas",
-          description:
-            suggestion.type === "github"
-              ? "Importação automática dos repositórios mais relevantes."
-              : "Biblioteca de componentes usada por 8 squads.",
-          tech: ["React", "TypeScript", "Storybook"],
-          stars: 142,
+          name: suggestion.title,
+          description: suggestion.description,
+          tech: profile.skills.slice(0, 3),
         };
         profile = {
           ...profile,
@@ -241,6 +234,11 @@ export function OnboardingFlow() {
       };
     });
   };
+
+  const professionalDna = useMemo(
+    () => buildProfessionalDnaFromProfile(data.profile, data.goalChips),
+    [data.profile, data.goalChips]
+  );
 
   const finishOnboarding = async () => {
     try {
@@ -426,7 +424,7 @@ export function OnboardingFlow() {
             <div className="flex flex-1 flex-col justify-center gap-8 py-6">
               <ProfilePreview
                 profile={data.profile}
-                suggestions={MOCK_AI_SUGGESTIONS}
+                suggestions={[]}
                 appliedSuggestions={data.appliedSuggestions}
                 onApplySuggestion={handleApplySuggestion}
               />
@@ -446,7 +444,7 @@ export function OnboardingFlow() {
 
           {step === "dna" && (
             <ProfessionalDnaReveal
-              dna={MOCK_PROFESSIONAL_DNA}
+              dna={professionalDna}
               onContinue={finishOnboarding}
               isLoading={persistMutation.isPending}
             />
