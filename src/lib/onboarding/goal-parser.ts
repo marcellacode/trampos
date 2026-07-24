@@ -17,8 +17,7 @@ const SKILL_PATTERNS: { pattern: RegExp; label: string }[] = [
 ];
 
 /**
- * Lightweight client-side goal parser.
- * Ready to be replaced by OpenAI / Anthropic interpretation endpoints.
+ * Lightweight client-side goal parser (fallback when Groq is unavailable).
  */
 export function parseGoalText(text: string): GoalChip[] {
   const chips: GoalChip[] = [];

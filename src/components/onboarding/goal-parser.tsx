@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useTransition } from "react";
+import { useEffect, useRef, useTransition } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Sparkles } from "lucide-react";
+import { interpretGoalsAction } from "@/app/actions/ai";
 import type { GoalChip } from "@/types/onboarding";
 import { parseGoalText } from "@/lib/onboarding/goal-parser";
 import { cn } from "@/lib/utils";
@@ -23,6 +24,7 @@ export function GoalParser({
   className,
 }: GoalParserProps) {
   const [, startTransition] = useTransition();
+  const requestId = useRef(0);
 
   useEffect(() => {
     if (value.trim().length < 10) {
@@ -31,10 +33,20 @@ export function GoalParser({
     }
 
     const timer = window.setTimeout(() => {
-      startTransition(() => {
-        onChipsChange(parseGoalText(value));
+      const currentRequest = ++requestId.current;
+
+      startTransition(async () => {
+        const result = await interpretGoalsAction(value);
+
+        if (currentRequest !== requestId.current) return;
+
+        if (result.success && result.data.chips.length > 0) {
+          onChipsChange(result.data.chips);
+        } else {
+          onChipsChange(parseGoalText(value));
+        }
       });
-    }, 320);
+    }, 480);
 
     return () => window.clearTimeout(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only re-parse when text changes

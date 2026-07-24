@@ -1,3 +1,4 @@
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { LoginPage } from "@/components/auth/login-page";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
@@ -13,6 +14,33 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
+  if (
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  ) {
+    try {
+      const supabase = await createServerSupabaseClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("onboarding_completed")
+          .eq("id", user.id)
+          .maybeSingle();
+
+        redirect(profile?.onboarding_completed ? "/dashboard" : "/onboarding");
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message === "NEXT_REDIRECT") {
+        throw error;
+      }
+      // Login still works without redirect check.
+    }
+  }
+
   let activities: Awaited<ReturnType<typeof fetchRecentJobActivity>> = [];
   let testimonials: Awaited<ReturnType<typeof fetchAuthTestimonials>> = [];
 

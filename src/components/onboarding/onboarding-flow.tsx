@@ -24,8 +24,8 @@ import {
 import { buildProfessionalDnaFromProfile } from "@/lib/onboarding/build-dna";
 import {
   persistOnboardingProfile,
+  processOnboardingComplete,
   resolveImport,
-  triggerN8nOnboardingWebhook,
 } from "@/lib/integrations/onboarding";
 import { useProfile } from "@/lib/profile/hooks";
 import type {
@@ -141,10 +141,11 @@ export function OnboardingFlow() {
   const persistMutation = useMutation({
     mutationFn: async (payload: OnboardingData) => {
       const result = await persistOnboardingProfile(payload);
-      await triggerN8nOnboardingWebhook({
+      await processOnboardingComplete({
         event: "onboarding.completed",
         profileId: result.id,
         importMethod: payload.importMethod,
+        goalText: payload.goalText,
       });
       return result;
     },

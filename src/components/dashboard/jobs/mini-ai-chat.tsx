@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GitCompare, Send, Sparkles, X } from "lucide-react";
+import { jobeChatAction } from "@/app/actions/ai";
 import type { ChatMessage } from "@/types/dashboard";
 import { AUTH_BRAND } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
@@ -32,14 +33,13 @@ export function MiniAIChat({
 }: MiniAIChatProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
-    e.preventDefault();
-    const text = input.trim();
-    if (!text) return;
+  async function sendMessage(text: string) {
+    if (!text.trim() || loading) return;
 
     const userMsg: ChatMessage = {
-      id: `u-${Date.now()}`,
+      id: `u-${crypto.randomUUID()}`,
       role: "user",
       content: text,
       timestamp: new Date().toLocaleTimeString("pt-BR", {
@@ -50,26 +50,35 @@ export function MiniAIChat({
 
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setLoading(true);
 
-    window.setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `a-${Date.now()}`,
-          role: "assistant",
-          content:
-            "Recebi sua mensagem. Quando a busca de vagas estiver conectada, responderei com recomendações baseadas no seu perfil.",
-          timestamp: new Date().toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
-    }, 700);
+    const result = await jobeChatAction(text, "jobs");
+
+    setLoading(false);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `a-${crypto.randomUUID()}`,
+        role: "assistant",
+        content: result.success
+          ? result.data.content
+          : result.error,
+        timestamp: new Date().toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
+  }
+
+  function handleSubmit(e: FormEvent) {
+    e.preventDefault();
+    void sendMessage(input);
   }
 
   function sendQuickPrompt(prompt: string) {
-    setInput(prompt);
+    void sendMessage(prompt);
   }
 
   return (
@@ -84,41 +93,53 @@ export function MiniAIChat({
             "fixed inset-y-0 right-0 z-40 flex w-full max-w-[340px] flex-col border-l border-white/[0.06] bg-[#0C0D0F] xl:static xl:z-0",
             className
           )}
-          aria-label={`${AUTH_BRAND.assistantName} — descoberta de vagas`}
+          aria-label={`${AUTH_BRAND.assistantName} — vagas`}
         >
           <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-4">
             <div className="flex items-center gap-2.5">
               <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7CFF]/15 ring-1 ring-[#4F7CFF]/30">
                 <Sparkles className="h-3.5 w-3.5 text-[#4F7CFF]" aria-hidden="true" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-[#22C55E] ring-2 ring-[#0C0D0F]" />
               </div>
               <div>
                 <p className="text-sm font-medium text-white">{AUTH_BRAND.assistantName}</p>
-                <p className="text-[11px] text-[#22C55E]">Descobrindo vagas</p>
+                <p className="text-[11px] text-[#9CA3AF]">
+                  {loading ? "Analisando..." : "Assistente de vagas"}
+                </p>
               </div>
             </div>
             <button
               type="button"
               onClick={onClose}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
-              aria-label={`Fechar ${AUTH_BRAND.assistantName}`}
+              aria-label="Fechar chat"
             >
               <X className="h-4 w-4" />
             </button>
           </div>
 
-          {onCompare && (
-            <div className="border-b border-white/[0.06] px-4 py-3">
+          <div className="flex flex-wrap gap-2 border-b border-white/[0.06] px-4 py-3">
+            {QUICK_PROMPTS.map((prompt) => (
+              <button
+                key={prompt}
+                type="button"
+                onClick={() => sendQuickPrompt(prompt)}
+                disabled={loading}
+                className="rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[11px] text-[#9CA3AF] transition-colors hover:border-[#4F7CFF]/30 hover:text-white disabled:opacity-40"
+              >
+                {prompt}
+              </button>
+            ))}
+            {onCompare && (
               <button
                 type="button"
                 onClick={onCompare}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#4F7CFF]/25 bg-[#4F7CFF]/10 px-3 py-2 text-xs font-medium text-[#4F7CFF] transition-colors hover:bg-[#4F7CFF]/15"
+                className="inline-flex items-center gap-1 rounded-full border border-[#4F7CFF]/30 bg-[#4F7CFF]/10 px-2.5 py-1 text-[11px] text-[#A8C0FF]"
               >
-                <GitCompare className="h-3.5 w-3.5" aria-hidden="true" />
-                Comparar vagas selecionadas
+                <GitCompare className="h-3 w-3" aria-hidden="true" />
+                Comparar
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
           <div className="flex-1 space-y-3 overflow-y-auto p-4">
             {messages.map((msg) => (
@@ -139,21 +160,15 @@ export function MiniAIChat({
                 </span>
               </motion.div>
             ))}
-          </div>
-
-          <div className="border-t border-white/[0.06] px-3 pt-2">
-            <div className="mb-2 flex gap-1.5 overflow-x-auto pb-1 scrollbar-none">
-              {QUICK_PROMPTS.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => sendQuickPrompt(prompt)}
-                  className="shrink-0 rounded-full border border-white/[0.08] bg-white/[0.03] px-2.5 py-1 text-[10px] text-[#9CA3AF] transition-colors hover:border-white/[0.14] hover:text-white"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
+            {loading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="max-w-[90%] rounded-2xl rounded-tl-md bg-white/[0.04] px-3.5 py-2.5 text-sm text-[#9CA3AF]"
+              >
+                Jobe está analisando...
+              </motion.div>
+            )}
           </div>
 
           <form
@@ -167,10 +182,11 @@ export function MiniAIChat({
                 placeholder={`Pergunte algo, ${userName.split(" ")[0]}...`}
                 className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
                 aria-label={`Mensagem para ${AUTH_BRAND.assistantName}`}
+                disabled={loading}
               />
               <button
                 type="submit"
-                disabled={!input.trim()}
+                disabled={!input.trim() || loading}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#4F7CFF] text-white transition-opacity disabled:opacity-40"
                 aria-label="Enviar"
               >

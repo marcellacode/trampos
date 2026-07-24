@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useId, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Command, Search, Sparkles } from "lucide-react";
+import { ArrowRight, Command, Loader2, Search, Sparkles } from "lucide-react";
+import { universalSearchAction } from "@/app/actions/ai";
 import { SEARCH_EXAMPLES } from "@/lib/dashboard/constants";
 import { cn } from "@/lib/utils";
 
@@ -19,9 +21,12 @@ export function UniversalSearch({
   className,
   compact = false,
 }: UniversalSearchProps) {
+  const router = useRouter();
   const [internalOpen, setInternalOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [exampleIndex, setExampleIndex] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
 
@@ -41,17 +46,22 @@ export function UniversalSearch({
     return () => window.clearInterval(id);
   }, []);
 
+  const openSearch = useCallback(() => {
+    setFeedback(null);
+    setOpen(true);
+  }, [setOpen]);
+
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
-        setOpen(true);
+        openSearch();
       }
       if (e.key === "Escape") setOpen(false);
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [setOpen]);
+  }, [openSearch, setOpen]);
 
   useEffect(() => {
     if (open) {
@@ -61,21 +71,39 @@ export function UniversalSearch({
   }, [open]);
 
   const handleSubmit = useCallback(
-    (value?: string) => {
+    async (value?: string) => {
       const q = (value ?? query).trim();
-      if (!q) return;
-      // Ready for OpenAI / n8n / Server Actions
-      setOpen(false);
+      if (!q || loading) return;
+
+      setLoading(true);
+      setFeedback(null);
+
+      const result = await universalSearchAction(q);
+      setLoading(false);
+
+      if (!result.success) {
+        setFeedback(result.error);
+        return;
+      }
+
+      if (result.data.type === "navigate") {
+        setOpen(false);
+        setQuery("");
+        router.push(result.data.href);
+        return;
+      }
+
+      setFeedback(result.data.content);
       setQuery("");
     },
-    [query, setOpen]
+    [query, loading, router, setOpen]
   );
 
   return (
     <>
       <button
         type="button"
-        onClick={() => setOpen(true)}
+        onClick={openSearch}
         className={cn(
           "group flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left transition-all hover:border-white/[0.14] hover:bg-white/[0.05]",
           compact ? "h-9 w-9 justify-center px-0" : "h-10 w-full max-w-xl px-3",
@@ -134,17 +162,28 @@ export function UniversalSearch({
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") handleSubmit();
+                    if (e.key === "Enter") void handleSubmit();
                   }}
                   placeholder="Pergunte qualquer coisa..."
                   className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
                   aria-autocomplete="list"
                   aria-controls={listId}
+                  disabled={loading}
                 />
-                <kbd className="rounded-md border border-white/[0.08] px-1.5 py-0.5 text-[10px] text-[#9CA3AF]">
-                  ESC
-                </kbd>
+                {loading ? (
+                  <Loader2 className="h-4 w-4 animate-spin text-[#4F7CFF]" />
+                ) : (
+                  <kbd className="rounded-md border border-white/[0.08] px-1.5 py-0.5 text-[10px] text-[#9CA3AF]">
+                    ESC
+                  </kbd>
+                )}
               </div>
+
+              {feedback && (
+                <div className="border-b border-white/[0.06] px-4 py-3 text-sm text-white/90">
+                  {feedback}
+                </div>
+              )}
 
               <div id={listId} className="p-2">
                 <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-[#9CA3AF]/70">
@@ -154,8 +193,9 @@ export function UniversalSearch({
                   <button
                     key={example}
                     type="button"
-                    onClick={() => handleSubmit(example)}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-[#9CA3AF] transition-colors hover:bg-white/[0.04] hover:text-white"
+                    onClick={() => void handleSubmit(example)}
+                    disabled={loading}
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-[#9CA3AF] transition-colors hover:bg-white/[0.04] hover:text-white disabled:opacity-40"
                   >
                     <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     <span className="flex-1">{example}</span>

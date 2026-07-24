@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Send, Sparkles, X } from "lucide-react";
+import { jobeChatAction } from "@/app/actions/ai";
 import type { ChatMessage } from "@/types/dashboard";
 import { AUTH_BRAND } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
@@ -24,14 +25,15 @@ export function MiniChat({
 }: MiniChatProps) {
   const [messages, setMessages] = useState(initialMessages);
   const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     const text = input.trim();
-    if (!text) return;
+    if (!text || loading) return;
 
     const userMsg: ChatMessage = {
-      id: `u-${Date.now()}`,
+      id: `u-${crypto.randomUUID()}`,
       role: "user",
       content: text,
       timestamp: new Date().toLocaleTimeString("pt-BR", {
@@ -42,23 +44,26 @@ export function MiniChat({
 
     setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    setLoading(true);
 
-    // Placeholder for OpenAI / n8n / WebSocket realtime
-    window.setTimeout(() => {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `a-${Date.now()}`,
-          role: "assistant",
-          content:
-            "Recebi sua mensagem. Assim que a integração com a IA estiver ativa, responderei com base no seu perfil e nas suas vagas.",
-          timestamp: new Date().toLocaleTimeString("pt-BR", {
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-        },
-      ]);
-    }, 700);
+    const result = await jobeChatAction(text, "copilot");
+
+    setLoading(false);
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: `a-${crypto.randomUUID()}`,
+        role: "assistant",
+        content: result.success
+          ? result.data.content
+          : result.error,
+        timestamp: new Date().toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        }),
+      },
+    ]);
   }
 
   return (
@@ -83,7 +88,9 @@ export function MiniChat({
               </div>
               <div>
                 <p className="text-sm font-medium text-white">{AUTH_BRAND.assistantName}</p>
-                <p className="text-[11px] text-[#22C55E]">Online · trabalhando</p>
+                <p className="text-[11px] text-[#22C55E]">
+                  {loading ? "Digitando..." : "Online · trabalhando"}
+                </p>
               </div>
             </div>
             <button
@@ -115,6 +122,15 @@ export function MiniChat({
                 </span>
               </motion.div>
             ))}
+            {loading && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="max-w-[90%] rounded-2xl rounded-tl-md bg-white/[0.04] px-3.5 py-2.5 text-sm text-[#9CA3AF]"
+              >
+                Jobe está pensando...
+              </motion.div>
+            )}
           </div>
 
           <form
@@ -128,10 +144,11 @@ export function MiniChat({
                 placeholder={`Pergunte algo, ${userName.split(" ")[0]}...`}
                 className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
                 aria-label={`Mensagem para ${AUTH_BRAND.assistantName}`}
+                disabled={loading}
               />
               <button
                 type="submit"
-                disabled={!input.trim()}
+                disabled={!input.trim() || loading}
                 className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#4F7CFF] text-white transition-opacity disabled:opacity-40"
                 aria-label="Enviar"
               >

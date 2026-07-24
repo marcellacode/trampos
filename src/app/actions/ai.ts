@@ -1,0 +1,368 @@
+"use server";
+
+import { z } from "zod";
+import { chatCompletion } from "@/lib/ai/groq";
+import { isGroqConfigured } from "@/lib/ai/env";
+import { buildJobeContext, JOBE_SYSTEM_PROMPT } from "@/lib/ai/jobe-prompt";
+import { checkRateLimit } from "@/lib/ai/rate-limit";
+import { extractResumeText } from "@/lib/ai/resume-text";
+import {
+  extractedProfileAiSchema,
+  interpretGoalsResponseSchema,
+  mapAiChipsToGoalChips,
+  mapAiProfileToExtracted,
+  onboardingCompleteResponseSchema,
+  universalSearchResponseSchema,
+  type UniversalSearchResult,
+} from "@/lib/ai/schemas";
+import { AuthError, requireAuth } from "@/lib/auth/require-auth";
+import { parseGoalText } from "@/lib/onboarding/goal-parser";
+import { fetchProfileData } from "@/lib/supabase/queries/profile";
+import { createChatMessage } from "@/lib/supabase/queries/mutations/chat";
+import type { ExtractedProfile, GoalChip } from "@/types/onboarding";
+
+export type ActionResult<T> =
+  | { success: true; data: T }
+  | { success: false; error: string };
+
+function toActionError(error: unknown): ActionResult<never> {
+  if (error instanceof AuthError) {
+    return { success: false, error: error.message };
+  }
+
+  if (error instanceof Error) {
+    return { success: false, error: error.message };
+  }
+
+  return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." };
+}
+
+function enforceRateLimit(userId: string): ActionResult<never> | null {
+  const { allowed, retryAfterMs } = checkRateLimit(userId);
+  if (!allowed) {
+    const seconds = Math.ceil((retryAfterMs ?? 60_000) / 1000);
+    return {
+      success: false,
+      error: `Muitas requisições. Aguarde ${seconds}s e tente novamente.`,
+    };
+  }
+  return null;
+}
+
+export async function jobeChatAction(
+  message: string,
+  context = "copilot"
+): Promise<ActionResult<{ content: string }>> {
+  try {
+    const trimmed = message.trim();
+    if (!trimmed) {
+      return { success: false, error: "Digite uma mensagem." };
+    }
+
+    const { supabase, user } = await requireAuth();
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    if (!isGroqConfigured()) {
+      return {
+        success: false,
+        error:
+          "A IA do Jobe não está configurada. Adicione GROQ_API_KEY ao servidor.",
+      };
+    }
+
+    const profile = await fetchProfileData(supabase, user.id);
+    const systemContent = `${JOBE_SYSTEM_PROMPT}\n\n${buildJobeContext(profile)}`;
+
+    const content = await chatCompletion([
+      { role: "system", content: systemContent },
+      { role: "user", content: trimmed },
+    ]);
+
+    await createChatMessage(supabase, user.id, {
+      context,
+      role: "user",
+      content: trimmed,
+    });
+    await createChatMessage(supabase, user.id, {
+      context,
+      role: "assistant",
+      content,
+    });
+
+    return { success: true, data: { content } };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function interpretGoalsAction(
+  text: string
+): Promise<ActionResult<{ chips: GoalChip[] }>> {
+  try {
+    const trimmed = text.trim();
+    if (trimmed.length < 10) {
+      return { success: true, data: { chips: [] } };
+    }
+
+    const { user } = await requireAuth();
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    if (!isGroqConfigured()) {
+      return { success: true, data: { chips: parseGoalText(trimmed) } };
+    }
+
+    try {
+      const raw = await chatCompletion(
+        [
+          {
+            role: "system",
+            content: `Você interpreta objetivos de carreira em português brasileiro.
+Retorne JSON: { "chips": [{ "label": string, "category": "skill"|"role"|"location"|"salary"|"contract"|"model" }] }
+Extraia habilidades, cargo desejado, localização, salário, tipo de contrato e modelo de trabalho.
+Máximo 12 chips. Labels curtos em PT-BR.`,
+          },
+          { role: "user", content: trimmed },
+        ],
+        { jsonMode: true, temperature: 0.2 }
+      );
+
+      const parsed = interpretGoalsResponseSchema.parse(JSON.parse(raw));
+      return {
+        success: true,
+        data: { chips: mapAiChipsToGoalChips(parsed.chips) },
+      };
+    } catch {
+      return { success: true, data: { chips: parseGoalText(trimmed) } };
+    }
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function parseResumeAction(
+  formData: FormData
+): Promise<ActionResult<{ profile: ExtractedProfile }>> {
+  try {
+    const { user } = await requireAuth();
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    const file = formData.get("file");
+    if (!(file instanceof File)) {
+      return { success: false, error: "Arquivo obrigatório." };
+    }
+
+    const extracted = await extractResumeText(file);
+    if ("error" in extracted) {
+      return { success: false, error: extracted.error };
+    }
+
+    if (!isGroqConfigured()) {
+      return {
+        success: false,
+        error:
+          "IA indisponível para analisar currículos. Configure GROQ_API_KEY.",
+      };
+    }
+
+    const raw = await chatCompletion(
+      [
+        {
+          role: "system",
+          content: `Extraia dados de currículo em português ou inglês.
+Retorne JSON com: name, currentRole, summary, avatarInitials (2 letras), seniority,
+skills (string[]), experiences [{company, role, period, description}],
+languages [{name, level}], projects [{name, description, tech[]}], certificates [{name, issuer, year}].
+Não invente informações ausentes no texto.`,
+        },
+        { role: "user", content: extracted.text },
+      ],
+      { jsonMode: true, temperature: 0.1, maxTokens: 2048 }
+    );
+
+    const parsed = extractedProfileAiSchema.parse(JSON.parse(raw));
+    return {
+      success: true,
+      data: { profile: mapAiProfileToExtracted(parsed) },
+    };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+const onboardingPayloadSchema = z.object({
+  event: z.string(),
+  profileId: z.string(),
+  importMethod: z.string().nullable(),
+  goalText: z.string().optional(),
+});
+
+export async function processOnboardingCompleteAction(
+  payload: z.infer<typeof onboardingPayloadSchema>
+): Promise<ActionResult<{ suggestionsCount: number }>> {
+  try {
+    const { supabase, user } = await requireAuth();
+    const data = onboardingPayloadSchema.parse(payload);
+
+    if (data.profileId !== user.id) {
+      return { success: false, error: "Perfil inválido." };
+    }
+
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    if (!isGroqConfigured()) {
+      return { success: true, data: { suggestionsCount: 0 } };
+    }
+
+    const profile = await fetchProfileData(supabase, user.id);
+    if (!profile) {
+      return { success: true, data: { suggestionsCount: 0 } };
+    }
+
+    const goalContext = data.goalText ? `\nMetas: ${data.goalText}` : "";
+
+    const raw = await chatCompletion(
+      [
+        {
+          role: "system",
+          content: `Você enriquece perfis profissionais para a Jobera.
+Retorne JSON: {
+  "predominantProfile": string,
+  "strengths": string[] (3-5 pontos fortes),
+  "suggestions": [{ "title", "description", "actionLabel", "type": "github"|"linkedin"|"skill"|"project"|"experience" }] (2-4 sugestões)
+}
+Baseie-se apenas no perfil real. PT-BR.`,
+        },
+        {
+          role: "user",
+          content: `${buildJobeContext(profile)}${goalContext}\nMétodo de importação: ${data.importMethod ?? "desconhecido"}`,
+        },
+      ],
+      { jsonMode: true, temperature: 0.4 }
+    );
+
+    const parsed = onboardingCompleteResponseSchema.parse(JSON.parse(raw));
+
+    await supabase.from("profile_ai_suggestions").delete().eq("user_id", user.id);
+
+    if (parsed.suggestions.length > 0) {
+      const { error } = await supabase.from("profile_ai_suggestions").insert(
+        parsed.suggestions.map((suggestion) => ({
+          user_id: user.id,
+          title: suggestion.title,
+          description: suggestion.description,
+          action_label: suggestion.actionLabel,
+          suggestion_type: suggestion.type,
+        }))
+      );
+      if (error) throw error;
+    }
+
+    if (parsed.predominantProfile || parsed.strengths.length > 0) {
+      const { data: existingDna } = await supabase
+        .from("professional_dna")
+        .select("id")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (existingDna?.id) {
+        await supabase
+          .from("dna_strengths")
+          .delete()
+          .eq("dna_id", existingDna.id);
+      }
+
+      const { data: dnaRow, error: dnaError } = await supabase
+        .from("professional_dna")
+        .upsert(
+          {
+            user_id: user.id,
+            predominant_profile:
+              parsed.predominantProfile ?? profile.currentRole ?? "Perfil em construção",
+            with_skills_label: "novas competências",
+          },
+          { onConflict: "user_id" }
+        )
+        .select("id")
+        .single();
+
+      if (dnaError) throw dnaError;
+
+      if (parsed.strengths.length > 0) {
+        const { error: strengthsError } = await supabase
+          .from("dna_strengths")
+          .insert(
+            parsed.strengths.map((strength, index) => ({
+              dna_id: dnaRow.id,
+              strength,
+              sort_order: index,
+            }))
+          );
+        if (strengthsError) throw strengthsError;
+      }
+    }
+
+    return {
+      success: true,
+      data: { suggestionsCount: parsed.suggestions.length },
+    };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function universalSearchAction(
+  query: string
+): Promise<ActionResult<UniversalSearchResult>> {
+  try {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      return { success: false, error: "Digite uma busca." };
+    }
+
+    const { supabase, user } = await requireAuth();
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    if (!isGroqConfigured()) {
+      return {
+        success: true,
+        data: {
+          type: "answer",
+          content:
+            "A busca inteligente requer GROQ_API_KEY configurada. Enquanto isso, use o menu Vagas no dashboard.",
+        },
+      };
+    }
+
+    const profile = await fetchProfileData(supabase, user.id);
+
+    const raw = await chatCompletion(
+      [
+        {
+          role: "system",
+          content: `Você interpreta buscas no dashboard Jobera.
+Rotas disponíveis: /dashboard, /dashboard/vagas, /dashboard/curriculo, /dashboard/objetivos, /dashboard/empregabilidade, /dashboard/entrevistas, /dashboard/mensagens, /dashboard/configuracoes.
+Retorne JSON:
+- { "type": "navigate", "href": "/dashboard/...", "message": "opcional" } para navegar
+- { "type": "answer", "content": "resposta curta" } para perguntas gerais
+Para vagas remotas/React/etc, use /dashboard/vagas com query params se fizer sentido.`,
+        },
+        {
+          role: "user",
+          content: `Busca: "${trimmed}"\n${buildJobeContext(profile)}`,
+        },
+      ],
+      { jsonMode: true, temperature: 0.2 }
+    );
+
+    const parsed = universalSearchResponseSchema.parse(JSON.parse(raw));
+    return { success: true, data: parsed };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+

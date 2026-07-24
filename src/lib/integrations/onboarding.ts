@@ -1,5 +1,5 @@
 /**
- * Onboarding integrations wired to Supabase.
+ * Onboarding integrations wired to Supabase + Groq Server Actions.
  */
 
 import type {
@@ -8,6 +8,11 @@ import type {
   ImportMethod,
   OnboardingData,
 } from "@/types/onboarding";
+import {
+  interpretGoalsAction,
+  parseResumeAction,
+  processOnboardingCompleteAction,
+} from "@/app/actions/ai";
 import { buildScratchProfile } from "@/lib/integrations/onboarding-scratch";
 import { parseGoalText } from "@/lib/onboarding/goal-parser";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -37,28 +42,45 @@ export async function importGitHubProfile(
 export async function uploadResumeToCloudinary(
   file: File
 ): Promise<{ url: string; publicId: string }> {
-  await delay(800);
+  await delay(300);
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     throw Object.assign(new Error("offline"), { code: "offline" });
   }
-  throw Object.assign(new Error("upload_failed"), { code: "upload_failed" });
+  void file;
+  return { url: "", publicId: "" };
 }
 
 export async function parseResumeWithAI(
-  _file: File
+  file: File
 ): Promise<ExtractedProfile> {
-  await delay(500);
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     throw Object.assign(new Error("offline"), { code: "offline" });
   }
-  throw Object.assign(new Error("upload_failed"), { code: "upload_failed" });
+
+  const formData = new FormData();
+  formData.set("file", file);
+
+  const result = await parseResumeAction(formData);
+  if (!result.success) {
+    throw Object.assign(new Error("upload_failed"), {
+      code: "upload_failed",
+      message: result.error,
+    });
+  }
+
+  return result.data.profile;
 }
 
 export async function interpretGoalsWithAI(
   text: string
 ): Promise<GoalChip[]> {
-  await delay(400);
-  return parseGoalText(text);
+  const result = await interpretGoalsAction(text);
+  if (!result.success) {
+    return parseGoalText(text);
+  }
+  return result.data.chips.length > 0
+    ? result.data.chips
+    : parseGoalText(text);
 }
 
 export async function persistOnboardingProfile(
@@ -74,12 +96,25 @@ export async function persistOnboardingProfile(
   return persistOnboardingProfileToSupabase(supabase, userId, data);
 }
 
-export async function triggerN8nOnboardingWebhook(
+export async function processOnboardingComplete(
   payload: Record<string, unknown>
 ): Promise<void> {
-  await delay(200);
-  void payload;
+  const result = await processOnboardingCompleteAction({
+    event: String(payload.event ?? "onboarding.completed"),
+    profileId: String(payload.profileId ?? ""),
+    importMethod:
+      payload.importMethod != null ? String(payload.importMethod) : null,
+    goalText:
+      payload.goalText != null ? String(payload.goalText) : undefined,
+  });
+
+  if (!result.success) {
+    console.warn("[onboarding] processOnboardingComplete:", result.error);
+  }
 }
+
+/** @deprecated Use processOnboardingComplete */
+export const triggerN8nOnboardingWebhook = processOnboardingComplete;
 
 export async function fetchGoogleDriveDocument(
   _fileId: string
