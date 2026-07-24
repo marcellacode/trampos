@@ -3,6 +3,7 @@ export { SmartFilters } from "./smart-filters";
 export { DiscoverySummaryBar } from "./discovery-summary";
 export { CompatibilityBar } from "./compatibility-bar";
 export { ApprovalProbabilityCard } from "./approval-probability-card";
+export { BestSendTimeCard } from "./best-send-time-card";
 export { RecommendationCard } from "./recommendation-card";
 export { CompanyCarousel } from "./company-carousel";
 export { OpportunityMap } from "./opportunity-map";

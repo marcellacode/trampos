@@ -37,12 +37,19 @@ export interface ApprovalProbability {
   simulation: ApprovalSimulation;
 }
 
+export interface BestSendTime {
+  dayLabel: string;
+  timeRange: string;
+  insight: string;
+}
+
 export interface JobRecommendation {
   id: string;
   company: string;
   role: string;
   compatibility: number;
   approvalProbability: ApprovalProbability;
+  bestSendTime: BestSendTime;
   salary: string;
   salaryMin: number;
   salaryMax: number;

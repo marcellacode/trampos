@@ -16,6 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { CompatibilityBar } from "@/components/dashboard/jobs/compatibility-bar";
 import { ApprovalProbabilityCard } from "@/components/dashboard/jobs/approval-probability-card";
+import { BestSendTimeCard } from "@/components/dashboard/jobs/best-send-time-card";
 import { HIDE_REASONS } from "@/lib/jobs/constants";
 import type { HideReason, JobRecommendation } from "@/types/jobs";
 import { cn } from "@/lib/utils";
@@ -120,6 +121,10 @@ export function RecommendationCard({
 
       <div className="relative mt-4">
         <ApprovalProbabilityCard data={job.approvalProbability} />
+      </div>
+
+      <div className="relative mt-4">
+        <BestSendTimeCard data={job.bestSendTime} />
       </div>
 
       {/* Por que essa vaga? */}

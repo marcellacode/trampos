@@ -41,6 +41,12 @@ export const MOCK_DISCOVERY: DiscoveryData = {
           suggestion: "Treine Docker antes.",
         },
       },
+      bestSendTime: {
+        dayLabel: "Hoje",
+        timeRange: "09:00–10:30",
+        insight:
+          "Empresas semelhantes respondem mais rápido nesse horário.",
+      },
       salary: "R$ 18.000 – R$ 24.000",
       salaryMin: 18000,
       salaryMax: 24000,
@@ -90,6 +96,12 @@ export const MOCK_DISCOVERY: DiscoveryData = {
           suggestion: "Pratique system design de APIs de pagamento.",
         },
       },
+      bestSendTime: {
+        dayLabel: "Amanhã",
+        timeRange: "08:30–10:00",
+        insight:
+          "Recrutadores internacionais costumam revisar candidaturas neste intervalo.",
+      },
       salary: "US$ 140k – US$ 180k",
       salaryMin: 140000,
       salaryMax: 180000,
@@ -137,6 +149,12 @@ export const MOCK_DISCOVERY: DiscoveryData = {
           suggestion: "Revise conceitos de Kotlin e Kubernetes.",
         },
       },
+      bestSendTime: {
+        dayLabel: "Hoje",
+        timeRange: "14:00–16:00",
+        insight:
+          "Empresas de food tech tendem a responder mais rápido à tarde.",
+      },
       salary: "R$ 12.000 – R$ 16.000",
       salaryMin: 12000,
       salaryMax: 16000,
@@ -182,6 +200,12 @@ export const MOCK_DISCOVERY: DiscoveryData = {
           ],
           suggestion: "Prepare um talk ou artigo sobre Next.js.",
         },
+      },
+      bestSendTime: {
+        dayLabel: "Segunda-feira",
+        timeRange: "10:00–11:30",
+        insight:
+          "Startups globais abrem a semana revisando candidaturas de engenharia.",
       },
       salary: "US$ 120k – US$ 155k",
       salaryMin: 120000,
