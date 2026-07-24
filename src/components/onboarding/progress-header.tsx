@@ -8,7 +8,7 @@ interface ProgressHeaderProps {
   totalSteps?: number;
 }
 
-export function ProgressHeader({ step, totalSteps = 6 }: ProgressHeaderProps) {
+export function ProgressHeader({ step, totalSteps = 7 }: ProgressHeaderProps) {
   const progress = Math.min(100, Math.max(0, (step / totalSteps) * 100));
 
   return (

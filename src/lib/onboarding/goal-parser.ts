@@ -83,5 +83,11 @@ export function parseGoalText(text: string): GoalChip[] {
   if (/\binternacional\b|\bexterior\b|\beua\b|\beuropa\b/i.test(text))
     push("Internacional", "location");
 
+  // Free-text fallback so the user can continue even without keyword matches.
+  if (chips.length === 0 && text.trim().length >= 10) {
+    const summary = text.trim().replace(/\s+/g, " ").slice(0, 48);
+    push(summary.endsWith("...") || summary.length < 48 ? summary : `${summary}…`, "role");
+  }
+
   return chips;
 }

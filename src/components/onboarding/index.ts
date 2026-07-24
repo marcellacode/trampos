@@ -7,6 +7,7 @@ export * from "@/components/onboarding/summary-cards";
 export * from "@/components/onboarding/goal-parser";
 export * from "@/components/onboarding/availability-cards";
 export * from "@/components/onboarding/profile-preview";
+export * from "@/components/onboarding/professional-dna";
 export * from "@/components/onboarding/success-screen";
 export * from "@/components/onboarding/onboarding-flow";
 export * from "@/components/onboarding/onboarding-page";

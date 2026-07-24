@@ -18,7 +18,39 @@ export type OnboardingStep =
   | "goals"
   | "availability"
   | "profile"
+  | "dna"
   | "success";
+
+export interface CompatibilityScore {
+  label: string;
+  score: number;
+}
+
+export interface SalaryRange {
+  currency: "BRL" | "USD";
+  min: number;
+  max: number | null;
+  label: string;
+}
+
+export interface SalaryPotential {
+  current: {
+    brazil: SalaryRange;
+    international: SalaryRange;
+  };
+  withSkills: {
+    skillsLabel: string;
+    brazil: SalaryRange;
+    international: SalaryRange;
+  };
+}
+
+export interface ProfessionalDna {
+  predominantProfile: string;
+  strengths: string[];
+  compatibility: CompatibilityScore[];
+  salary: SalaryPotential;
+}
 
 export interface Experience {
   id: string;

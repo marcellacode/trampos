@@ -35,6 +35,10 @@ export function GoalsStep({
     },
   });
 
+  const {
+    formState: { errors },
+  } = form;
+
   useEffect(() => {
     form.setValue("goalText", goalText, { shouldValidate: true });
   }, [form, goalText]);
@@ -43,7 +47,8 @@ export function GoalsStep({
     form.setValue("goalChips", goalChips, { shouldValidate: true });
   }, [form, goalChips]);
 
-  const canContinue = form.formState.isValid;
+  // Text length is enough to continue; chips are an AI enhancement, not a gate.
+  const canContinue = goalText.trim().length >= 10;
 
   return (
     <form
@@ -58,9 +63,9 @@ export function GoalsStep({
         onChipsChange={onChipsChange}
       />
 
-      {form.formState.errors.goalText && (
+      {errors.goalText && (
         <p role="alert" className="text-center text-sm text-red-300">
-          {form.formState.errors.goalText.message}
+          {errors.goalText.message}
         </p>
       )}
 

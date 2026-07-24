@@ -33,8 +33,9 @@ export const goalChipSchema = z.object({
 export const goalsStepSchema = z.object({
   goalText: z
     .string()
+    .trim()
     .min(10, "Conte um pouco mais sobre o que você procura."),
-  goalChips: z.array(goalChipSchema).min(1, "Adicione ao menos um objetivo."),
+  goalChips: z.array(goalChipSchema).default([]),
 });
 
 export const availabilityStepSchema = z.object({

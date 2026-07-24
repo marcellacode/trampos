@@ -16,7 +16,7 @@ interface OnboardingLayoutProps {
 
 export function OnboardingLayout({
   step,
-  totalSteps = 6,
+  totalSteps = 7,
   children,
   className,
   contentClassName,

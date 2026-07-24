@@ -25,7 +25,7 @@ export function GoalParser({
   const [, startTransition] = useTransition();
 
   useEffect(() => {
-    if (value.trim().length < 12) {
+    if (value.trim().length < 10) {
       if (chips.length > 0) onChipsChange([]);
       return;
     }

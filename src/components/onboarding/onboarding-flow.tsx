@@ -11,6 +11,7 @@ import { UploadArea } from "@/components/onboarding/upload-area";
 import { AIProcessing } from "@/components/onboarding/ai-processing";
 import { SummaryCards } from "@/components/onboarding/summary-cards";
 import { ProfilePreview } from "@/components/onboarding/profile-preview";
+import { ProfessionalDnaReveal } from "@/components/onboarding/professional-dna";
 import { SuccessScreen } from "@/components/onboarding/success-screen";
 import { GoalsStep } from "@/components/onboarding/steps/goals-step";
 import { AvailabilityStep } from "@/components/onboarding/steps/availability-step";
@@ -18,6 +19,8 @@ import {
   EMPTY_PROFILE,
   ERROR_MESSAGES,
   MOCK_AI_SUGGESTIONS,
+  MOCK_PROFESSIONAL_DNA,
+  ONBOARDING_TOTAL_STEPS,
   STEP_META,
 } from "@/lib/onboarding/constants";
 import {
@@ -249,7 +252,11 @@ export function OnboardingFlow() {
   };
 
   return (
-    <OnboardingLayout step={stepNumber} hideProgress={step === "success"}>
+    <OnboardingLayout
+      step={stepNumber}
+      totalSteps={ONBOARDING_TOTAL_STEPS}
+      hideProgress={step === "success"}
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={step + String(showUpload)}
@@ -428,20 +435,25 @@ export function OnboardingFlow() {
                   type="button"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  disabled={persistMutation.isPending}
-                  onClick={finishOnboarding}
-                  className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-[#4F7CFF] px-8 text-sm font-semibold text-white shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-[#638BFF] disabled:opacity-60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08090A]"
+                  onClick={() => setStep("dna")}
+                  className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-[#4F7CFF] px-8 text-sm font-semibold text-white shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-[#638BFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08090A]"
                 >
-                  {persistMutation.isPending
-                    ? "Finalizando..."
-                    : "Finalizar perfil"}
+                  Ver meu DNA Profissional
                 </motion.button>
               </div>
             </div>
           )}
 
+          {step === "dna" && (
+            <ProfessionalDnaReveal
+              dna={MOCK_PROFESSIONAL_DNA}
+              onContinue={finishOnboarding}
+              isLoading={persistMutation.isPending}
+            />
+          )}
+
           {step === "success" && (
-            <SuccessScreen onEnterDashboard={() => router.push("/")} />
+            <SuccessScreen onEnterDashboard={() => router.push("/dashboard")} />
           )}
         </motion.div>
       </AnimatePresence>

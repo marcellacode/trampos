@@ -4,10 +4,11 @@ import type {
   ContractType,
   ExtractedProfile,
   OnboardingStep,
+  ProfessionalDna,
   WorkModel,
 } from "@/types/onboarding";
 
-export const ONBOARDING_TOTAL_STEPS = 6;
+export const ONBOARDING_TOTAL_STEPS = 7;
 
 export const STEP_META: Record<
   OnboardingStep,
@@ -19,7 +20,8 @@ export const STEP_META: Record<
   goals: { number: 3, label: "Objetivos" },
   availability: { number: 4, label: "Disponibilidade" },
   profile: { number: 5, label: "Perfil" },
-  success: { number: 6, label: "Pronto" },
+  dna: { number: 6, label: "DNA" },
+  success: { number: 7, label: "Pronto" },
 };
 
 export const PROCESSING_MESSAGES = [
@@ -230,6 +232,54 @@ export const MOCK_AI_SUGGESTIONS: AiSuggestion[] = [
     type: "skill",
   },
 ];
+
+export const MOCK_PROFESSIONAL_DNA: ProfessionalDna = {
+  predominantProfile: "Construtora de Produtos",
+  strengths: [
+    "Forte em Front-end",
+    "Boa comunicação",
+    "Perfil analítico",
+    "Facilidade para aprender tecnologias",
+    "Boa aderência a startups",
+  ],
+  compatibility: [
+    { label: "Startups", score: 96 },
+    { label: "Scale-ups", score: 91 },
+    { label: "Grandes empresas", score: 84 },
+    { label: "Consultorias", score: 76 },
+  ],
+  salary: {
+    current: {
+      brazil: {
+        currency: "BRL",
+        min: 7500,
+        max: 9000,
+        label: "Brasil",
+      },
+      international: {
+        currency: "USD",
+        min: 3000,
+        max: 4200,
+        label: "Internacional",
+      },
+    },
+    withSkills: {
+      skillsLabel: "Docker + AWS",
+      brazil: {
+        currency: "BRL",
+        min: 9000,
+        max: 11000,
+        label: "Brasil",
+      },
+      international: {
+        currency: "USD",
+        min: 4500,
+        max: null,
+        label: "Internacional",
+      },
+    },
+  },
+};
 
 export const SUCCESS_STATS = {
   jobsAnalyzed: 2438,
