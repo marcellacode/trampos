@@ -19,6 +19,7 @@ interface DashboardLayoutProps {
   chatMessages: ChatMessage[];
   children: ReactNode;
   className?: string;
+  chatPanel?: (props: { open: boolean; onClose: () => void }) => ReactNode;
 }
 
 export function DashboardLayout({
@@ -29,6 +30,7 @@ export function DashboardLayout({
   chatMessages,
   children,
   className,
+  chatPanel,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -72,13 +74,20 @@ export function DashboardLayout({
         </main>
       </div>
 
-      <MiniChat
-        open={chatOpen}
-        onClose={() => setChatOpen(false)}
-        messages={chatMessages}
-        userName={user.firstName}
-        className="xl:fixed xl:inset-y-0 xl:right-0 xl:w-[340px]"
-      />
+      {chatPanel ? (
+        chatPanel({
+          open: chatOpen,
+          onClose: () => setChatOpen(false),
+        })
+      ) : (
+        <MiniChat
+          open={chatOpen}
+          onClose={() => setChatOpen(false)}
+          messages={chatMessages}
+          userName={user.firstName}
+          className="xl:fixed xl:inset-y-0 xl:right-0 xl:w-[340px]"
+        />
+      )}
     </div>
   );
 }
