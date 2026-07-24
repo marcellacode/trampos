@@ -10,6 +10,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AUTH_BRAND } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
 
 interface EmptyStateProps {
@@ -84,7 +85,7 @@ export function EmptyMessagesState() {
       icon={MessageSquare}
       title="Caixa de mensagens vazia"
       description="Recrutadores e a IA enviarão atualizações aqui assim que houver movimento nas suas candidaturas."
-      ctaLabel="Abrir assistente"
+      ctaLabel={`Abrir ${AUTH_BRAND.assistantName}`}
       ctaHref="/dashboard/assistente"
     />
   );

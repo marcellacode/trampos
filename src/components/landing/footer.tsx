@@ -92,7 +92,7 @@ export function Footer() {
 
         <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-white/8 pt-8 sm:flex-row">
           <p className="text-sm text-[#9CA3AF]">
-            © {new Date().getFullYear()} Trampos AI. Todos os direitos reservados.
+            © {new Date().getFullYear()} Jobera. Todos os direitos reservados.
           </p>
           <p className="text-sm text-[#9CA3AF]">
             Feito com IA, para quem busca emprego.

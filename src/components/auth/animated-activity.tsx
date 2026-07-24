@@ -45,7 +45,7 @@ export function AnimatedActivity() {
           </div>
           <div>
             <p className="text-xs font-medium text-white">
-              Agente {AUTH_BRAND.fullName}
+              Agente {AUTH_BRAND.assistantName}
             </p>
             <p className="text-[11px] text-[#9CA3AF]">Trabalhando agora</p>
           </div>

@@ -4,10 +4,11 @@ import { useParams } from "next/navigation";
 import { Construction } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
+import { AUTH_BRAND } from "@/lib/auth/constants";
 
 const TITLES: Record<string, string> = {
   vagas: "Vagas",
-  assistente: "Assistente IA",
+  assistente: AUTH_BRAND.assistantName,
   curriculo: "Currículo",
   portfolio: "Portfólio",
   objetivos: "Objetivos",

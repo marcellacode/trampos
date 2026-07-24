@@ -2,6 +2,7 @@
 
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
+import { AUTH_BRAND } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
 
 interface LogoProps {
@@ -14,7 +15,7 @@ export function Logo({ className, showText = true }: LogoProps) {
     <Link
       href="/"
       className={cn("group flex items-center gap-2.5", className)}
-      aria-label="TramplyAI - Página inicial"
+      aria-label={`${AUTH_BRAND.fullName} - Página inicial`}
     >
       <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/30 transition-all group-hover:bg-[#4F7CFF]/20 group-hover:ring-[#4F7CFF]/50">
         <Sparkles className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
@@ -22,7 +23,8 @@ export function Logo({ className, showText = true }: LogoProps) {
       </div>
       {showText && (
         <span className="text-base font-semibold tracking-tight text-white">
-          Tramply<span className="text-[#4F7CFF]">AI</span>
+          {AUTH_BRAND.name}
+          <span className="text-[#4F7CFF]">{AUTH_BRAND.suffix}</span>
         </span>
       )}
     </Link>

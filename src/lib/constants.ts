@@ -116,12 +116,12 @@ export const FEATURES = [
 ] as const;
 
 export const COMPARISON_FEATURES = [
-  { label: "IA adapta currículo", indeed: false, linkedin: false, trampos: true },
-  { label: "Aplicação automática", indeed: false, linkedin: false, trampos: true },
-  { label: "Feedback inteligente", indeed: false, linkedin: false, trampos: true },
-  { label: "Compatibilidade %", indeed: false, linkedin: false, trampos: true },
-  { label: "Treino para entrevista", indeed: false, linkedin: false, trampos: true },
-  { label: "Monitoramento diário", indeed: false, linkedin: true, trampos: true },
+  { label: "IA adapta currículo", indeed: false, linkedin: false, jobera: true },
+  { label: "Aplicação automática", indeed: false, linkedin: false, jobera: true },
+  { label: "Feedback inteligente", indeed: false, linkedin: false, jobera: true },
+  { label: "Compatibilidade %", indeed: false, linkedin: false, jobera: true },
+  { label: "Treino para entrevista", indeed: false, linkedin: false, jobera: true },
+  { label: "Monitoramento diário", indeed: false, linkedin: true, jobera: true },
 ] as const;
 
 export type TestimonialItem = {
@@ -178,7 +178,7 @@ export const FAQ_ITEMS = [
   {
     question: "Qual a diferença para o LinkedIn ou Indeed?",
     answer:
-      "LinkedIn e Indeed são plataformas de busca — você ainda precisa fazer todo o trabalho. Trampos AI é um agente autônomo que trabalha ativamente por você: busca, adapta, aplica e acompanha.",
+      "LinkedIn e Indeed são plataformas de busca — você ainda precisa fazer todo o trabalho. Jobera é um agente autônomo que trabalha ativamente por você: busca, adapta, aplica e acompanha.",
   },
   {
     question: "Existe plano gratuito?",

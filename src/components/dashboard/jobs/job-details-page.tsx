@@ -6,11 +6,13 @@ import { AlertCircle, RefreshCw } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import {
   ApplySidebar,
+  CareerImpactSection,
   CompanyAnalysis,
   CultureRadar,
   GithubProjects,
   HiringTimeline,
   InterviewQuestions,
+  JobComparisonSection,
   JobFAQSection,
   JobHero,
   JobSections,
@@ -20,6 +22,8 @@ import {
   ResumeSuggestions,
   SalaryComparison,
   SimilarCompanies,
+  StudyTopics,
+  TeamInfoSection,
   TechComparison,
   WhyMatch,
 } from "@/components/dashboard/jobs/details";
@@ -121,8 +125,10 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
               {/* Main column ~70% */}
               <div className="min-w-0 space-y-6">
                 <WhyMatch job={job} />
+                <CareerImpactSection data={job.careerImpact} />
                 <JobSections sections={job.sections} stack={job.stack} />
                 <TechComparison data={job.techComparison} />
+                <StudyTopics data={job.studyPlan} />
                 <CompanyAnalysis
                   company={job.company}
                   logo={job.logo}
@@ -130,6 +136,7 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
                   profile={job.companyProfile}
                   stats={job.stats}
                 />
+                <TeamInfoSection data={job.teamInfo} />
                 <div className="grid gap-6 lg:grid-cols-2">
                   <CultureRadar data={job.culture} />
                   <SalaryComparison data={job.salaryComparison} />
@@ -143,6 +150,7 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
                   <PortfolioHighlights projects={job.portfolioProjects} />
                 </div>
                 <SimilarCompanies companies={job.similarCompanies} />
+                <JobComparisonSection data={job.comparison} />
                 <RelatedJobs jobs={job.relatedJobs} />
               </div>
 

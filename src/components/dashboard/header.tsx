@@ -7,6 +7,7 @@ import { CopilotStatus } from "@/components/dashboard/copilot-status";
 import { UniversalSearch } from "@/components/dashboard/universal-search";
 import { NotificationCenter } from "@/components/dashboard/notification-center";
 import { getGreeting } from "@/lib/dashboard/hooks";
+import { AUTH_BRAND } from "@/lib/auth/constants";
 import type { DashboardUser, NotificationItem } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
 
@@ -110,7 +111,7 @@ export function Header({
               ? "bg-[#4F7CFF]/15 text-[#4F7CFF]"
               : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
           )}
-          aria-label="Assistente IA"
+          aria-label={AUTH_BRAND.assistantName}
           aria-pressed={chatOpen}
         >
           <PanelRightOpen className="h-[18px] w-[18px]" />

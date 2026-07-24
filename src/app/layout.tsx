@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TramplyAI — Sua IA trabalha para conseguir seu próximo emprego",
+  title: "Jobera — Sua IA trabalha para conseguir seu próximo emprego",
   description:
     "A primeira plataforma onde uma IA trabalha para conseguir um emprego para você. Procura vagas, adapta currículo, envia candidaturas e agenda entrevistas.",
   keywords: [
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     "currículo",
   ],
   openGraph: {
-    title: "TramplyAI",
+    title: "Jobera",
     description:
       "Sua IA trabalha para conseguir seu próximo emprego.",
     type: "website",

@@ -33,7 +33,7 @@ export function Comparison() {
       <Container>
         <SectionHeader
           label="Comparação"
-          title="Por que Trampos AI é diferente"
+          title="Por que Jobera é diferente"
           description="Veja como nos comparamos com as plataformas tradicionais de emprego."
         />
 
@@ -58,7 +58,7 @@ export function Comparison() {
                     LinkedIn
                   </th>
                   <th className="px-4 py-5 text-center text-sm font-semibold text-[#4F7CFF]">
-                    Trampos AI
+                    Jobera
                   </th>
                 </tr>
               </thead>

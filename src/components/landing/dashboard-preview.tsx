@@ -52,7 +52,7 @@ export function DashboardPreview() {
             <aside className="border-b border-white/8 p-4 lg:w-56 lg:border-b-0 lg:border-r" aria-label="Navegação do dashboard">
               <div className="mb-6 flex items-center gap-2 px-2">
                 <div className="h-2 w-2 rounded-full bg-[#4F7CFF]" aria-hidden="true" />
-                <span className="text-sm font-semibold text-white">Trampos AI</span>
+                <span className="text-sm font-semibold text-white">Jobera</span>
               </div>
               <nav>
                 <ul className="flex gap-1 overflow-x-auto lg:flex-col" role="list">

@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { GitCompare, Send, Sparkles, X } from "lucide-react";
 import type { ChatMessage } from "@/types/dashboard";
+import { AUTH_BRAND } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
 
 interface MiniAIChatProps {
@@ -83,7 +84,7 @@ export function MiniAIChat({
             "fixed inset-y-0 right-0 z-40 flex w-full max-w-[340px] flex-col border-l border-white/[0.06] bg-[#0C0D0F] xl:static xl:z-0",
             className
           )}
-          aria-label="Assistente IA de descoberta"
+          aria-label={`${AUTH_BRAND.assistantName} — descoberta de vagas`}
         >
           <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-4">
             <div className="flex items-center gap-2.5">
@@ -92,7 +93,7 @@ export function MiniAIChat({
                 <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-[#22C55E] ring-2 ring-[#0C0D0F]" />
               </div>
               <div>
-                <p className="text-sm font-medium text-white">Assistente IA</p>
+                <p className="text-sm font-medium text-white">{AUTH_BRAND.assistantName}</p>
                 <p className="text-[11px] text-[#22C55E]">Descobrindo vagas</p>
               </div>
             </div>
@@ -100,7 +101,7 @@ export function MiniAIChat({
               type="button"
               onClick={onClose}
               className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
-              aria-label="Fechar assistente"
+              aria-label={`Fechar ${AUTH_BRAND.assistantName}`}
             >
               <X className="h-4 w-4" />
             </button>
@@ -165,7 +166,7 @@ export function MiniAIChat({
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={`Pergunte algo, ${userName.split(" ")[0]}...`}
                 className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
-                aria-label="Mensagem para o assistente"
+                aria-label={`Mensagem para ${AUTH_BRAND.assistantName}`}
               />
               <button
                 type="submit"

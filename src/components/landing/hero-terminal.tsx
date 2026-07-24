@@ -68,7 +68,7 @@ export function HeroTerminal() {
           <div className="flex flex-1 items-center justify-center gap-2">
             <Terminal className="h-3.5 w-3.5 text-[#9CA3AF]" aria-hidden="true" />
             <span className="font-mono text-xs text-[#9CA3AF]">
-              trampos-ai-agent — running
+              jobera-agent — running
             </span>
           </div>
           <motion.div
@@ -84,7 +84,7 @@ export function HeroTerminal() {
         {/* Terminal body */}
         <div className="space-y-3 p-5 font-mono text-sm" role="log" aria-live="polite" aria-label="Ações da IA em execução">
           <div className="text-[#9CA3AF]">
-            <span className="text-[#4F7CFF]">$</span> trampos-ai start --user=voce
+            <span className="text-[#4F7CFF]">$</span> jobera start --user=voce
           </div>
 
           <AnimatePresence mode="popLayout">

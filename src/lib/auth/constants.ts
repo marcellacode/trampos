@@ -11,9 +11,10 @@ export const LOGIN_ACTIVITY: ActivityItem[] = [
 export const LOGIN_TESTIMONIALS: Testimonial[] = [];
 
 export const AUTH_BRAND = {
-  name: "Tramply",
-  suffix: "AI",
-  fullName: "TramplyAI",
+  name: "Job",
+  suffix: "era",
+  fullName: "Jobera",
+  assistantName: "Jobe",
   tagline:
     "Sua carreira agora tem uma Inteligência Artificial trabalhando por você.",
   description:

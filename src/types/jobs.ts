@@ -248,6 +248,53 @@ export interface JobSections {
   benefits: string[];
 }
 
+export interface StudyTopic {
+  id: string;
+  title: string;
+  priority: 1 | 2 | 3 | 4 | 5;
+}
+
+export interface StudyPlan {
+  topics: StudyTopic[];
+}
+
+export interface TeamInfo {
+  teamName: string;
+  size: number;
+  stack: string[];
+  averageTenureYears: number;
+  available: boolean;
+}
+
+export interface CareerImpactRole {
+  id: string;
+  role: string;
+  upliftPercent: number;
+}
+
+export interface CareerImpact {
+  roles: CareerImpactRole[];
+  explanation: string;
+}
+
+export interface JobComparisonItem {
+  id: string;
+  company: string;
+  logo: string;
+  color: string;
+  salary: string;
+  remote: string;
+  compatibility: number;
+  processSteps: number;
+  benefitsRating: number;
+}
+
+export interface JobComparison {
+  jobs: JobComparisonItem[];
+  recommendedCompanyId: string;
+  aiConclusion: string;
+}
+
 export interface JobDetail extends JobRecommendation {
   publishedAt: string;
   verified: boolean;
@@ -269,4 +316,8 @@ export interface JobDetail extends JobRecommendation {
   applyChecklist: ApplyChecklistItem[];
   aiSummary: string;
   aiSummaryReasons: string[];
+  studyPlan: StudyPlan;
+  teamInfo: TeamInfo;
+  careerImpact: CareerImpact;
+  comparison: JobComparison;
 }

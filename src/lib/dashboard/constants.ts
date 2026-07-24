@@ -15,11 +15,12 @@ import {
   TrendingUp,
 } from "lucide-react";
 import type { NavItem } from "@/types/dashboard";
+import { AUTH_BRAND } from "@/lib/auth/constants";
 
 export const DASHBOARD_NAV_ITEMS: NavItem[] = [
   { label: "Copiloto", href: "/dashboard", icon: LayoutDashboard },
   { label: "Vagas", href: "/dashboard/vagas", icon: Briefcase },
-  { label: "Assistente IA", href: "/dashboard/assistente", icon: Sparkles },
+  { label: AUTH_BRAND.assistantName, href: "/dashboard/assistente", icon: Sparkles },
   { label: "Currículo", href: "/dashboard/curriculo", icon: FileText },
   { label: "Portfólio", href: "/dashboard/portfolio", icon: Globe2 },
   { label: "Objetivos", href: "/dashboard/objetivos", icon: Target },

@@ -29,7 +29,7 @@ export function DemoSection() {
                   <Bot className="h-5 w-5 text-[#4F7CFF]" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">Trampos AI</p>
+                  <p className="font-medium text-white">Jobe</p>
                   <p className="text-xs text-[#22C55E]">Online agora</p>
                 </div>
               </div>

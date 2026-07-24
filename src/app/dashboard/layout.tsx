@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { DashboardQueryProvider } from "@/components/dashboard/query-provider";
 
 export const metadata: Metadata = {
-  title: "Copiloto — TramplyAI",
+  title: "Copiloto — Jobera",
   description:
     "Seu centro de comando de carreira. Veja o que a IA fez enquanto você estava fora.",
 };

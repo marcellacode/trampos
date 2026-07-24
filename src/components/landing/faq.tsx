@@ -20,7 +20,7 @@ export function FAQ() {
         <SectionHeader
           label="FAQ"
           title="Perguntas frequentes"
-          description="Tudo o que você precisa saber sobre o Trampos AI."
+          description="Tudo o que você precisa saber sobre o Jobera."
         />
 
         <div className="mx-auto max-w-3xl">

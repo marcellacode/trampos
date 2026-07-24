@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-const STORAGE_KEY = "trampos-copilot-paused";
+const STORAGE_KEY = "jobera-copilot-paused";
 const VERIFICATION_INTERVAL_MS = 2 * 60 * 1000;
 
 export type CopilotStatus = "active" | "paused";
