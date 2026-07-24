@@ -6,6 +6,7 @@ import { RecommendationCard } from "@/components/dashboard/recommendation-card";
 import { GoalCard } from "@/components/dashboard/goal-card";
 import { CompaniesCard } from "@/components/dashboard/companies-card";
 import { JobsCarousel } from "@/components/dashboard/jobs-carousel";
+import { EmployabilityMap } from "@/components/dashboard/employability-map";
 import { MarketRadar } from "@/components/dashboard/market-radar";
 import { AISuggestions } from "@/components/dashboard/ai-suggestions";
 import { LoadingSkeletons } from "@/components/dashboard/loading-skeletons";
@@ -96,6 +97,8 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
         ) : (
           <JobsCarousel jobs={data.jobs} />
         )}
+
+        <EmployabilityMap skills={data.employability} compact />
 
         <div className="grid gap-4 lg:grid-cols-5">
           <MarketRadar trends={data.market} className="lg:col-span-3" />

@@ -9,6 +9,8 @@ import {
   FolderGit2,
   Globe2,
   LayoutDashboard,
+  Link2,
+  Map,
   MessageSquare,
   Mic,
   Settings,
@@ -18,7 +20,13 @@ import {
   UserPlus,
   Video,
 } from "lucide-react";
-import type { DashboardData, NavItem } from "@/types/dashboard";
+import type {
+  DailyMission,
+  DashboardData,
+  EmployabilityOverview,
+  EmployabilitySkill,
+  NavItem,
+} from "@/types/dashboard";
 import { buildSeedTimeline } from "@/lib/dashboard/timeline";
 
 export const DASHBOARD_NAV_ITEMS: NavItem[] = [
@@ -28,12 +36,104 @@ export const DASHBOARD_NAV_ITEMS: NavItem[] = [
   { label: "Currículo", href: "/dashboard/curriculo", icon: FileText },
   { label: "Portfólio", href: "/dashboard/portfolio", icon: Globe2 },
   { label: "Objetivos", href: "/dashboard/objetivos", icon: Target },
+  {
+    label: "Empregabilidade",
+    href: "/dashboard/empregabilidade",
+    icon: Map,
+  },
   { label: "Mercado", href: "/dashboard/mercado", icon: BarChart3 },
   { label: "Entrevistas", href: "/dashboard/entrevistas", icon: Mic, badge: 2 },
   { label: "Agenda", href: "/dashboard/agenda", icon: Calendar },
   { label: "Mensagens", href: "/dashboard/mensagens", icon: MessageSquare, badge: 3 },
   { label: "Empresas Favoritas", href: "/dashboard/empresas", icon: Building2 },
   { label: "Configurações", href: "/dashboard/configuracoes", icon: Settings },
+];
+
+export const MOCK_EMPLOYABILITY_OVERVIEW: EmployabilityOverview = {
+  score: 92,
+  goal: 95,
+  missions: [
+    {
+      id: "mission-github",
+      label: "Atualizar GitHub",
+      upliftPercent: 2,
+      completed: true,
+      href: "/dashboard/portfolio",
+      icon: FolderGit2,
+    },
+    {
+      id: "mission-cert",
+      label: "Adicionar certificado",
+      upliftPercent: 1,
+      completed: true,
+      href: "/dashboard/curriculo",
+      icon: FileText,
+    },
+    {
+      id: "mission-interview",
+      label: "Treinar entrevista",
+      upliftPercent: 3,
+      completed: true,
+      href: "/dashboard/entrevistas",
+      icon: Mic,
+    },
+    {
+      id: "mission-linkedin",
+      label: "Conectar LinkedIn",
+      upliftPercent: 4,
+      completed: true,
+      href: "/dashboard/configuracoes",
+      icon: Link2,
+    },
+  ] satisfies DailyMission[],
+};
+
+export const MOCK_EMPLOYABILITY: EmployabilitySkill[] = [
+  {
+    id: "react",
+    label: "React",
+    score: 96,
+    upliftPercent: 2,
+    explanation:
+      "Seu React já está alinhado com a maioria das vagas que você procura. Um reforço avançado (performance, arquitetura) deve aumentar sua compatibilidade em aproximadamente 2%.",
+    context: "Exigido em 9 de 10 vagas Frontend na sua busca",
+  },
+  {
+    id: "nextjs",
+    label: "Next.js",
+    score: 88,
+    upliftPercent: 5,
+    explanation:
+      "Aprender Next.js com mais profundidade (App Router, SSR/ISR) deve aumentar sua compatibilidade em aproximadamente 5% com as vagas que você procura.",
+    context: "Em alta em startups e scale-ups remotas",
+  },
+  {
+    id: "docker",
+    label: "Docker",
+    score: 71,
+    upliftPercent: 11,
+    explanation:
+      "Aprender Docker deve aumentar sua compatibilidade em aproximadamente 11% com as vagas que você procura.",
+    context: "Gap mais comum entre o seu perfil e vagas sênior",
+  },
+  {
+    id: "aws",
+    label: "AWS",
+    score: 54,
+    upliftPercent: 14,
+    explanation:
+      "Aprender fundamentos de AWS (deploy, S3, IAM) deve aumentar sua compatibilidade em aproximadamente 14% com as vagas que você procura.",
+    context: "Frequente em vagas full stack e plataformas",
+  },
+  {
+    id: "ingles",
+    label: "Inglês",
+    score: 93,
+    upliftPercent: 4,
+    explanation:
+      "Elevar o inglês para fluência profissional (B2+) deve aumentar sua compatibilidade em aproximadamente 4% — e abrir faixas salariais internacionais.",
+    context: "Diferencial forte para empresas remotas globais",
+  },
 ];
 
 export const SEARCH_EXAMPLES = [
@@ -237,13 +337,15 @@ export const MOCK_DASHBOARD: DashboardData = {
     { id: "m-4", tech: "AWS", change: 18, demand: 88 },
     { id: "m-5", tech: "Docker", change: 12, demand: 79 },
   ],
+  employability: MOCK_EMPLOYABILITY,
+  employabilityOverview: MOCK_EMPLOYABILITY_OVERVIEW,
   suggestions: [
     {
       id: "sug-1",
       title: "Aprenda Docker",
       description: "Sua compatibilidade aumenta 11% nas vagas senior.",
       impact: "+11% match",
-      href: "/dashboard/assistente?q=docker",
+      href: "/dashboard/empregabilidade?skill=docker",
       icon: TrendingUp,
       color: "#4F7CFF",
     },

@@ -113,6 +113,36 @@ export interface MarketTrend {
   demand: number;
 }
 
+/** Gamified daily action that boosts overall employability */
+export interface DailyMission {
+  id: string;
+  label: string;
+  upliftPercent: number;
+  completed: boolean;
+  href: string;
+  icon: LucideIcon;
+}
+
+export interface EmployabilityOverview {
+  score: number;
+  goal: number;
+  missions: DailyMission[];
+}
+
+/** Skill opportunity on the employability map */
+export interface EmployabilitySkill {
+  id: string;
+  label: string;
+  /** Current fit with target jobs (0–100) */
+  score: number;
+  /** Expected compatibility gain if the user levels up this skill */
+  upliftPercent: number;
+  /** AI explanation shown when the skill is selected */
+  explanation: string;
+  /** Optional short market context */
+  context?: string;
+}
+
 export interface AISuggestion {
   id: string;
   title: string;
@@ -152,6 +182,8 @@ export interface DashboardData {
   companies: InterestedCompany[];
   jobs: JobCard[];
   market: MarketTrend[];
+  employability: EmployabilitySkill[];
+  employabilityOverview: EmployabilityOverview;
   suggestions: AISuggestion[];
   chat: ChatMessage[];
   notifications: NotificationItem[];

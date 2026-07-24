@@ -11,6 +11,7 @@ const TITLES: Record<string, string> = {
   curriculo: "Currículo",
   portfolio: "Portfólio",
   objetivos: "Objetivos",
+  empregabilidade: "Empregabilidade",
   mercado: "Mercado",
   entrevistas: "Entrevistas",
   agenda: "Agenda",
