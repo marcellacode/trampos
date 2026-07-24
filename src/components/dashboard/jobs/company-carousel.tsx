@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Building2, ChevronLeft, ChevronRight, Globe } from "lucide-react";
+import { sortByCompatibility } from "@/lib/jobs/sort";
 import type { CompanyMatch } from "@/types/jobs";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ interface CompanyCarouselProps {
 
 export function CompanyCarousel({ companies, className }: CompanyCarouselProps) {
   const scrollerRef = useRef<HTMLDivElement>(null);
+  const rankedCompanies = sortByCompatibility(companies, (c) => c.name);
 
   function scroll(dir: -1 | 1) {
     scrollerRef.current?.scrollBy({ left: dir * 300, behavior: "smooth" });
@@ -58,7 +60,7 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
         className="-mx-1 flex gap-3 overflow-x-auto px-1 pb-2 scrollbar-none"
         style={{ scrollbarWidth: "none" }}
       >
-        {companies.map((company, index) => (
+        {rankedCompanies.map((company, index) => (
           <motion.article
             key={company.id}
             initial={{ opacity: 0, y: 12 }}

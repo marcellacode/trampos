@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { JobsRanking } from "@/components/dashboard/jobs-ranking";
 import {
   CompanyCarousel,
   ComparisonModal,
@@ -16,6 +17,7 @@ import {
   SearchHero,
   SmartFilters,
 } from "@/components/dashboard/jobs";
+import { sortByCompatibility } from "@/lib/jobs/sort";
 import { MOCK_DASHBOARD } from "@/lib/dashboard/constants";
 import { useDiscovery } from "@/lib/jobs/hooks";
 import type { HideReason, SmartFilter } from "@/types/jobs";
@@ -38,7 +40,10 @@ export function JobsDiscoveryPage() {
 
   const visibleJobs = useMemo(() => {
     if (!data) return [];
-    return data.jobs.filter((j) => !hiddenJobs.has(j.id));
+    return sortByCompatibility(
+      data.jobs.filter((j) => !hiddenJobs.has(j.id)),
+      (job) => job.company
+    );
   }, [data, hiddenJobs]);
 
   const compareJobs = useMemo(() => {
@@ -136,6 +141,19 @@ export function JobsDiscoveryPage() {
 
           <DiscoverySummaryBar summary={data.summary} />
 
+          {visibleJobs.length > 0 && (
+            <JobsRanking
+              jobs={visibleJobs.map((job) => ({
+                id: job.id,
+                company: job.company,
+                compatibility: job.compatibility,
+                logo: job.logo,
+                color: job.color,
+                href: job.href,
+              }))}
+            />
+          )}
+
           {compareIds.length > 0 && (
             <div className="flex items-center justify-between rounded-xl border border-[#4F7CFF]/30 bg-[#4F7CFF]/8 px-4 py-3">
               <p className="text-sm text-white">
@@ -166,7 +184,7 @@ export function JobsDiscoveryPage() {
               <p className="mt-0.5 text-sm text-[#9CA3AF]">
                 {searchQuery
                   ? `Resultados para "${searchQuery}"`
-                  : "Curadas pela IA com base no seu perfil e objetivos"}
+                  : "Ordenadas por compatibilidade com o seu perfil"}
               </p>
             </div>
 

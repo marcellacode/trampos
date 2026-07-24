@@ -5,7 +5,7 @@ import { KPIGrid } from "@/components/dashboard/kpi-grid";
 import { RecommendationCard } from "@/components/dashboard/recommendation-card";
 import { GoalCard } from "@/components/dashboard/goal-card";
 import { CompaniesCard } from "@/components/dashboard/companies-card";
-import { JobsCarousel } from "@/components/dashboard/jobs-carousel";
+import { JobsRanking } from "@/components/dashboard/jobs-ranking";
 import { EmployabilityMap } from "@/components/dashboard/employability-map";
 import { MarketRadar } from "@/components/dashboard/market-radar";
 import { AISuggestions } from "@/components/dashboard/ai-suggestions";
@@ -95,7 +95,7 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
         {viewState === "empty-jobs" ? (
           <EmptyJobsState />
         ) : (
-          <JobsCarousel jobs={data.jobs} />
+          <JobsRanking jobs={data.jobs} />
         )}
 
         <EmployabilityMap skills={data.employability} compact />

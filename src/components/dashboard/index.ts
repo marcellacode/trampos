@@ -9,7 +9,7 @@ export { KPIGrid } from "./kpi-grid";
 export { RecommendationCard } from "./recommendation-card";
 export { GoalCard } from "./goal-card";
 export { CompaniesCard } from "./companies-card";
-export { JobsCarousel } from "./jobs-carousel";
+export { JobsRanking } from "./jobs-ranking";
 export { MarketRadar } from "./market-radar";
 export { EmployabilityMap } from "./employability-map";
 export { EmployabilityPage } from "./employability-page";
