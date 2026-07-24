@@ -37,6 +37,8 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
   const [open, setOpen] = useState(false);
   const jobs = data.jobs;
 
+  if (jobs.length === 0) return null;
+
   const rows = [
     {
       label: "Salário",

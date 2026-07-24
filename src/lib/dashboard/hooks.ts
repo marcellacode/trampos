@@ -3,11 +3,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { EMPTY_DASHBOARD } from "@/lib/dashboard/empty-data";
 import type { DashboardData } from "@/types/dashboard";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { fetchDashboardData } from "@/lib/supabase/queries/dashboard";
+import { getCurrentUserId } from "@/lib/supabase/queries/profile";
 
 async function fetchDashboard(): Promise<DashboardData> {
-  // TODO: Server Actions / Supabase — return real user dashboard data
-  await new Promise((resolve) => setTimeout(resolve, 300));
-  return EMPTY_DASHBOARD;
+  const supabase = createBrowserSupabaseClient();
+  const userId = await getCurrentUserId(supabase);
+  return fetchDashboardData(supabase, userId);
 }
 
 export function useDashboard() {
@@ -20,11 +23,10 @@ export function useDashboard() {
 
 export function useDashboardShell() {
   const query = useDashboard();
-  const shell = query.data ?? EMPTY_DASHBOARD;
 
   return {
     ...query,
-    shell,
+    shell: query.data ?? EMPTY_DASHBOARD,
   };
 }
 

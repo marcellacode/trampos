@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
@@ -27,6 +27,7 @@ import {
   resolveImport,
   triggerN8nOnboardingWebhook,
 } from "@/lib/integrations/onboarding";
+import { useProfile } from "@/lib/profile/hooks";
 import type {
   AiSuggestion,
   AvailabilityOption,
@@ -74,6 +75,7 @@ function getErrorMessage(error: unknown): OnboardingError {
 
 export function OnboardingFlow() {
   const router = useRouter();
+  const { data: savedProfile } = useProfile();
   const [step, setStep] = useState<OnboardingStep>("import");
   const [showUpload, setShowUpload] = useState(false);
   const [error, setError] = useState<OnboardingError | null>(null);
@@ -90,6 +92,14 @@ export function OnboardingFlow() {
   });
 
   const stepNumber = STEP_META[step].number;
+
+  useEffect(() => {
+    if (!savedProfile?.name) return;
+    setData((prev) => ({
+      ...prev,
+      profile: savedProfile,
+    }));
+  }, [savedProfile]);
 
   const importMutation = useMutation({
     mutationFn: async ({
@@ -241,11 +251,7 @@ export function OnboardingFlow() {
   );
 
   const finishOnboarding = async () => {
-    try {
-      await persistMutation.mutateAsync(data);
-    } catch {
-      // Frontend-ready: still allow demo completion if persistence stub fails
-    }
+    await persistMutation.mutateAsync(data);
     setStep("success");
   };
 

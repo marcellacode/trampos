@@ -81,9 +81,11 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
                 >
                   {company.logo}
                 </div>
-                <span className="rounded-lg bg-[#22C55E]/10 px-2 py-1 text-xs font-semibold text-[#22C55E]">
-                  {company.compatibility}%
-                </span>
+                {company.hasMatch ? (
+                  <span className="rounded-lg bg-[#22C55E]/10 px-2 py-1 text-xs font-semibold text-[#22C55E]">
+                    {company.compatibility}%
+                  </span>
+                ) : null}
               </div>
 
               <h3 className="mt-4 text-sm font-semibold text-white">

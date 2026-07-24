@@ -3,105 +3,74 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Quote } from "lucide-react";
-import { LOGIN_TESTIMONIALS } from "@/lib/auth/constants";
+import type { Testimonial } from "@/types/auth";
 
-const INTERVAL_MS = 5500;
+interface RotatingTestimonialsProps {
+  testimonials: Testimonial[];
+}
 
-export function RotatingTestimonials() {
+export function RotatingTestimonials({
+  testimonials,
+}: RotatingTestimonialsProps) {
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    if (LOGIN_TESTIMONIALS.length === 0) return;
+    if (testimonials.length <= 1) return;
 
-    const timer = window.setInterval(() => {
-      setIndex((prev) => (prev + 1) % LOGIN_TESTIMONIALS.length);
-    }, INTERVAL_MS);
-    return () => window.clearInterval(timer);
-  }, []);
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % testimonials.length);
+    }, 6000);
 
-  if (LOGIN_TESTIMONIALS.length === 0) {
-    return (
-      <div className="w-full max-w-md min-h-[168px] rounded-2xl border border-dashed border-white/10 bg-white/[0.02] p-6">
-        <p className="text-sm leading-relaxed text-[#9CA3AF]">
-          Depoimentos de usuários aparecerão aqui quando estiverem disponíveis.
-        </p>
-      </div>
-    );
+    return () => clearInterval(interval);
+  }, [testimonials.length]);
+
+  if (testimonials.length === 0) {
+    return null;
   }
 
-  const current = LOGIN_TESTIMONIALS[index];
+  const current = testimonials[index];
 
   return (
-    <div
-      className="w-full max-w-md min-h-[168px]"
-      aria-live="polite"
-      aria-atomic="true"
-      aria-label="Depoimentos de usuários"
-    >
+    <div className="rounded-2xl border border-white/[0.08] bg-[#111315]/70 p-6 backdrop-blur-sm">
+      <Quote className="mb-4 h-5 w-5 text-[#4F7CFF]/40" aria-hidden="true" />
+
       <AnimatePresence mode="wait">
         <motion.blockquote
           key={current.id}
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -12 }}
-          transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
-          className="relative"
+          exit={{ opacity: 0, y: -8 }}
+          transition={{ duration: 0.35 }}
+          className="text-sm leading-relaxed text-white/85"
         >
-          <Quote
-            className="mb-3 h-5 w-5 text-[#4F7CFF]/50"
-            aria-hidden="true"
-          />
-          <p className="text-sm leading-relaxed text-white/80">
-            &ldquo;{current.quote}&rdquo;
-          </p>
-
-          <footer className="mt-4 flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#4F7CFF] to-[#4F7CFF]/50 text-xs font-semibold text-white ring-2 ring-[#4F7CFF]/20"
-              aria-hidden="true"
-            >
-              {current.avatar}
-            </div>
-            <div>
-              <cite className="not-italic text-sm font-medium text-white">
-                {current.name}
-              </cite>
-              <p className="text-xs text-[#9CA3AF]">
-                {current.role} · {current.company}
-              </p>
-            </div>
-          </footer>
+          &ldquo;{current.quote}&rdquo;
         </motion.blockquote>
       </AnimatePresence>
 
-      <div className="mt-5 flex gap-1.5" role="tablist" aria-label="Navegação de depoimentos">
-        {LOGIN_TESTIMONIALS.map((item, i) => (
-          <button
-            key={item.id}
-            type="button"
-            role="tab"
-            aria-selected={i === index}
-            aria-label={`Depoimento de ${item.name}`}
-            onClick={() => setIndex(i)}
-            className="group relative h-1.5 overflow-hidden rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/60"
-            style={{ width: i === index ? 28 : 8 }}
-          >
-            <span
-              className={`absolute inset-0 rounded-full transition-colors ${
-                i === index ? "bg-[#4F7CFF]" : "bg-white/20 group-hover:bg-white/35"
+      <div className="mt-4 flex items-center gap-3">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F7CFF]/15 text-xs font-semibold text-[#4F7CFF]">
+          {current.avatar}
+        </div>
+        <div>
+          <p className="text-sm font-medium text-white">{current.name}</p>
+          <p className="text-xs text-[#9CA3AF]">
+            {current.role} · {current.company}
+          </p>
+        </div>
+      </div>
+
+      {testimonials.length > 1 && (
+        <div className="mt-4 flex gap-1.5">
+          {testimonials.map((item, i) => (
+            <div
+              key={item.id}
+              className={`h-1.5 rounded-full transition-all ${
+                i === index ? "w-4 bg-[#4F7CFF]" : "w-1.5 bg-white/20"
               }`}
             />
-            {i === index && (
-              <motion.span
-                className="absolute inset-y-0 left-0 rounded-full bg-white/40"
-                initial={{ width: "0%" }}
-                animate={{ width: "100%" }}
-                transition={{ duration: INTERVAL_MS / 1000, ease: "linear" }}
-              />
-            )}
-          </button>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

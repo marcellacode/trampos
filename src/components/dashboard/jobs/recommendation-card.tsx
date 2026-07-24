@@ -116,7 +116,10 @@ export function RecommendationCard({
       </div>
 
       <div className="relative mt-5">
-        <CompatibilityBar value={job.compatibility} />
+        <CompatibilityBar
+          value={job.compatibility}
+          hasMatch={job.hasMatch}
+        />
       </div>
 
       <div className="relative mt-4">

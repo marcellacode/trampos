@@ -3,30 +3,10 @@ import type {
   OAuthSignInOptions,
   SignInWithPasswordOptions,
 } from "@/types/auth";
-
-/**
- * Auth client stubs prepared for Supabase Auth.
- * Replace the body of each method with supabase.auth.* calls.
- */
-
-export async function signInWithPassword({
-  email,
-  password,
-}: SignInWithPasswordOptions): Promise<{ error: string | null }> {
-  await delay(1600);
-  void email;
-  void password;
-  return { error: null };
-}
-
-export async function signInWithOAuth({
-  provider,
-  redirectTo = "/onboarding",
-}: OAuthSignInOptions): Promise<{ error: string | null }> {
-  await delay(900);
-  console.info(`[auth] OAuth ready for ${provider} → ${redirectTo}`);
-  return { error: null };
-}
+import {
+  createBrowserSupabaseClient,
+  getAuthCallbackUrl,
+} from "@/lib/supabase/client";
 
 export function mapProvider(
   provider: AuthProvider
@@ -35,6 +15,25 @@ export function mapProvider(
   return provider;
 }
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+export async function signInWithPassword({
+  email,
+  password,
+}: SignInWithPasswordOptions): Promise<{ error: string | null }> {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase.auth.signInWithPassword({ email, password });
+  return { error: error?.message ?? null };
+}
+
+export async function signInWithOAuth({
+  provider,
+  redirectTo = "/onboarding",
+}: OAuthSignInOptions): Promise<{ error: string | null }> {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: mapProvider(provider),
+    options: {
+      redirectTo: getAuthCallbackUrl(redirectTo),
+    },
+  });
+  return { error: error?.message ?? null };
 }

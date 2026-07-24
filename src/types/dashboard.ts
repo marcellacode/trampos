@@ -98,6 +98,7 @@ export interface JobCard {
   id: string;
   company: string;
   role: string;
+  hasMatch: boolean;
   compatibility: number;
   salary: string;
   location: string;

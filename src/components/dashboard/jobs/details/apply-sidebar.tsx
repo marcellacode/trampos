@@ -20,6 +20,7 @@ import type {
   ApprovalProbability,
   JobDetail,
 } from "@/types/jobs";
+import { useApplyToJob } from "@/lib/crud/hooks";
 import { cn } from "@/lib/utils";
 
 interface ApplySidebarProps {
@@ -119,11 +120,22 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
 }
 
 export function ApplySidebar({ job, className }: ApplySidebarProps) {
+  const applyMutation = useApplyToJob();
+
+  async function handleApply() {
+    if (!job.companyId) return;
+    await applyMutation.mutateAsync({
+      jobId: job.id,
+      companyId: job.companyId,
+      roleTitle: job.role,
+    });
+  }
+
   return (
     <aside className={cn("space-y-4", className)}>
       <ReportCard className="sticky top-24 border-[#4F7CFF]/15 p-5">
         <div className="flex flex-col items-center">
-          <CompatibilityCard value={job.compatibility} size={120} />
+          <CompatibilityCard value={job.compatibility} hasMatch={job.hasMatch} size={120} />
         </div>
 
         <div className="mt-4">
@@ -154,9 +166,13 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           </ul>
         </div>
 
-        <Button className="mt-5 h-12 w-full gap-2 text-base shadow-[0_0_32px_rgba(79,124,255,0.25)]">
+        <Button
+          className="mt-5 h-12 w-full gap-2 text-base shadow-[0_0_32px_rgba(79,124,255,0.25)]"
+          disabled={applyMutation.isPending || !job.companyId}
+          onClick={() => void handleApply()}
+        >
           <Sparkles className="h-4 w-4" aria-hidden="true" />
-          Candidatar com IA
+          {applyMutation.isSuccess ? "Candidatura registrada" : "Candidatar com IA"}
         </Button>
 
         <div className="mt-4 flex items-center gap-1.5 text-xs text-[#9CA3AF]">
@@ -191,6 +207,17 @@ export function MobileApplySheet({
   open,
   onToggle,
 }: MobileApplySheetProps) {
+  const applyMutation = useApplyToJob();
+
+  async function handleApply() {
+    if (!job.companyId) return;
+    await applyMutation.mutateAsync({
+      jobId: job.id,
+      companyId: job.companyId,
+      roleTitle: job.role,
+    });
+  }
+
   return (
     <>
       {/* Fixed bottom bar */}
@@ -201,14 +228,24 @@ export function MobileApplySheet({
             onClick={onToggle}
             className="flex flex-col items-center gap-0.5 px-2 text-[#9CA3AF]"
           >
-            <span className="text-lg font-bold text-[#22C55E]">
-              {job.compatibility}%
-            </span>
-            <span className="text-[10px]">Compat.</span>
+            {job.hasMatch ? (
+              <>
+                <span className="text-lg font-bold text-[#22C55E]">
+                  {job.compatibility}%
+                </span>
+                <span className="text-[10px]">Compat.</span>
+              </>
+            ) : (
+              <span className="text-[10px] text-[#9CA3AF]">Sem match</span>
+            )}
           </button>
-          <Button className="h-11 flex-1 gap-2">
+          <Button
+            className="h-11 flex-1 gap-2"
+            disabled={applyMutation.isPending || !job.companyId}
+            onClick={() => void handleApply()}
+          >
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            Candidatar com IA
+            {applyMutation.isSuccess ? "Enviado" : "Candidatar com IA"}
           </Button>
         </div>
       </div>

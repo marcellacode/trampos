@@ -1,12 +1,6 @@
 import type { ActivityItem, Testimonial } from "@/types/auth";
 
-export const LOGIN_ACTIVITY: ActivityItem[] = [
-  { id: "1", label: "Analisando perfil" },
-  { id: "2", label: "Encontrando vagas" },
-  { id: "3", label: "Calculando compatibilidade" },
-  { id: "4", label: "Personalizando currículo" },
-  { id: "5", label: "Preparando candidatura" },
-];
+export const LOGIN_ACTIVITY: ActivityItem[] = [];
 
 export const LOGIN_TESTIMONIALS: Testimonial[] = [];
 

@@ -7,8 +7,17 @@ import { BackgroundEffects } from "@/components/auth/background-effects";
 import { AnimatedActivity } from "@/components/auth/animated-activity";
 import { RotatingTestimonials } from "@/components/auth/rotating-testimonials";
 import { AUTH_BRAND } from "@/lib/auth/constants";
+import type { ActivityItem, Testimonial } from "@/types/auth";
 
-export function LoginShowcase() {
+interface LoginShowcaseProps {
+  activities: ActivityItem[];
+  testimonials: Testimonial[];
+}
+
+export function LoginShowcase({
+  activities,
+  testimonials,
+}: LoginShowcaseProps) {
   return (
     <section
       className="relative hidden h-screen flex-col justify-between overflow-hidden bg-[#08090A] p-10 lg:flex xl:p-14"
@@ -51,24 +60,28 @@ export function LoginShowcase() {
           </p>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-          className="w-full shrink-0"
-        >
-          <AnimatedActivity />
-        </motion.div>
+        {activities.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full shrink-0"
+          >
+            <AnimatedActivity activities={activities} />
+          </motion.div>
+        )}
       </div>
 
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.35 }}
-        className="relative z-10 shrink-0"
-      >
-        <RotatingTestimonials />
-      </motion.div>
+      {testimonials.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          className="relative z-10 shrink-0"
+        >
+          <RotatingTestimonials testimonials={testimonials} />
+        </motion.div>
+      )}
     </section>
   );
 }

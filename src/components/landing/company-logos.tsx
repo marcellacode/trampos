@@ -2,9 +2,20 @@
 
 import { motion } from "framer-motion";
 import { Container } from "@/components/shared/container";
-import { COMPANIES } from "@/lib/constants";
 
-export function CompanyLogos() {
+export interface LandingCompany {
+  name: string;
+  color: string;
+  logo?: string;
+}
+
+interface CompanyLogosProps {
+  companies: LandingCompany[];
+}
+
+export function CompanyLogos({ companies }: CompanyLogosProps) {
+  if (companies.length === 0) return null;
+
   return (
     <section
       id="empresas"
@@ -19,7 +30,7 @@ export function CompanyLogos() {
           viewport={{ once: true }}
           className="mb-10 text-center text-sm font-medium uppercase tracking-wider text-[#9CA3AF]"
         >
-          Empresas onde nossos usuários trabalham
+          Empresas com vagas no catálogo
         </motion.p>
 
         <div className="relative overflow-hidden">
@@ -30,9 +41,9 @@ export function CompanyLogos() {
             animate={{ x: [0, -1200] }}
             transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
             className="flex w-max gap-12 sm:gap-16"
-            aria-label="Logos de empresas parceiras"
+            aria-label="Empresas do catálogo"
           >
-            {[...COMPANIES, ...COMPANIES].map((company, i) => (
+            {[...companies, ...companies].map((company, i) => (
               <div
                 key={`${company.name}-${i}`}
                 className="group flex shrink-0 items-center justify-center"
@@ -41,7 +52,7 @@ export function CompanyLogos() {
                   className="text-xl font-semibold tracking-tight opacity-40 transition-all duration-300 group-hover:opacity-80 sm:text-2xl"
                   style={{ color: company.color }}
                 >
-                  {company.name}
+                  {company.logo || company.name}
                 </span>
               </div>
             ))}

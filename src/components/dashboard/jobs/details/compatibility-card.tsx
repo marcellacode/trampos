@@ -7,15 +7,33 @@ import { cn } from "@/lib/utils";
 
 interface CompatibilityCardProps {
   value: number;
+  hasMatch?: boolean;
   className?: string;
   size?: number;
 }
 
 export function CompatibilityCard({
   value,
+  hasMatch = true,
   className,
   size = 140,
 }: CompatibilityCardProps) {
+  if (!hasMatch) {
+    return (
+      <div className={cn("flex flex-col items-center", className)}>
+        <div
+          className="flex flex-col items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.02]"
+          style={{ width: size, height: size }}
+        >
+          <span className="text-sm font-medium text-[#9CA3AF]">Sem match</span>
+          <span className="mt-1 text-[10px] text-[#9CA3AF]">
+            Complete seu perfil
+          </span>
+        </div>
+      </div>
+    );
+  }
+
   const color = getCompatibilityColor(value);
   const data = [
     { name: "match", value },

@@ -45,8 +45,11 @@ export interface BestSendTime {
 
 export interface JobRecommendation {
   id: string;
+  companyId: string;
   company: string;
   role: string;
+  /** Present only when the user has a personalized match in Supabase */
+  hasMatch: boolean;
   compatibility: number;
   approvalProbability: ApprovalProbability;
   bestSendTime: BestSendTime;
@@ -62,6 +65,7 @@ export interface JobRecommendation {
   stats: JobStats;
   benefits: string[];
   remote: boolean;
+  aiSummary: string;
 }
 
 export interface SmartFilter {
@@ -83,6 +87,7 @@ export interface CompanyMatch {
   name: string;
   logo: string;
   color: string;
+  hasMatch: boolean;
   compatibility: number;
   environment: CompanyEnvironment;
   remote: boolean;
@@ -214,6 +219,7 @@ export interface SimilarCompany {
   name: string;
   logo: string;
   color: string;
+  hasMatch: boolean;
   compatibility: number;
   href: string;
 }
@@ -222,6 +228,7 @@ export interface RelatedJob {
   id: string;
   company: string;
   role: string;
+  hasMatch: boolean;
   compatibility: number;
   salary: string;
   logo: string;

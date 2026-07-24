@@ -106,7 +106,11 @@ export function SimilarCompanies({ companies }: SimilarCompaniesProps) {
                 {company.name}
               </p>
               <div className="mt-3">
-                <CompatibilityBar value={company.compatibility} size="sm" />
+                <CompatibilityBar
+                  value={company.compatibility}
+                  hasMatch={company.hasMatch}
+                  size="sm"
+                />
               </div>
             </Link>
           </motion.div>

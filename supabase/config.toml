@@ -1,7 +1,7 @@
 # Supabase local development configuration
 # https://supabase.com/docs/guides/cli/config
 
-project_id = "jobera"
+project_id = "kccbfeqzhxygndrfvzwd"
 
 [api]
 enabled = true

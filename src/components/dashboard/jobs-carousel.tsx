@@ -79,9 +79,11 @@ export function JobsCarousel({ jobs, className }: JobsCarouselProps) {
               >
                 {job.logo}
               </div>
-              <span className="rounded-lg bg-[#22C55E]/10 px-2 py-1 text-xs font-semibold text-[#22C55E]">
-                {job.compatibility}%
-              </span>
+              {job.hasMatch ? (
+                <span className="rounded-lg bg-[#22C55E]/10 px-2 py-1 text-xs font-semibold text-[#22C55E]">
+                  {job.compatibility}%
+                </span>
+              ) : null}
             </div>
 
             <p className="text-xs text-[#9CA3AF]">{job.company}</p>

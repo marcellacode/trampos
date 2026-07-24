@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 interface RankedJob {
   id: string;
   company: string;
+  hasMatch?: boolean;
   compatibility: number;
   logo?: string;
   color?: string;
@@ -90,12 +91,16 @@ export function JobsRanking({ jobs, className, limit }: JobsRankingProps) {
                 {job.company}
               </span>
 
-              <span
-                className="shrink-0 text-sm font-semibold tabular-nums"
-                style={{ color }}
-              >
-                {job.compatibility}%
-              </span>
+              {job.hasMatch !== false ? (
+                <span
+                  className="shrink-0 text-sm font-semibold tabular-nums"
+                  style={{ color }}
+                >
+                  {job.compatibility}%
+                </span>
+              ) : (
+                <span className="shrink-0 text-xs text-[#9CA3AF]">—</span>
+              )}
             </>
           );
 

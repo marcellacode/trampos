@@ -5,40 +5,48 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
-import { TESTIMONIALS } from "@/lib/constants";
+import type { TestimonialItem } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
-export function Testimonials() {
-  if (TESTIMONIALS.length === 0) {
+interface TestimonialsProps {
+  testimonials: TestimonialItem[];
+}
+
+export function Testimonials({ testimonials }: TestimonialsProps) {
+  if (testimonials.length === 0) {
     return null;
   }
 
-  return <TestimonialsCarousel />;
+  return <TestimonialsCarousel testimonials={testimonials} />;
 }
 
-function TestimonialsCarousel() {
+function TestimonialsCarousel({
+  testimonials,
+}: {
+  testimonials: TestimonialItem[];
+}) {
   const [current, setCurrent] = useState(0);
   const [direction, setDirection] = useState(0);
 
   useEffect(() => {
     const interval = setInterval(() => {
       setDirection(1);
-      setCurrent((prev) => (prev + 1) % TESTIMONIALS.length);
+      setCurrent((prev) => (prev + 1) % testimonials.length);
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, [testimonials.length]);
 
   const navigate = (dir: number) => {
     setDirection(dir);
     setCurrent((prev) => {
       const next = prev + dir;
-      if (next < 0) return TESTIMONIALS.length - 1;
-      if (next >= TESTIMONIALS.length) return 0;
+      if (next < 0) return testimonials.length - 1;
+      if (next >= testimonials.length) return 0;
       return next;
     });
   };
 
-  const testimonial = TESTIMONIALS[current];
+  const testimonial = testimonials[current];
 
   return (
     <section
@@ -50,7 +58,7 @@ function TestimonialsCarousel() {
         <SectionHeader
           label="Depoimentos"
           title="Histórias reais de quem confiou na IA"
-          description="Milhares de profissionais já transformaram suas carreiras."
+          description="Depoimentos publicados no catálogo da plataforma."
         />
 
         <div className="relative mx-auto max-w-3xl">
@@ -65,7 +73,7 @@ function TestimonialsCarousel() {
               className="relative rounded-2xl border border-white/10 bg-[#111315] p-8 sm:p-10"
               role="group"
               aria-roledescription="slide"
-              aria-label={`Depoimento ${current + 1} de ${TESTIMONIALS.length}`}
+              aria-label={`Depoimento ${current + 1} de ${testimonials.length}`}
             >
               <Quote className="mb-6 h-8 w-8 text-[#4F7CFF]/30" aria-hidden="true" />
 
@@ -90,7 +98,6 @@ function TestimonialsCarousel() {
             </motion.div>
           </AnimatePresence>
 
-          {/* Navigation */}
           <div className="mt-6 flex items-center justify-center gap-4">
             <button
               type="button"
@@ -102,7 +109,7 @@ function TestimonialsCarousel() {
             </button>
 
             <div className="flex gap-2" role="tablist" aria-label="Selecionar depoimento">
-              {TESTIMONIALS.map((_, i) => (
+              {testimonials.map((_, i) => (
                 <button
                   key={i}
                   type="button"

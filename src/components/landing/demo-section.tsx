@@ -6,7 +6,23 @@ import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { FadeInView } from "@/components/shared/fade-in-view";
 
-export function DemoSection() {
+interface DemoSectionProps {
+  userMessage: string;
+  assistantMessage: string;
+  jobTitle: string;
+  companyName: string;
+}
+
+export function DemoSection({
+  userMessage,
+  assistantMessage,
+  jobTitle,
+  companyName,
+}: DemoSectionProps) {
+  if (!userMessage || !assistantMessage) {
+    return null;
+  }
+
   return (
     <section
       className="relative py-24 sm:py-32"
@@ -16,9 +32,9 @@ export function DemoSection() {
 
       <Container>
         <SectionHeader
-          label="Demonstração"
-          title="Veja a IA em ação"
-          description="Exemplo de conversa com seu agente de carreira."
+          label="Vaga real"
+          title={`${jobTitle} · ${companyName}`}
+          description="Resumo gerado a partir do catálogo de vagas da plataforma."
         />
 
         <FadeInView>
@@ -30,11 +46,11 @@ export function DemoSection() {
                 </div>
                 <div>
                   <p className="font-medium text-white">Jobe</p>
-                  <p className="text-xs text-[#22C55E]">Online agora</p>
+                  <p className="text-xs text-[#22C55E]">Catálogo ativo</p>
                 </div>
               </div>
 
-              <div className="space-y-6 p-6" role="log" aria-label="Demonstração de conversa">
+              <div className="space-y-6 p-6" role="log" aria-label="Resumo da vaga">
                 <motion.div
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
@@ -43,7 +59,7 @@ export function DemoSection() {
                   className="flex justify-end gap-3"
                 >
                   <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-[#4F7CFF] px-4 py-3 text-sm text-white">
-                    Quero uma vaga React remoto acima de 8 mil.
+                    {userMessage}
                   </div>
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10">
                     <User className="h-4 w-4 text-white" aria-hidden="true" />
@@ -61,9 +77,7 @@ export function DemoSection() {
                     <Bot className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
                   </div>
                   <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-white/8 bg-white/5 px-4 py-3 text-sm leading-relaxed text-white/90">
-                    Entendi seu objetivo. Vou analisar vagas compatíveis,
-                    personalizar seu currículo e preparar candidaturas — com sua
-                    aprovação em cada etapa.
+                    {assistantMessage}
                   </div>
                 </motion.div>
               </div>

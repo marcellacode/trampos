@@ -1,19 +1,9 @@
-/**
- * Supabase client stub — wire when backend is ready.
- *
- * 1. npm install @supabase/supabase-js @supabase/ssr
- * 2. Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY
- * 3. Replace createBrowserClient / createServerClient implementations
- */
+import { createBrowserClient } from "@supabase/ssr";
 
 export function createBrowserSupabaseClient() {
-  // import { createBrowserClient } from '@supabase/ssr'
-  // return createBrowserClient(
-  //   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  //   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  // )
-  throw new Error(
-    "Supabase ainda não configurado. Defina as env vars e descomente o client."
+  return createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
   );
 }
 

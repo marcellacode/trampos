@@ -26,7 +26,17 @@ export function ComparisonModal({
   if (jobs.length < 2) return null;
 
   const [a, b] = jobs;
-  const recommended = recommendedId ?? (a.compatibility >= b.compatibility ? a.id : b.id);
+  const recommended =
+    recommendedId ??
+    (a.hasMatch && b.hasMatch
+      ? a.compatibility >= b.compatibility
+        ? a.id
+        : b.id
+      : a.hasMatch
+        ? a.id
+        : b.hasMatch
+          ? b.id
+          : a.id);
 
   const rows = [
     {
@@ -46,8 +56,8 @@ export function ComparisonModal({
     },
     {
       label: "Compatibilidade",
-      a: `${a.compatibility}%`,
-      b: `${b.compatibility}%`,
+      a: a.hasMatch ? `${a.compatibility}%` : "—",
+      b: b.hasMatch ? `${b.compatibility}%` : "—",
     },
     {
       label: "Empresa",
@@ -56,13 +66,8 @@ export function ComparisonModal({
     },
     {
       label: "Tempo de resposta",
-      a: `${a.stats.responseDays} dias`,
-      b: `${b.stats.responseDays} dias`,
-    },
-    {
-      label: "Avaliações",
-      a: "4.6 / 5.0",
-      b: "4.8 / 5.0",
+      a: a.stats.responseDays > 0 ? `${a.stats.responseDays} dias` : "—",
+      b: b.stats.responseDays > 0 ? `${b.stats.responseDays} dias` : "—",
     },
   ];
 
@@ -145,6 +150,8 @@ export function ComparisonModal({
                       className={cn(
                         "text-center text-white/90",
                         row.label === "Compatibilidade" &&
+                          a.hasMatch &&
+                          b.hasMatch &&
                           a.compatibility >= b.compatibility &&
                           "font-semibold text-[#22C55E]"
                       )}
@@ -155,6 +162,8 @@ export function ComparisonModal({
                       className={cn(
                         "text-center text-white/90",
                         row.label === "Compatibilidade" &&
+                          a.hasMatch &&
+                          b.hasMatch &&
                           b.compatibility > a.compatibility &&
                           "font-semibold text-[#22C55E]"
                       )}
@@ -178,10 +187,20 @@ export function ComparisonModal({
                     <p className="mt-1 text-xs leading-relaxed text-[#9CA3AF]">
                       {recommended === a.id ? (
                         <>
-                          A <strong className="text-white">{a.company}</strong> tem
-                          maior compatibilidade ({a.compatibility}%) e processo mais
-                          rápido ({a.stats.processDays} dias). Ideal se prioriza fit
-                          cultural e agilidade.
+                          A <strong className="text-white">{a.company}</strong>
+                          {a.hasMatch ? (
+                            <>
+                              {" "}
+                              tem maior compatibilidade ({a.compatibility}%) e
+                            </>
+                          ) : (
+                            " tem"
+                          )}{" "}
+                          processo mais rápido (
+                          {a.stats.processDays > 0
+                            ? `${a.stats.processDays} dias`
+                            : "—"}
+                          ). Ideal se prioriza fit cultural e agilidade.
                         </>
                       ) : (
                         <>

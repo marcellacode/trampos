@@ -1,11 +1,25 @@
 import type { JobDetail } from "@/types/jobs";
-import { MOCK_JOB_DETAIL } from "@/lib/jobs/mock-job-detail";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { fetchJobById } from "@/lib/supabase/queries/jobs";
+import { getCurrentUserId } from "@/lib/supabase/queries/profile";
 
-export function getJobDetail(id: string): JobDetail | undefined {
+export async function getJobDetail(id: string): Promise<JobDetail | undefined> {
   if (!id) return undefined;
-  return { ...MOCK_JOB_DETAIL, id, href: `/dashboard/vagas/${id}` };
+
+  const supabase = createBrowserSupabaseClient();
+  const userId = await getCurrentUserId(supabase);
+  const job = await fetchJobById(supabase, id, userId);
+  return job ?? undefined;
 }
 
-export function getAllJobIds(): string[] {
-  return [MOCK_JOB_DETAIL.id];
+export async function getAllJobIds(): Promise<string[]> {
+  const supabase = createBrowserSupabaseClient();
+  const { data, error } = await supabase
+    .from("jobs")
+    .select("id")
+    .eq("is_active", true)
+    .limit(100);
+
+  if (error) throw error;
+  return (data ?? []).map((job) => job.id);
 }

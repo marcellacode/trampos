@@ -109,7 +109,11 @@ export function JobHero({ job, saved, onSave, onShare }: JobHeroProps) {
           </div>
 
           <div className="w-full lg:max-w-xs">
-            <CompatibilityBar value={job.compatibility} size="lg" />
+            <CompatibilityBar
+              value={job.compatibility}
+              hasMatch={job.hasMatch}
+              size="lg"
+            />
           </div>
         </div>
 

@@ -8,6 +8,7 @@ import { EmployabilityMap } from "@/components/dashboard/employability-map";
 import { MarketRadar } from "@/components/dashboard/market-radar";
 import { AISuggestions } from "@/components/dashboard/ai-suggestions";
 import { EmptyJobsState } from "@/components/dashboard/empty-states";
+import { EmployabilityCrudSection } from "@/components/dashboard/modules/employability-crud-page";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 
 function EmployabilityContent() {
@@ -57,6 +58,8 @@ function EmployabilityContent() {
           )}
         </div>
       )}
+
+      <EmployabilityCrudSection />
     </div>
   );
 }

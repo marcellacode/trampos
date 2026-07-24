@@ -4,8 +4,14 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LoginShowcase } from "@/components/auth/login-showcase";
 import { LoginCard } from "@/components/auth/login-card";
+import type { ActivityItem, Testimonial } from "@/types/auth";
 
-export function LoginPage() {
+interface LoginPageProps {
+  activities: ActivityItem[];
+  testimonials: Testimonial[];
+}
+
+export function LoginPage({ activities, testimonials }: LoginPageProps) {
   const router = useRouter();
 
   useEffect(() => {
@@ -22,7 +28,7 @@ export function LoginPage() {
   return (
     <main className="relative min-h-screen bg-[#08090A] lg:h-screen lg:overflow-hidden">
       <div className="grid min-h-screen lg:h-screen lg:grid-cols-2">
-        <LoginShowcase />
+        <LoginShowcase activities={activities} testimonials={testimonials} />
 
         <section
           className="relative flex min-h-screen items-center justify-center px-4 py-10 sm:px-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:px-10"

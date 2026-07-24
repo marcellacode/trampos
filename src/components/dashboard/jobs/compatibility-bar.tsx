@@ -6,12 +6,14 @@ import { cn } from "@/lib/utils";
 
 interface CompatibilityBarProps {
   value: number;
+  hasMatch?: boolean;
   className?: string;
   size?: "sm" | "md" | "lg";
 }
 
 export function CompatibilityBar({
   value,
+  hasMatch = true,
   className,
   size = "md",
 }: CompatibilityBarProps) {
@@ -19,8 +21,16 @@ export function CompatibilityBar({
   const width = useTransform(spring, (v) => `${v}%`);
 
   useEffect(() => {
-    spring.set(value);
-  }, [value, spring]);
+    spring.set(hasMatch ? value : 0);
+  }, [value, hasMatch, spring]);
+
+  if (!hasMatch) {
+    return (
+      <p className={cn("text-xs text-[#9CA3AF]", className)}>
+        Faça login para calcular compatibilidade personalizada.
+      </p>
+    );
+  }
 
   const color =
     value >= 95

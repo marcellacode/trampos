@@ -22,7 +22,7 @@ create table public.profiles (
   copilot_status public.copilot_status not null default 'active',
 
   -- ExtractedProfile core
-  current_role text not null default '',
+  "current_role" text not null default '',
   summary text not null default '',
   avatar_initials text not null default '',
   seniority text not null default '',

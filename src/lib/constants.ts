@@ -6,31 +6,6 @@ export const NAV_LINKS = [
   { label: "Contato", href: "#contato" },
 ] as const;
 
-export const HERO_STATS = [
-  { value: "IA", label: "busca contínua de vagas" },
-  { value: "100%", label: "currículo personalizado por vaga" },
-  { value: "24/7", label: "acompanhamento automático" },
-] as const;
-
-export const TERMINAL_ACTIONS = [
-  { text: "Analisando perfil...", delay: 0 },
-  { text: "Buscando vagas...", delay: 1.2 },
-  { text: "Calculando compatibilidade...", delay: 2.4 },
-  { text: "Personalizando currículo...", delay: 3.6 },
-  { text: "Preparando candidatura...", delay: 4.8 },
-] as const;
-
-export const COMPANIES = [
-  { name: "Google", color: "#4285F4" },
-  { name: "Microsoft", color: "#00A4EF" },
-  { name: "Amazon", color: "#FF9900" },
-  { name: "Nubank", color: "#820AD1" },
-  { name: "iFood", color: "#EA1D2C" },
-  { name: "Mercado Livre", color: "#FFE600" },
-  { name: "Uber", color: "#FFFFFF" },
-  { name: "Spotify", color: "#1DB954" },
-] as const;
-
 export const HOW_IT_WORKS_STEPS = [
   {
     step: 1,

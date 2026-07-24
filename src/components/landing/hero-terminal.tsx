@@ -3,17 +3,23 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, Circle, Terminal } from "lucide-react";
-import { TERMINAL_ACTIONS } from "@/lib/constants";
 
-export function HeroTerminal() {
+interface HeroTerminalProps {
+  actions: { id: string; label: string }[];
+}
+
+export function HeroTerminal({ actions }: HeroTerminalProps) {
   const [visibleCount, setVisibleCount] = useState(0);
   const [currentTyping, setCurrentTyping] = useState("");
   const [cycle, setCycle] = useState(0);
+  const actionCount = actions.length;
 
   useEffect(() => {
+    if (actionCount === 0) return;
+
     const interval = setInterval(() => {
       setVisibleCount((prev) => {
-        if (prev >= TERMINAL_ACTIONS.length) {
+        if (prev >= actionCount) {
           setTimeout(() => {
             setVisibleCount(0);
             setCurrentTyping("");
@@ -26,18 +32,18 @@ export function HeroTerminal() {
     }, 1400);
 
     return () => clearInterval(interval);
-  }, [cycle]);
+  }, [cycle, actionCount]);
 
   useEffect(() => {
-    if (visibleCount === 0 || visibleCount > TERMINAL_ACTIONS.length) return;
+    if (actionCount === 0 || visibleCount === 0 || visibleCount > actionCount) return;
 
-    const action = TERMINAL_ACTIONS[visibleCount - 1];
+    const action = actions[visibleCount - 1];
     let charIndex = 0;
     setCurrentTyping("");
 
     const typeInterval = setInterval(() => {
-      if (charIndex <= action.text.length) {
-        setCurrentTyping(action.text.slice(0, charIndex));
+      if (charIndex <= action.label.length) {
+        setCurrentTyping(action.label.slice(0, charIndex));
         charIndex++;
       } else {
         clearInterval(typeInterval);
@@ -45,7 +51,11 @@ export function HeroTerminal() {
     }, 30);
 
     return () => clearInterval(typeInterval);
-  }, [visibleCount, cycle]);
+  }, [visibleCount, cycle, actions, actionCount]);
+
+  if (actionCount === 0) {
+    return null;
+  }
 
   return (
     <motion.div
@@ -54,11 +64,9 @@ export function HeroTerminal() {
       transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
       className="relative"
     >
-      {/* Glow behind terminal */}
       <div className="absolute -inset-4 rounded-2xl bg-[#4F7CFF]/10 blur-2xl" />
 
       <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#111315]/90 shadow-2xl backdrop-blur-sm glow-primary">
-        {/* Title bar */}
         <div className="flex items-center gap-2 border-b border-white/8 px-4 py-3">
           <div className="flex gap-1.5" aria-hidden="true">
             <div className="h-3 w-3 rounded-full bg-[#FF5F57]" />
@@ -81,27 +89,26 @@ export function HeroTerminal() {
           </motion.div>
         </div>
 
-        {/* Terminal body */}
-        <div className="space-y-3 p-5 font-mono text-sm" role="log" aria-live="polite" aria-label="Ações da IA em execução">
+        <div className="space-y-3 p-5 font-mono text-sm" role="log" aria-live="polite" aria-label="Vagas monitoradas pela IA">
           <div className="text-[#9CA3AF]">
-            <span className="text-[#4F7CFF]">$</span> jobera start --user=voce
+            <span className="text-[#4F7CFF]">$</span> jobera scan --catalog
           </div>
 
           <AnimatePresence mode="popLayout">
-            {TERMINAL_ACTIONS.slice(0, visibleCount - 1).map((action, i) => (
+            {actions.slice(0, visibleCount - 1).map((action) => (
               <motion.div
-                key={`${cycle}-${i}`}
+                key={`${cycle}-${action.id}`}
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
                 className="flex items-center gap-2.5"
               >
                 <Check className="h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden="true" />
-                <span className="text-white/90">{action.text}</span>
+                <span className="text-white/90">{action.label}</span>
               </motion.div>
             ))}
           </AnimatePresence>
 
-          {visibleCount > 0 && visibleCount <= TERMINAL_ACTIONS.length && (
+          {visibleCount > 0 && visibleCount <= actionCount && (
             <motion.div
               key={`typing-${cycle}-${visibleCount}`}
               initial={{ opacity: 0 }}
@@ -125,35 +132,18 @@ export function HeroTerminal() {
               </span>
             </motion.div>
           )}
-
-          {visibleCount === 0 && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              className="flex items-center gap-2.5 text-[#9CA3AF]"
-            >
-              <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                className="h-4 w-4 shrink-0 rounded-full border-2 border-[#4F7CFF]/30 border-t-[#4F7CFF]"
-                aria-hidden="true"
-              />
-              <span>Iniciando agente...</span>
-            </motion.div>
-          )}
         </div>
 
-        {/* Progress bar */}
         <div className="border-t border-white/8 px-5 py-3">
           <div className="flex items-center justify-between text-xs text-[#9CA3AF]">
-            <span>Progresso do agente</span>
-            <span>{Math.min(visibleCount, TERMINAL_ACTIONS.length)}/{TERMINAL_ACTIONS.length}</span>
+            <span>Vagas no catálogo</span>
+            <span>{Math.min(visibleCount, actionCount)}/{actionCount}</span>
           </div>
           <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/5">
             <motion.div
               className="h-full rounded-full bg-gradient-to-r from-[#4F7CFF] to-[#22C55E]"
               animate={{
-                width: `${(Math.min(visibleCount, TERMINAL_ACTIONS.length) / TERMINAL_ACTIONS.length) * 100}%`,
+                width: `${(Math.min(visibleCount, actionCount) / actionCount) * 100}%`,
               }}
               transition={{ duration: 0.5, ease: "easeOut" }}
             />

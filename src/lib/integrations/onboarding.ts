@@ -1,6 +1,5 @@
 /**
- * Integration stubs for onboarding.
- * Wire real SDKs / webhooks when backend is ready.
+ * Onboarding integrations wired to Supabase.
  */
 
 import type {
@@ -11,6 +10,11 @@ import type {
 } from "@/types/onboarding";
 import { buildScratchProfile } from "@/lib/integrations/onboarding-scratch";
 import { parseGoalText } from "@/lib/onboarding/goal-parser";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import {
+  getCurrentUserId,
+  persistOnboardingProfileToSupabase,
+} from "@/lib/supabase/queries/profile";
 
 export async function importLinkedInProfile(): Promise<ExtractedProfile> {
   await delay(800);
@@ -58,10 +62,16 @@ export async function interpretGoalsWithAI(
 }
 
 export async function persistOnboardingProfile(
-  _data: OnboardingData
+  data: OnboardingData
 ): Promise<{ id: string }> {
-  await delay(600);
-  return { id: `profile_${Date.now()}` };
+  const supabase = createBrowserSupabaseClient();
+  const userId = await getCurrentUserId(supabase);
+
+  if (!userId) {
+    throw Object.assign(new Error("auth_required"), { code: "auth_required" });
+  }
+
+  return persistOnboardingProfileToSupabase(supabase, userId, data);
 }
 
 export async function triggerN8nOnboardingWebhook(

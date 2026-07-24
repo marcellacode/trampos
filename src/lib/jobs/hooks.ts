@@ -2,18 +2,21 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { DiscoveryData, JobDetail } from "@/types/jobs";
-import { EMPTY_DISCOVERY } from "@/lib/jobs/empty-data";
-import { getJobDetail } from "@/lib/jobs/job-details";
+import { createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { fetchDiscoveryData } from "@/lib/supabase/queries/discovery";
+import { fetchJobById } from "@/lib/supabase/queries/jobs";
+import { getCurrentUserId } from "@/lib/supabase/queries/profile";
 
 async function fetchDiscovery(): Promise<DiscoveryData> {
-  // TODO: Server Actions / Supabase — return real job discovery data
-  await new Promise((r) => setTimeout(r, 300));
-  return EMPTY_DISCOVERY;
+  const supabase = createBrowserSupabaseClient();
+  const userId = await getCurrentUserId(supabase);
+  return fetchDiscoveryData(supabase, userId);
 }
 
 async function fetchJob(id: string): Promise<JobDetail | null> {
-  await new Promise((r) => setTimeout(r, 200));
-  return getJobDetail(id) ?? null;
+  const supabase = createBrowserSupabaseClient();
+  const userId = await getCurrentUserId(supabase);
+  return fetchJobById(supabase, id, userId);
 }
 
 export function useDiscovery() {

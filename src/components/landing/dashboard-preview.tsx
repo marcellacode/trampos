@@ -2,13 +2,11 @@
 
 import {
   Briefcase,
-  Calendar,
-  FileText,
+  Building2,
+  Globe2,
   LayoutDashboard,
-  MessageSquare,
   Sparkles,
   TrendingUp,
-  Video,
   type LucideIcon,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -16,17 +14,39 @@ import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { DASHBOARD_NAV } from "@/lib/constants";
 
+export interface DashboardPreviewStats {
+  jobs: number;
+  companies: number;
+  trends: number;
+  opportunities: number;
+}
+
+interface DashboardPreviewProps {
+  stats: DashboardPreviewStats;
+}
+
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
   Briefcase,
   Sparkles,
-  FileText,
+  FileText: Sparkles,
   TrendingUp,
-  Video,
-  Calendar,
+  Video: TrendingUp,
+  Calendar: Globe2,
 };
 
-export function DashboardPreview() {
+export function DashboardPreview({ stats }: DashboardPreviewProps) {
+  const cards = [
+    { label: "Vagas", icon: Briefcase, value: stats.jobs },
+    { label: "Empresas", icon: Building2, value: stats.companies },
+    { label: "Tendências", icon: TrendingUp, value: stats.trends },
+    { label: "Oportunidades", icon: Globe2, value: stats.opportunities },
+  ].filter((item) => item.value > 0);
+
+  if (cards.length === 0) {
+    return null;
+  }
+
   return (
     <section
       className="relative py-24 sm:py-32"
@@ -38,7 +58,7 @@ export function DashboardPreview() {
         <SectionHeader
           label="Dashboard"
           title="Seu centro de comando de carreira"
-          description="Acompanhe vagas, entrevistas e progresso em tempo real."
+          description="Números reais do catálogo e do mercado monitorados pela plataforma."
         />
 
         <motion.div
@@ -82,21 +102,15 @@ export function DashboardPreview() {
             <div className="flex-1 p-6 lg:p-8">
               <div className="mb-8">
                 <h3 className="text-2xl font-semibold text-white">
-                  Bom dia. 👋
+                  Catálogo ao vivo
                 </h3>
                 <p className="mt-2 text-[#9CA3AF]">
-                  Seu dashboard centraliza vagas, candidaturas, entrevistas e
-                  mensagens em um só lugar.
+                  Indicadores públicos extraídos do Supabase em tempo real.
                 </p>
               </div>
 
               <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
-                {[
-                  { label: "Vagas", icon: Briefcase },
-                  { label: "Entrevistas", icon: Video },
-                  { label: "Mensagens", icon: MessageSquare },
-                  { label: "Objetivos", icon: Calendar },
-                ].map((item, index) => (
+                {cards.map((item, index) => (
                   <motion.div
                     key={item.label}
                     initial={{ opacity: 0, scale: 0.95 }}
@@ -107,7 +121,7 @@ export function DashboardPreview() {
                   >
                     <item.icon className="mb-3 h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
                     <p className="text-sm font-medium text-white">{item.label}</p>
-                    <p className="mt-1 text-xs text-[#9CA3AF]">Aguardando dados</p>
+                    <p className="mt-1 text-xs text-[#9CA3AF]">{item.value} no catálogo</p>
                   </motion.div>
                 ))}
               </div>
@@ -115,8 +129,8 @@ export function DashboardPreview() {
               <div className="rounded-xl border border-dashed border-white/10 bg-white/[0.02] p-8 text-center">
                 <Sparkles className="mx-auto mb-3 h-5 w-5 text-[#4F7CFF]" aria-hidden="true" />
                 <p className="text-sm text-[#9CA3AF]">
-                  Prévia ilustrativa. Seus dados reais aparecerão aqui após o
-                  onboarding.
+                  Faça login para ver seu dashboard personalizado com matches,
+                  KPIs e timeline reais.
                 </p>
               </div>
             </div>

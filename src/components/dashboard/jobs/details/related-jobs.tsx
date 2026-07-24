@@ -48,12 +48,14 @@ export function RelatedJobs({ jobs }: RelatedJobsProps) {
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
-                <span
-                  className="text-sm font-semibold tabular-nums"
-                  style={{ color }}
-                >
-                  {job.compatibility}%
-                </span>
+                {job.hasMatch ? (
+                  <span
+                    className="text-sm font-semibold tabular-nums"
+                    style={{ color }}
+                  >
+                    {job.compatibility}%
+                  </span>
+                ) : null}
                 <ArrowUpRight
                   className="h-4 w-4 text-[#9CA3AF] transition-colors group-hover:text-[#4F7CFF]"
                   aria-hidden="true"

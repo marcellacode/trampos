@@ -7,9 +7,18 @@ import { Button } from "@/components/ui/button";
 import { AnimatedBackground } from "@/components/shared/animated-background";
 import { Container } from "@/components/shared/container";
 import { HeroTerminal } from "@/components/landing/hero-terminal";
-import { HERO_STATS } from "@/lib/constants";
 
-export function Hero() {
+export interface HeroStat {
+  value: string;
+  label: string;
+}
+
+interface HeroProps {
+  stats: HeroStat[];
+  terminalActions: { id: string; label: string }[];
+}
+
+export function Hero({ stats, terminalActions }: HeroProps) {
   return (
     <section
       className="relative flex min-h-screen items-center overflow-hidden pt-16"
@@ -19,7 +28,6 @@ export function Hero() {
 
       <Container className="relative py-20 lg:py-32">
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
-          {/* Left column */}
           <div>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -84,29 +92,29 @@ export function Hero() {
               </Button>
             </motion.div>
 
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.4 }}
-              className="mt-12 flex flex-col gap-4 sm:flex-row sm:gap-8"
-              role="list"
-              aria-label="Indicadores da plataforma"
-            >
-              {HERO_STATS.map((stat, i) => (
-                <div key={i} className="flex items-center gap-2" role="listitem">
-                  <div className="h-1 w-1 rounded-full bg-[#4F7CFF]" aria-hidden="true" />
-                  <span className="text-sm text-[#9CA3AF]">
-                    <strong className="font-semibold text-white">{stat.value}</strong>{" "}
-                    {stat.label}
-                  </span>
-                </div>
-              ))}
-            </motion.div>
+            {stats.length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.4 }}
+                className="mt-12 flex flex-col gap-4 sm:flex-row sm:gap-8"
+                role="list"
+                aria-label="Indicadores da plataforma"
+              >
+                {stats.map((stat) => (
+                  <div key={stat.label} className="flex items-center gap-2" role="listitem">
+                    <div className="h-1 w-1 rounded-full bg-[#4F7CFF]" aria-hidden="true" />
+                    <span className="text-sm text-[#9CA3AF]">
+                      <strong className="font-semibold text-white">{stat.value}</strong>{" "}
+                      {stat.label}
+                    </span>
+                  </div>
+                ))}
+              </motion.div>
+            )}
           </div>
 
-          {/* Right column - Terminal */}
-          <HeroTerminal />
+          <HeroTerminal actions={terminalActions} />
         </div>
       </Container>
     </section>
