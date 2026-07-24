@@ -2,6 +2,7 @@ export { DashboardLayout } from "./dashboard-layout";
 export { DashboardPage } from "./dashboard-page";
 export { Sidebar } from "./sidebar";
 export { Header } from "./header";
+export { CopilotStatus } from "./copilot-status";
 export { UniversalSearch } from "./universal-search";
 export { Timeline } from "./timeline";
 export { KPIGrid } from "./kpi-grid";

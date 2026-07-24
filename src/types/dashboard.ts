@@ -25,15 +25,32 @@ export interface NavItem {
   badge?: number;
 }
 
+export type TimelineActor = "ai" | "company";
+
+export type TimelineEventKind =
+  | "job_found"
+  | "compatibility"
+  | "resume_tailored"
+  | "application_sent"
+  | "company_viewed"
+  | "interview_invite";
+
 export interface TimelineActivity {
   id: string;
+  /** Display time as HH:mm */
   time: string;
+  /** ISO timestamp used for live ordering */
+  createdAt: string;
   title: string;
   description?: string;
   href: string;
+  actor: TimelineActor;
+  kind: TimelineEventKind;
   icon: LucideIcon;
   color: string;
   glow: string;
+  /** True when the event arrived after the initial page load */
+  isLive?: boolean;
 }
 
 export interface KpiMetric {

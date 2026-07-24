@@ -11,7 +11,6 @@ import {
   LayoutDashboard,
   MessageSquare,
   Mic,
-  Search,
   Settings,
   Sparkles,
   Target,
@@ -20,6 +19,7 @@ import {
   Video,
 } from "lucide-react";
 import type { DashboardData, NavItem } from "@/types/dashboard";
+import { buildSeedTimeline } from "@/lib/dashboard/timeline";
 
 export const DASHBOARD_NAV_ITEMS: NavItem[] = [
   { label: "Copiloto", href: "/dashboard", icon: LayoutDashboard },
@@ -54,68 +54,7 @@ export const MOCK_DASHBOARD: DashboardData = {
   },
   unreadNotifications: 4,
   unreadMessages: 3,
-  timeline: [
-    {
-      id: "tl-1",
-      time: "02:13",
-      title: "Analisei 2.841 novas vagas",
-      description: "Fontes: LinkedIn, Gupy, Greenhouse e 12 boards.",
-      href: "/dashboard/vagas",
-      icon: Search,
-      color: "#4F7CFF",
-      glow: "rgba(79,124,255,0.35)",
-    },
-    {
-      id: "tl-2",
-      time: "03:52",
-      title: "Encontrei 18 compatíveis",
-      description: "Score médio de 91% com o seu perfil.",
-      href: "/dashboard/vagas",
-      icon: CheckCircle2,
-      color: "#22C55E",
-      glow: "rgba(34,197,94,0.35)",
-    },
-    {
-      id: "tl-3",
-      time: "04:08",
-      title: "Atualizei seu currículo para 6 vagas",
-      description: "Versões otimizadas por ATS e palavras-chave.",
-      href: "/dashboard/curriculo",
-      icon: FileText,
-      color: "#8B5CF6",
-      glow: "rgba(139,92,246,0.35)",
-    },
-    {
-      id: "tl-4",
-      time: "04:15",
-      title: "Candidatei você em 4 vagas autorizadas",
-      description: "Candidaturas enviadas com carta personalizada.",
-      href: "/dashboard/vagas",
-      icon: Briefcase,
-      color: "#F59E0B",
-      glow: "rgba(245,158,11,0.35)",
-    },
-    {
-      id: "tl-5",
-      time: "06:22",
-      title: "Empresa Nubank visualizou seu perfil",
-      description: "Recruiter de Engineering abriu seu currículo.",
-      href: "/dashboard/empresas",
-      icon: Eye,
-      color: "#820AD1",
-      glow: "rgba(130,10,209,0.35)",
-    },
-    {
-      id: "tl-6",
-      time: "07:10",
-      title: "Recebemos convite para entrevista",
-      description: "iFood · Frontend React · amanhã às 14h.",
-      href: "/dashboard/entrevistas",
-      icon: Video,
-      color: "#EC4899",
-      glow: "rgba(236,72,153,0.35)",
-    },
-  ],
+  timeline: buildSeedTimeline(),
   kpis: [
     {
       id: "kpi-compat",

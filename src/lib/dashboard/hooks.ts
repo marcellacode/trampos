@@ -18,6 +18,9 @@ export function useDashboard() {
   });
 }
 
+export { useLiveTimeline } from "@/lib/dashboard/use-live-timeline";
+
+
 export function getGreeting(date = new Date()): string {
   const hour = date.getHours();
   if (hour < 12) return "Bom dia";

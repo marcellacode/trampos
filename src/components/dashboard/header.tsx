@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Bell, Menu, MessageSquare, PanelRightOpen } from "lucide-react";
+import { CopilotStatus } from "@/components/dashboard/copilot-status";
 import { UniversalSearch } from "@/components/dashboard/universal-search";
 import { NotificationCenter } from "@/components/dashboard/notification-center";
 import { getGreeting } from "@/lib/dashboard/hooks";
@@ -64,6 +65,8 @@ export function Header({
         <div className="md:hidden">
           <UniversalSearch compact />
         </div>
+
+        <CopilotStatus />
 
         <div className="relative">
           <button
