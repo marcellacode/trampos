@@ -22,4 +22,8 @@ export const crudKeys = {
   profile: ["profile"] as const,
   profileVisibility: ["profile", "visibility"] as const,
   dashboard: ["dashboard"] as const,
+  companyMemberships: ["company", "memberships"] as const,
+  editableCompany: (companyId: string) =>
+    ["company", "editable", companyId] as const,
+  publicCompany: (slug: string) => ["company", "public", slug] as const,
 };

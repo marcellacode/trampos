@@ -9,6 +9,10 @@ import {
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { getCurrentUserId } from "@/lib/supabase/queries/profile";
 import {
+  fetchCompanyMemberships,
+  fetchEditableCompany,
+} from "@/lib/supabase/queries/company";
+import {
   applyToJob,
   createJobApplication,
   deleteJobApplication,
@@ -854,4 +858,41 @@ export function useUpdateProfileVisibility() {
       withUser((s, u) => updateProfileVisibility(s, u, input)),
     crudKeys.profileVisibility
   );
+}
+
+export function useCompanyMemberships() {
+  return useQuery({
+    queryKey: crudKeys.companyMemberships,
+    queryFn: () => withUser((s, u) => fetchCompanyMemberships(s, u)),
+  });
+}
+
+export function useEditableCompany(companyId: string | null) {
+  return useQuery({
+    queryKey: crudKeys.editableCompany(companyId ?? "none"),
+    queryFn: async () => {
+      if (!companyId) return null;
+      return withUser((s, u) => fetchEditableCompany(s, u, companyId));
+    },
+    enabled: Boolean(companyId),
+  });
+}
+
+export function useCompanyActiveJobs(companyId: string | null) {
+  return useQuery({
+    queryKey: ["company", "jobs", companyId ?? "none"],
+    queryFn: async () => {
+      if (!companyId) return [];
+      const supabase = createBrowserSupabaseClient();
+      const { data, error } = await supabase
+        .from("jobs")
+        .select("id, slug, title, location, salary_display, remote, published_at")
+        .eq("company_id", companyId)
+        .eq("is_active", true)
+        .order("published_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: Boolean(companyId),
+  });
 }

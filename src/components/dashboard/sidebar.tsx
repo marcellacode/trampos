@@ -5,7 +5,11 @@ import { usePathname } from "next/navigation";
 import { ChevronUp, LogOut, Settings, X } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/shared/logo";
-import { DASHBOARD_NAV_ITEMS } from "@/lib/dashboard/constants";
+import {
+  COMPANY_NAV_ITEM,
+  DASHBOARD_NAV_ITEMS,
+} from "@/lib/dashboard/constants";
+import { useCompanyMemberships } from "@/lib/crud/hooks";
 import type { DashboardUser } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
 
@@ -19,6 +23,15 @@ interface SidebarProps {
 export function Sidebar({ user, open = false, onClose, className }: SidebarProps) {
   const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
+  const membershipsQuery = useCompanyMemberships();
+  const navItems =
+    (membershipsQuery.data?.length ?? 0) > 0
+      ? [
+          ...DASHBOARD_NAV_ITEMS.slice(0, 3),
+          COMPANY_NAV_ITEM,
+          ...DASHBOARD_NAV_ITEMS.slice(3),
+        ]
+      : DASHBOARD_NAV_ITEMS;
 
   const content = (
     <div className="flex h-full flex-col bg-card">
@@ -38,7 +51,7 @@ export function Sidebar({ user, open = false, onClose, className }: SidebarProps
 
       <nav className="flex-1 overflow-y-auto p-3" aria-label="Menu principal">
         <ul className="space-y-0.5" role="list">
-          {DASHBOARD_NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const Icon = item.icon;
             const active =
               item.href === "/dashboard"

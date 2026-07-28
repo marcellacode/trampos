@@ -1,5 +1,6 @@
 import {
   Briefcase,
+  Building2,
   Calendar,
   FileText,
   LayoutDashboard,
@@ -18,6 +19,12 @@ export const DASHBOARD_NAV_ITEMS: NavItem[] = [
   { label: "Mensagens", href: "/dashboard/mensagens", icon: MessageSquare },
   { label: "Configurações", href: "/dashboard/configuracoes", icon: Settings },
 ];
+
+export const COMPANY_NAV_ITEM: NavItem = {
+  label: "Minha empresa",
+  href: "/dashboard/empresa",
+  icon: Building2,
+};
 
 export const SEARCH_EXAMPLES = [
   "Vagas de React remoto",

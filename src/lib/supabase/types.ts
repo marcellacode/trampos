@@ -12,6 +12,10 @@ export interface DbCompany {
   environment: string | null;
   remote_friendly: boolean;
   href: string | null;
+  bio?: string;
+  cover_url?: string | null;
+  is_claimed?: boolean;
+  claimed_at?: string | null;
   company_benefits?: { benefit: string; sort_order: number }[];
 }
 

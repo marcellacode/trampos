@@ -128,12 +128,16 @@ export type Database = {
       }
       companies: {
         Row: {
+          bio: string
           brand_color: string
+          claimed_at: string | null
+          cover_url: string | null
           created_at: string
           employees_label: string
           environment: Database["public"]["Enums"]["company_environment"] | null
           href: string | null
           id: string
+          is_claimed: boolean
           logo: string
           market_years: number | null
           name: string
@@ -145,7 +149,10 @@ export type Database = {
           verified: boolean
         }
         Insert: {
+          bio?: string
           brand_color?: string
+          claimed_at?: string | null
+          cover_url?: string | null
           created_at?: string
           employees_label?: string
           environment?:
@@ -153,6 +160,7 @@ export type Database = {
             | null
           href?: string | null
           id?: string
+          is_claimed?: boolean
           logo?: string
           market_years?: number | null
           name: string
@@ -164,7 +172,10 @@ export type Database = {
           verified?: boolean
         }
         Update: {
+          bio?: string
           brand_color?: string
+          claimed_at?: string | null
+          cover_url?: string | null
           created_at?: string
           employees_label?: string
           environment?:
@@ -172,6 +183,7 @@ export type Database = {
             | null
           href?: string | null
           id?: string
+          is_claimed?: boolean
           logo?: string
           market_years?: number | null
           name?: string
@@ -183,6 +195,45 @@ export type Database = {
           verified?: boolean
         }
         Relationships: []
+      }
+      company_members: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["company_member_role"]
+          user_id: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["company_member_role"]
+          user_id: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["company_member_role"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_members_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "company_members_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       company_benefits: {
         Row: {
@@ -3097,6 +3148,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_company: {
+        Args: { p_company_id: string }
+        Returns: Database["public"]["Tables"]["company_members"]["Row"]
+      }
       is_owner: { Args: { target_user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -3125,6 +3180,7 @@ export type Database = {
       chat_context: "dashboard" | "discovery" | "job_detail" | "assistant"
       chat_role: "assistant" | "user"
       company_environment: "startup" | "scale_up" | "corporativa"
+      company_member_role: "admin" | "recruiter" | "viewer"
       contract_type: "clt" | "pj" | "freelancer" | "international"
       copilot_status: "active" | "paused"
       currency_code: "BRL" | "USD"
@@ -3322,6 +3378,7 @@ export const Constants = {
       chat_context: ["dashboard", "discovery", "job_detail", "assistant"],
       chat_role: ["assistant", "user"],
       company_environment: ["startup", "scale_up", "corporativa"],
+      company_member_role: ["admin", "recruiter", "viewer"],
       contract_type: ["clt", "pj", "freelancer", "international"],
       copilot_status: ["active", "paused"],
       currency_code: ["BRL", "USD"],
