@@ -10,7 +10,9 @@ import {
   upsertExternalJobFromRecommendation,
 } from "@/lib/external-jobs/upsert-external-job";
 import { loadUserProfile } from "@/lib/matching/compute-compatibility";
+import { applicationStatusLabel } from "@/lib/applications/status-labels";
 import type { JobApplicationRow } from "@/lib/supabase/queries/mutations/applications";
+import { createNotification } from "@/lib/supabase/queries/mutations/notifications";
 import { createTimelineEvent } from "@/lib/supabase/queries/mutations/timeline";
 
 export interface PrepareApplicationInput {
@@ -115,7 +117,7 @@ async function needsExternalConsent(
     .from("job_applications")
     .select("id", { count: "exact", head: true })
     .eq("user_id", userId)
-    .eq("source", "external")
+    .eq("application_source", "external")
     .not("user_consent_at", "is", null);
 
   return (count ?? 0) === 0;
@@ -196,7 +198,7 @@ export async function prepareApplication(
         : "Candidatura registrada",
     applied_at: now,
     last_activity_at: now,
-    source: isExternal ? "external" : "internal",
+    application_source: isExternal ? "external" : "internal",
     ats_provider: atsProvider,
     external_apply_url: applyUrl,
     submission_status: submissionStatus,
@@ -269,6 +271,175 @@ export async function prepareApplication(
     tailoredResumeText: tailored.resumeText,
     coverLetterText: tailored.coverLetter,
     isExternal,
+  };
+}
+
+export interface ApplyInternalJobInput {
+  jobId: string;
+  job?: JobRecommendation;
+}
+
+export async function applyInternalJob(
+  supabase: SupabaseClient,
+  userId: string,
+  input: ApplyInternalJobInput
+): Promise<PreparedApplication> {
+  const { data: jobRow, error: jobError } = await supabase
+    .from("jobs")
+    .select(
+      `
+      id,
+      title,
+      is_active,
+      application_mode,
+      company_id,
+      ai_summary,
+      companies!jobs_company_id_fkey (id, name),
+      job_stack (tech_name, sort_order),
+      job_section_items (section_type, content, sort_order)
+    `
+    )
+    .eq("id", input.jobId)
+    .maybeSingle();
+
+  if (jobError) throw jobError;
+  if (!jobRow?.is_active) {
+    throw new Error("Esta vaga não está mais disponível para candidatura.");
+  }
+  if (jobRow.application_mode !== "internal") {
+    throw new Error("Esta vaga não aceita candidatura interna na plataforma.");
+  }
+
+  const company = Array.isArray(jobRow.companies)
+    ? jobRow.companies[0]
+    : jobRow.companies;
+  const companyId = (company?.id as string | undefined) ?? jobRow.company_id;
+  const companyName =
+    input.job?.company ?? (company?.name as string | undefined) ?? "Empresa";
+  const roleTitle = input.job?.role ?? (jobRow.title as string);
+
+  const profile = await loadUserProfile(supabase, userId);
+  await validateProfileForApplication(supabase, userId, profile);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const applications = () => (supabase as any).from("job_applications");
+
+  const { data: existing } = await applications()
+    .select("*")
+    .eq("user_id", userId)
+    .eq("job_id", input.jobId)
+    .maybeSingle();
+
+  if (existing?.submission_status === "completed") {
+    throw new Error("Você já se candidatou a esta vaga.");
+  }
+
+  const sectionItems = (jobRow.job_section_items ?? []) as {
+    section_type: string;
+    content: string;
+    sort_order: number;
+  }[];
+  const description =
+    input.job?.description ??
+    sectionItems
+      .filter((item) => item.section_type === "summary")
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((item) => item.content)
+      .join("\n\n") ??
+    (jobRow.ai_summary as string);
+
+  const stack =
+    input.job?.stack ??
+    ((jobRow.job_stack ?? []) as { tech_name: string }[]).map(
+      (item) => item.tech_name
+    );
+
+  let tailoredResumeText = existing?.tailored_resume_text as string | null;
+  let coverLetterText = existing?.cover_letter_text as string | null;
+
+  if (!tailoredResumeText || !coverLetterText) {
+    const tailored = await tailorResumeForJob(profile!, {
+      role: roleTitle,
+      company: companyName,
+      description,
+      stack,
+    });
+    tailoredResumeText = tailored.resumeText;
+    coverLetterText = tailored.coverLetter;
+  }
+
+  const now = new Date().toISOString();
+  const statusLabel = applicationStatusLabel("applied");
+
+  const payload: Record<string, unknown> = {
+    user_id: userId,
+    job_id: input.jobId,
+    external_job_id: null,
+    company_id: companyId,
+    role_title: roleTitle,
+    status: "applied",
+    status_label: statusLabel,
+    applied_at: now,
+    last_activity_at: now,
+    application_source: "internal",
+    submission_status: "completed",
+    tailored_resume_text: tailoredResumeText,
+    cover_letter_text: coverLetterText,
+  };
+
+  let application: JobApplicationRow;
+
+  if (existing?.id) {
+    const { data, error } = await applications()
+      .update(payload)
+      .eq("id", existing.id)
+      .select("*")
+      .single();
+    if (error) throw error;
+    application = data as JobApplicationRow;
+  } else {
+    const { data, error } = await applications()
+      .insert(payload)
+      .select("*")
+      .single();
+    if (error) {
+      if (error.code === "23505") {
+        throw new Error("Você já se candidatou a esta vaga.");
+      }
+      throw error;
+    }
+    application = data as JobApplicationRow;
+  }
+
+  await createTimelineEvent(supabase, userId, {
+    title: `Candidatura enviada: ${roleTitle}`,
+    description: `Sua candidatura para ${companyName} foi registrada na plataforma.`,
+    href: `/dashboard/vagas/${input.jobId}`,
+    event_kind: "application_sent",
+    actor: "user",
+    icon_name: "send",
+    color_token: "green",
+    job_id: input.jobId,
+    company_id: companyId,
+  });
+
+  await createNotification(supabase, userId, {
+    title: `Candidatura enviada — ${roleTitle}`,
+    description: `${companyName} recebeu sua candidatura com currículo adaptado.`,
+    href: `/dashboard/vagas/${input.jobId}`,
+    action_label: "Ver vaga",
+    icon_name: "send",
+    color_token: "green",
+    notification_group: "today",
+  });
+
+  return {
+    application,
+    applyUrl: null,
+    submissionStatus: "completed",
+    tailoredResumeText,
+    coverLetterText,
+    isExternal: false,
   };
 }
 

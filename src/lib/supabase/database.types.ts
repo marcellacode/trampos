@@ -826,7 +826,7 @@ export type Database = {
           job_id: string | null
           last_activity_at: string
           role_title: string
-          source: string
+          application_source: Database["public"]["Enums"]["application_source"]
           status: Database["public"]["Enums"]["application_status"]
           status_label: string
           submission_error: string | null
@@ -849,7 +849,7 @@ export type Database = {
           job_id?: string | null
           last_activity_at?: string
           role_title: string
-          source?: string
+          application_source?: Database["public"]["Enums"]["application_source"]
           status?: Database["public"]["Enums"]["application_status"]
           status_label?: string
           submission_error?: string | null
@@ -872,7 +872,7 @@ export type Database = {
           job_id?: string | null
           last_activity_at?: string
           role_title?: string
-          source?: string
+          application_source?: Database["public"]["Enums"]["application_source"]
           status?: Database["public"]["Enums"]["application_status"]
           status_label?: string
           submission_error?: string | null
@@ -3170,6 +3170,7 @@ export type Database = {
         | "skill"
         | "project"
         | "experience"
+      application_source: "internal" | "external"
       application_status:
         | "interested"
         | "applied"
@@ -3373,6 +3374,7 @@ export const Constants = {
         "project",
         "experience",
       ],
+      application_source: ["internal", "external"],
       application_status: [
         "interested",
         "applied",

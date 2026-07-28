@@ -1,10 +1,18 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { AuthError, requireAuth } from "@/lib/auth/require-auth";
 import {
+  applyInternalJob,
   confirmExternalApplication,
   prepareApplication,
 } from "@/lib/integrations/ats/application-service";
+import type { ApplicationStatus } from "@/lib/applications/status-labels";
+import {
+  fetchCompanyJobApplications,
+  fetchUserInternalApplication,
+  updateCompanyApplicationStatus,
+} from "@/lib/supabase/queries/company-applications";
 import type { JobRecommendation } from "@/types/jobs";
 import type { ActionResult } from "@/app/actions/ai";
 
@@ -92,6 +100,107 @@ export async function confirmExternalApplicationAction(
     const { supabase, user } = await requireAuth();
     const row = await confirmExternalApplication(supabase, user.id, applicationId);
     return { success: true, data: { id: row.id } };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function applyInternalJobAction(
+  job: JobRecommendation
+): Promise<ActionResult<PreparedApplicationResult>> {
+  try {
+    const { supabase, user } = await requireAuth();
+    const result = await applyInternalJob(supabase, user.id, {
+      jobId: job.id,
+      job,
+    });
+
+    revalidatePath(`/dashboard/vagas/${job.id}`);
+    revalidatePath("/dashboard/empresa/candidatos");
+
+    return {
+      success: true,
+      data: {
+        applicationId: result.application.id,
+        applyUrl: null,
+        submissionStatus: result.submissionStatus,
+        tailoredResumeText: result.tailoredResumeText,
+        coverLetterText: result.coverLetterText,
+        isExternal: false,
+      },
+    };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function getInternalApplicationAction(
+  jobId: string
+): Promise<
+  ActionResult<{
+    applicationId: string;
+    submissionStatus: string;
+    tailoredResumeText: string | null;
+    coverLetterText: string | null;
+  } | null>
+> {
+  try {
+    const { supabase, user } = await requireAuth();
+    const row = await fetchUserInternalApplication(supabase, user.id, jobId);
+    if (!row) return { success: true, data: null };
+
+    return {
+      success: true,
+      data: {
+        applicationId: row.id,
+        submissionStatus: row.submission_status,
+        tailoredResumeText: row.tailored_resume_text,
+        coverLetterText: row.cover_letter_text,
+      },
+    };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function listCompanyApplicationsAction(
+  companyId: string,
+  jobId?: string | null
+): Promise<
+  ActionResult<Awaited<ReturnType<typeof fetchCompanyJobApplications>>>
+> {
+  try {
+    const { supabase, user } = await requireAuth();
+    const rows = await fetchCompanyJobApplications(
+      supabase,
+      user.id,
+      companyId,
+      jobId
+    );
+    return { success: true, data: rows };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function updateApplicationStatusAction(input: {
+  companyId: string;
+  applicationId: string;
+  status: ApplicationStatus;
+}): Promise<ActionResult<{ id: string }>> {
+  try {
+    const { supabase, user } = await requireAuth();
+    await updateCompanyApplicationStatus(
+      supabase,
+      user.id,
+      input.companyId,
+      input.applicationId,
+      input.status
+    );
+
+    revalidatePath("/dashboard/empresa/candidatos");
+
+    return { success: true, data: { id: input.applicationId } };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
   }

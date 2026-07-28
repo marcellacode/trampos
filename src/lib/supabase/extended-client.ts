@@ -8,6 +8,8 @@ export function fromExtendedTable(
     | "user_job_matches"
     | "saved_jobs"
     | "interview_sessions"
+    | "posts"
+    | "follows"
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (supabase as any).from(table);

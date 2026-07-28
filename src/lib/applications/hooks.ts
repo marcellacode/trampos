@@ -1,12 +1,18 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
+  applyInternalJobAction,
   confirmExternalApplicationAction,
+  getInternalApplicationAction,
   prepareJobApplicationAction,
 } from "@/app/actions/applications";
 import type { JobRecommendation } from "@/types/jobs";
-import { isExternalJob, getApplyButtonLabel, usesExternalApply } from "@/lib/jobs/source-utils";
+import {
+  getApplyButtonLabel,
+  isPlatformApply,
+  usesExternalApply,
+} from "@/lib/jobs/source-utils";
 
 export type ApplicationUiState = "idle" | "preparing" | "prepared" | "completed";
 
@@ -47,14 +53,36 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
   const [tailoredResumeText, setTailoredResumeText] = useState<string | null>(null);
   const [coverLetterText, setCoverLetterText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   const isExternal = usesExternalApply(job);
+  const isInternalPlatform = isPlatformApply(job);
+
+  useEffect(() => {
+    if (!isInternalPlatform || hydrated) return;
+
+    void getInternalApplicationAction(job.id).then((result) => {
+      setHydrated(true);
+      if (!result.success || !result.data) return;
+
+      if (result.data.submissionStatus === "completed") {
+        setApplicationId(result.data.applicationId);
+        setTailoredResumeText(result.data.tailoredResumeText);
+        setCoverLetterText(result.data.coverLetterText);
+        setState("completed");
+      }
+    });
+  }, [isInternalPlatform, hydrated, job.id]);
 
   const prepare = useCallback(async () => {
     setState("preparing");
     setError(null);
 
-    const result = await prepareJobApplicationAction(job as JobRecommendation);
+    const action = isInternalPlatform
+      ? applyInternalJobAction
+      : prepareJobApplicationAction;
+
+    const result = await action(job as JobRecommendation);
     if (!result.success) {
       setState("idle");
       setError(result.error);
@@ -69,7 +97,7 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
       result.data.submissionStatus === "completed" ? "completed" : "prepared"
     );
     return true;
-  }, [job]);
+  }, [isInternalPlatform, job]);
 
   const confirmExternal = useCallback(async () => {
     if (!applicationId) return false;
@@ -96,6 +124,7 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
   return {
     state,
     isExternal,
+    isInternalPlatform,
     applyUrl,
     applicationId,
     tailoredResumeText,

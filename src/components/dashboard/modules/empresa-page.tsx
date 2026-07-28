@@ -136,6 +136,12 @@ export function EmpresaDashboardPage() {
                 >
                   Gerenciar vagas
                 </Link>
+                <Link
+                  href="/dashboard/empresa/candidatos"
+                  className="text-sm font-medium text-primary hover:underline"
+                >
+                  Ver candidatos
+                </Link>
                 {selectedMembership ? (
                   <Link
                     href={`/empresa/${selectedMembership.company.slug}`}

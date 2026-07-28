@@ -9,6 +9,7 @@ import {
   Clock,
   Copy,
   ExternalLink,
+  Send,
   Sparkles,
   Star,
 } from "lucide-react";
@@ -147,10 +148,36 @@ function PreviewBlock({
   );
 }
 
+function buildInternalChecklist(
+  state: "idle" | "preparing" | "prepared" | "completed",
+  isDone: boolean,
+  hasPreview: boolean
+): ApplyChecklistItem[] {
+  return [
+    { id: "profile", label: "Perfil e currículo base", status: "done" },
+    {
+      id: "tailored",
+      label: "Currículo adaptado para a vaga",
+      status: hasPreview ? "done" : state === "preparing" ? "auto" : "pending",
+    },
+    {
+      id: "cover",
+      label: "Carta de apresentação",
+      status: hasPreview ? "done" : state === "preparing" ? "auto" : "pending",
+    },
+    {
+      id: "submit",
+      label: "Enviar candidatura na plataforma",
+      status: isDone ? "done" : state === "preparing" ? "auto" : "pending",
+    },
+  ];
+}
+
 export function ApplySidebar({ job, className }: ApplySidebarProps) {
   const {
     state,
     isExternal,
+    isInternalPlatform,
     applyUrl,
     tailoredResumeText,
     coverLetterText,
@@ -165,6 +192,9 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
 
   const showPreview = Boolean(tailoredResumeText || coverLetterText);
   const platformApply = isPlatformApply(job);
+  const checklist = isInternalPlatform
+    ? buildInternalChecklist(state, isDone, showPreview)
+    : job.applyChecklist;
 
   async function handlePrimaryAction() {
     if (isDone) return;
@@ -223,6 +253,8 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
         >
           {state === "prepared" && applyUrl ? (
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          ) : isInternalPlatform ? (
+            <Send className="h-4 w-4" aria-hidden="true" />
           ) : (
             <Sparkles className="h-4 w-4" aria-hidden="true" />
           )}
@@ -247,13 +279,19 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           </p>
         )}
 
-        {state === "prepared" && platformApply && (
+        {isDone && isInternalPlatform && (
+          <p className="mt-2 text-center text-xs text-success">
+            Candidatura enviada. A empresa receberá seu currículo adaptado.
+          </p>
+        )}
+
+        {isDone && !isInternalPlatform && platformApply && (
           <p className="mt-2 text-center text-xs text-muted-foreground">
             Sua candidatura foi registrada na plataforma Jobera.
           </p>
         )}
 
-        {isDone && (
+        {isDone && !isInternalPlatform && !platformApply && (
           <p className="mt-2 text-center text-xs text-success">
             Candidatura registrada com sucesso.
           </p>
@@ -264,13 +302,13 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           Melhor horário: {job.bestSendTime.dayLabel}, {job.bestSendTime.timeRange}
         </div>
 
-        {job.applyChecklist.length > 0 && (
+        {checklist.length > 0 && (
           <div className="mt-5 border-t border-border pt-4">
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Checklist
             </p>
             <ul className="space-y-2.5" role="list">
-              {job.applyChecklist.map((item) => (
+              {checklist.map((item) => (
                 <ChecklistItem key={item.id} item={item} />
               ))}
             </ul>
@@ -288,7 +326,7 @@ interface MobileApplySheetProps {
 }
 
 export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps) {
-  const { prepare, isLoading } = useJobApplication({ job });
+  const { prepare, isLoading, isInternalPlatform } = useJobApplication({ job });
 
   return (
     <>
@@ -316,8 +354,18 @@ export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps)
               void prepare();
             }}
           >
-            <Sparkles className="h-4 w-4" aria-hidden="true" />
-            {isLoading ? "Preparando..." : "Preparar candidatura"}
+            {isInternalPlatform ? (
+              <Send className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+            )}
+            {isLoading
+              ? isInternalPlatform
+                ? "Enviando..."
+                : "Preparando..."
+              : isInternalPlatform
+                ? "Enviar candidatura"
+                : "Preparar candidatura"}
           </Button>
         </div>
       </div>

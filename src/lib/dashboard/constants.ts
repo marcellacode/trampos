@@ -6,12 +6,14 @@ import {
   LayoutDashboard,
   MessageSquare,
   Mic,
+  Newspaper,
   Settings,
 } from "lucide-react";
 import type { NavItem } from "@/types/dashboard";
 
 export const DASHBOARD_NAV_ITEMS: NavItem[] = [
   { label: "Início", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Feed", href: "/dashboard/feed", icon: Newspaper },
   { label: "Vagas", href: "/dashboard/vagas", icon: Briefcase },
   { label: "Currículo", href: "/dashboard/curriculo", icon: FileText },
   { label: "Entrevistas", href: "/dashboard/entrevistas", icon: Mic },

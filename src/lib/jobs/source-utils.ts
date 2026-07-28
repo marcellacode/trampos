@@ -87,12 +87,20 @@ export function getApplyButtonLabel(
     applicationMode?: JobApplicationMode;
   }
 ): string {
-  if (state === "preparing") return "Preparando...";
-  if (state === "completed") return "Concluída";
+  if (state === "preparing") {
+    return options.applicationMode === "internal" && !options.usesExternalApply
+      ? "Enviando..."
+      : "Preparando...";
+  }
+  if (state === "completed") {
+    return options.applicationMode === "internal" && !options.usesExternalApply
+      ? "Candidatura enviada"
+      : "Concluída";
+  }
   if (state === "prepared" && options.applyUrl) return "Abrir candidatura";
   if (state === "prepared") return "Candidatura registrada";
   if (options.applicationMode === "internal" && !options.usesExternalApply) {
-    return "Candidatar-se na plataforma";
+    return "Enviar candidatura";
   }
   if (options.usesExternalApply) return "Preparar candidatura com IA";
   return "Candidatar-se na plataforma";

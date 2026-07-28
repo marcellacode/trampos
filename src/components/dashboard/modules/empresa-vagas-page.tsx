@@ -86,6 +86,12 @@ export function EmpresaVagasPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:items-end">
+            <Link
+              href="/dashboard/empresa/candidatos"
+              className="text-sm font-medium text-primary hover:underline"
+            >
+              Ver candidatos
+            </Link>
             {memberships.length > 1 ? (
               <label className="flex flex-col gap-1.5 text-sm">
                 <span className="font-medium text-foreground">Empresa</span>
