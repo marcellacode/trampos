@@ -63,8 +63,8 @@ export function Hero({ stats, terminalActions }: HeroProps) {
               className="mt-6 max-w-xl text-lg leading-relaxed text-[#9CA3AF] sm:text-xl"
             >
               Enquanto você trabalha, estuda ou dorme, nossa IA procura vagas,
-              adapta seu currículo, envia candidaturas e acompanha cada etapa
-              do processo seletivo.
+              adapta seu currículo, prepara candidaturas personalizadas e acompanha
+              cada etapa do processo seletivo.
             </motion.p>
 
             <motion.div

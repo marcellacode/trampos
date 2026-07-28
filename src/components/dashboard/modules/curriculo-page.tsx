@@ -22,6 +22,7 @@ import {
   useUpdateLanguage,
 } from "@/lib/crud/hooks";
 import { CURRICULO_MODULE } from "@/lib/crud/modules";
+import { TailoredResumeVersions } from "@/components/dashboard/curriculo/tailored-resume-versions";
 
 export function CurriculoModulePage() {
   const experiencesQuery = useExperiences();
@@ -47,6 +48,8 @@ export function CurriculoModulePage() {
 
   return (
     <ModuleCrudShell config={CURRICULO_MODULE}>
+      <TailoredResumeVersions />
+
       <EntityCrudSection
         config={experiences}
         items={experiencesQuery.data ?? []}

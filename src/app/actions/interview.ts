@@ -6,6 +6,8 @@ import { checkRateLimit } from "@/lib/ai/rate-limit";
 import { chatCompletion } from "@/lib/ai/groq";
 import { isGroqConfigured } from "@/lib/ai/env";
 import { loadUserProfile } from "@/lib/matching/compute-compatibility";
+import { isInternalJobRef } from "@/lib/external-jobs/resolve-job-ref";
+import { getExternalJobByKey } from "@/lib/external-jobs/upsert-external-job";
 import type { ActionResult } from "@/app/actions/ai";
 
 function getErrorMessage(error: unknown): string {
@@ -18,6 +20,73 @@ export interface InterviewMessage {
   role: "interviewer" | "user" | "feedback";
   content: string;
   timestamp: string;
+}
+
+interface JobInterviewContext {
+  roleTitle: string;
+  companyName: string;
+  jobId: string | null;
+  externalJobId: string | null;
+  stack: string[];
+  description: string;
+}
+
+async function resolveJobInterviewContext(
+  supabase: Awaited<ReturnType<typeof requireAuth>>["supabase"],
+  jobId?: string,
+  fallback?: { roleTitle?: string; companyName?: string }
+): Promise<JobInterviewContext | null> {
+  if (!jobId) return null;
+
+  if (isInternalJobRef(jobId)) {
+    const { data } = await supabase
+      .from("jobs")
+      .select("id, title, ai_summary, company_id")
+      .eq("id", jobId)
+      .maybeSingle();
+
+    if (!data) return null;
+
+    let companyName = fallback?.companyName ?? "Empresa";
+    if (data.company_id) {
+      const { data: company } = await supabase
+        .from("companies")
+        .select("name")
+        .eq("id", data.company_id)
+        .maybeSingle();
+      companyName = company?.name ?? companyName;
+    }
+
+    return {
+      roleTitle: data.title,
+      companyName,
+      jobId: data.id,
+      externalJobId: null,
+      stack: [],
+      description: data.ai_summary ?? "",
+    };
+  }
+
+  const external = await getExternalJobByKey(supabase, jobId);
+  if (external) {
+    return {
+      roleTitle: external.title,
+      companyName: external.company_name || fallback?.companyName || "Empresa",
+      jobId: null,
+      externalJobId: external.id,
+      stack: Array.isArray(external.stack) ? (external.stack as string[]) : [],
+      description: external.description ?? "",
+    };
+  }
+
+  return {
+    roleTitle: fallback?.roleTitle ?? "Desenvolvedor",
+    companyName: fallback?.companyName ?? "Empresa",
+    jobId: null,
+    externalJobId: null,
+    stack: [],
+    description: "",
+  };
 }
 
 export async function startInterviewSessionAction(input?: {
@@ -35,8 +104,14 @@ export async function startInterviewSessionAction(input?: {
     }
 
     const profile = await loadUserProfile(supabase, user.id);
-    const roleTitle = input?.roleTitle ?? profile?.currentRole ?? "Desenvolvedor";
-    const companyName = input?.companyName ?? "Empresa";
+    const jobContext = await resolveJobInterviewContext(supabase, input?.jobId, {
+      roleTitle: input?.roleTitle,
+      companyName: input?.companyName,
+    });
+
+    const roleTitle =
+      jobContext?.roleTitle ?? input?.roleTitle ?? profile?.currentRole ?? "Desenvolvedor";
+    const companyName = jobContext?.companyName ?? input?.companyName ?? "Empresa";
 
     let question =
       "Conte-me sobre você e por que se interessa por esta vaga.";
@@ -46,7 +121,7 @@ export async function startInterviewSessionAction(input?: {
         [
           {
             role: "system",
-            content: `Gere a primeira pergunta de entrevista simulada em PT-BR.
+            content: `Gere a primeira pergunta de entrevista simulada em PT-BR para a vaga específica.
 Retorne JSON: { "question": string }`,
           },
           {
@@ -54,6 +129,8 @@ Retorne JSON: { "question": string }`,
             content: JSON.stringify({
               role: roleTitle,
               company: companyName,
+              description: jobContext?.description?.slice(0, 600),
+              stack: jobContext?.stack?.slice(0, 8),
               profile: profile
                 ? { skills: profile.skills.slice(0, 8), summary: profile.summary }
                 : null,
@@ -74,7 +151,8 @@ Retorne JSON: { "question": string }`,
     const { data, error } = await fromExtendedTable(supabase, "interview_sessions")
       .insert({
         user_id: user.id,
-        job_id: input?.jobId?.match(/^[0-9a-f-]{36}$/i) ? input.jobId : null,
+        job_id: jobContext?.jobId ?? null,
+        external_job_id: jobContext?.externalJobId ?? null,
         role_title: roleTitle,
         company_name: companyName,
         status: "active",
@@ -183,18 +261,120 @@ export async function submitInterviewAnswerAction(
       messages.push({ role: "interviewer", content: nextQuestion, timestamp: now });
     }
 
+    if (done) {
+      await fromExtendedTable(supabase, "interview_sessions")
+        .update({
+          messages,
+          status: "completed",
+          score,
+          feedback_summary: feedbackSummary || feedback,
+        })
+        .eq("id", sessionId);
+    } else {
+      await fromExtendedTable(supabase, "interview_sessions")
+        .update({ messages, status: "active" })
+        .eq("id", sessionId);
+    }
+
+    return {
+      success: true,
+      data: { messages, done, score: done ? score : undefined, feedbackSummary },
+    };
+  } catch (error) {
+    return { success: false, error: getErrorMessage(error) };
+  }
+}
+
+export async function endInterviewSessionAction(
+  sessionId: string
+): Promise<
+  ActionResult<{
+    score: number;
+    feedbackSummary: string;
+    messages: InterviewMessage[];
+  }>
+> {
+  try {
+    const { supabase, user } = await requireAuth();
+    const rate = checkRateLimit(user.id);
+    if (!rate.allowed) {
+      return { success: false, error: "Aguarde e tente novamente." };
+    }
+
+    const { data: session, error: fetchError } = await fromExtendedTable(
+      supabase,
+      "interview_sessions"
+    )
+      .select("*")
+      .eq("id", sessionId)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (fetchError || !session) {
+      return { success: false, error: "Sessão não encontrada." };
+    }
+
+    const messages = (session.messages ?? []) as InterviewMessage[];
+
+    if (session.status === "completed" && session.score != null) {
+      return {
+        success: true,
+        data: {
+          score: session.score as number,
+          feedbackSummary: (session.feedback_summary as string) || "",
+          messages,
+        },
+      };
+    }
+
+    let score = 70;
+    let feedbackSummary =
+      "Boa prática geral. Continue treinando respostas com exemplos STAR.";
+
+    if (isGroqConfigured()) {
+      const raw = await chatCompletion(
+        [
+          {
+            role: "system",
+            content: `Encerre a entrevista simulada com resumo final. Retorne JSON:
+{ "score": 0-100, "feedbackSummary": string }`,
+          },
+          {
+            role: "user",
+            content: JSON.stringify({
+              role: session.role_title,
+              company: session.company_name,
+              messages,
+            }),
+          },
+        ],
+        { jsonMode: true, temperature: 0.3 }
+      );
+
+      const parsed = JSON.parse(raw) as { score?: number; feedbackSummary?: string };
+      score = parsed.score ?? score;
+      feedbackSummary = parsed.feedbackSummary ?? feedbackSummary;
+    }
+
+    const now = new Date().toISOString();
+    messages.push({
+      role: "feedback",
+      content: feedbackSummary,
+      timestamp: now,
+    });
+
     await fromExtendedTable(supabase, "interview_sessions")
       .update({
         messages,
-        status: done ? "completed" : "active",
-        score: done ? score : session.score,
-        feedback_summary: done ? feedbackSummary || feedback : session.feedback_summary,
+        status: "completed",
+        score,
+        feedback_summary: feedbackSummary,
       })
       .eq("id", sessionId);
 
     return {
       success: true,
-      data: { messages, done, score: done ? score : undefined, feedbackSummary },
+      data: { score, feedbackSummary, messages },
     };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };

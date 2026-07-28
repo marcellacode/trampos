@@ -11,9 +11,32 @@ import type { InterviewQuestion } from "@/types/jobs";
 
 interface InterviewQuestionsProps {
   questions: InterviewQuestion[];
+  jobId?: string;
+  roleTitle?: string;
+  companyName?: string;
 }
 
-export function InterviewQuestions({ questions }: InterviewQuestionsProps) {
+function buildInterviewHref(
+  jobId?: string,
+  roleTitle?: string,
+  companyName?: string
+): string {
+  const params = new URLSearchParams();
+  if (jobId) params.set("jobId", jobId);
+  if (roleTitle) params.set("role", roleTitle);
+  if (companyName) params.set("company", companyName);
+  const query = params.toString();
+  return query ? `/dashboard/entrevistas?${query}` : "/dashboard/entrevistas";
+}
+
+export function InterviewQuestions({
+  questions,
+  jobId,
+  roleTitle,
+  companyName,
+}: InterviewQuestionsProps) {
+  const trainHref = buildInterviewHref(jobId, roleTitle, companyName);
+
   return (
     <ReportCard glow>
       <ReportSectionHeader
@@ -44,7 +67,7 @@ export function InterviewQuestions({ questions }: InterviewQuestionsProps) {
       </div>
 
       <Button
-        render={<Link href="/dashboard/entrevistas" />}
+        render={<Link href={trainHref} />}
         nativeButton={false}
         variant="outline"
         className="mt-5 h-10 w-full gap-2 border-[#4F7CFF]/30 bg-[#4F7CFF]/5 text-[#4F7CFF] hover:bg-[#4F7CFF]/10"

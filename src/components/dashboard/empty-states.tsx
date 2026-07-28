@@ -112,7 +112,7 @@ export function NewUserState({ firstName }: { firstName: string }) {
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-[#9CA3AF] sm:text-base">
           Complete seu objetivo profissional e a IA começará a buscar vagas,
-          adaptar currículos e candidatar você automaticamente — enquanto você
+          adaptar currículos e preparar candidaturas personalizadas — enquanto você
           foca no que importa.
         </p>
         <div className="mt-7 flex flex-wrap gap-3">

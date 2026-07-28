@@ -112,6 +112,15 @@ function JobDetailsContent({ job }: { job: JobDetail }) {
           </div>
           <ApplySidebar job={job} className="hidden lg:block" />
         </div>
+        <div className="grid gap-6 lg:grid-cols-2">
+          <ResumeSuggestions suggestions={job.resumeSuggestions} job={job} />
+          <InterviewQuestions
+            questions={job.interviewQuestions}
+            jobId={job.id}
+            roleTitle={job.role}
+            companyName={job.company}
+          />
+        </div>
         <MobileApplySheet
           job={job}
           open={sheetOpen}
@@ -156,10 +165,15 @@ function JobDetailsContent({ job }: { job: JobDetail }) {
             </div>
             <HiringTimeline stages={job.hiringTimeline} />
             <JobFAQSection faqs={job.faqs} />
-            <InterviewQuestions questions={job.interviewQuestions} />
+            <InterviewQuestions
+              questions={job.interviewQuestions}
+              jobId={job.id}
+              roleTitle={job.role}
+              companyName={job.company}
+            />
             <GithubProjects projects={job.githubProjects} />
             <div className="grid gap-6 lg:grid-cols-2">
-              <ResumeSuggestions suggestions={job.resumeSuggestions} />
+              <ResumeSuggestions suggestions={job.resumeSuggestions} job={job} />
               <PortfolioHighlights projects={job.portfolioProjects} />
             </div>
             <SimilarCompanies companies={job.similarCompanies} />

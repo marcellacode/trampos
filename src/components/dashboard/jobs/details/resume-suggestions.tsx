@@ -1,17 +1,22 @@
 "use client";
 
-import { ArrowRight, FileText, Plus, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
+import { RefreshCw, Sparkles } from "lucide-react";
+import { regenerateTailoredResumeAction } from "@/app/actions/resume";
 import { Button } from "@/components/ui/button";
 import {
   AIBadge,
   ReportCard,
   ReportSectionHeader,
 } from "@/components/dashboard/jobs/details/report-card";
-import type { ResumeSuggestion } from "@/types/jobs";
+import type { JobRecommendation, ResumeSuggestion } from "@/types/jobs";
 import { cn } from "@/lib/utils";
+import { ArrowRight, FileText, Plus } from "lucide-react";
 
 interface ResumeSuggestionsProps {
   suggestions: ResumeSuggestion[];
+  job: Pick<JobRecommendation, "id" | "role" | "company" | "description" | "stack" | "companyId" | "externalUrl" | "source">;
+  onSuggestionsUpdated?: (suggestions: ResumeSuggestion[]) => void;
 }
 
 const TYPE_CONFIG = {
@@ -20,7 +25,34 @@ const TYPE_CONFIG = {
   highlight: { icon: Sparkles, label: "Destacar", color: "#F59E0B" },
 };
 
-export function ResumeSuggestions({ suggestions }: ResumeSuggestionsProps) {
+export function ResumeSuggestions({
+  suggestions: initialSuggestions,
+  job,
+  onSuggestionsUpdated,
+}: ResumeSuggestionsProps) {
+  const [suggestions, setSuggestions] = useState(initialSuggestions);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    setSuggestions(initialSuggestions);
+  }, [initialSuggestions]);
+
+  async function handleRegenerate() {
+    setLoading(true);
+    setError(null);
+    const result = await regenerateTailoredResumeAction(job as JobRecommendation);
+    setLoading(false);
+
+    if (!result.success) {
+      setError(result.error);
+      return;
+    }
+
+    setSuggestions(result.data.suggestions);
+    onSuggestionsUpdated?.(result.data.suggestions);
+  }
+
   return (
     <ReportCard>
       <ReportSectionHeader
@@ -28,6 +60,12 @@ export function ResumeSuggestions({ suggestions }: ResumeSuggestionsProps) {
         subtitle="Antes de enviar, a IA sugere estes ajustes"
         badge={<AIBadge />}
       />
+
+      {suggestions.length === 0 && !loading && (
+        <p className="text-sm text-[#9CA3AF]">
+          Gere adaptações personalizadas para ver sugestões específicas desta vaga.
+        </p>
+      )}
 
       <ul className="space-y-2.5" role="list">
         {suggestions.map((s) => {
@@ -60,9 +98,24 @@ export function ResumeSuggestions({ suggestions }: ResumeSuggestionsProps) {
         })}
       </ul>
 
-      <Button className="mt-5 h-10 w-full gap-2">
-        <FileText className="h-4 w-4" aria-hidden="true" />
-        Aplicar automaticamente
+      {error && <p className="mt-3 text-xs text-[#EF4444]">{error}</p>}
+
+      <Button
+        className="mt-5 h-10 w-full gap-2"
+        disabled={loading}
+        onClick={() => void handleRegenerate()}
+      >
+        {loading ? (
+          <>
+            <RefreshCw className="h-4 w-4 animate-spin" aria-hidden="true" />
+            Gerando adaptação...
+          </>
+        ) : (
+          <>
+            <FileText className="h-4 w-4" aria-hidden="true" />
+            {suggestions.length > 0 ? "Regenerar adaptação" : "Gerar adaptação com IA"}
+          </>
+        )}
       </Button>
     </ReportCard>
   );

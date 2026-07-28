@@ -301,7 +301,7 @@ export function useDeleteChatMessage(context = "dashboard") {
 }
 
 export function useMarkChatRead(context = "dashboard") {
-  return useCrudMutation(
+  return useCrudMutation<void, void>(
     () => withUser((s, u) => markChatContextRead(s, u, context)),
     crudKeys.chat(context)
   );

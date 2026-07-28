@@ -1,50 +1,128 @@
 "use client";
 
-import { ModuleCrudShell } from "@/components/crud/module-crud-page";
-import { CareerChatPanel } from "@/components/dashboard/career-chat-panel";
+import { Suspense } from "react";
+import { useSearchParams } from "next/navigation";
+import {
+  EntityCrudSection,
+  ModuleCrudShell,
+} from "@/components/crud/module-crud-page";
+import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { InterviewSimulator } from "@/components/dashboard/interview/interview-simulator";
-import { useChatMessages } from "@/lib/crud/hooks";
+import { MessagesInbox } from "@/components/dashboard/messages-inbox";
+import {
+  useCreateTimelineEvent,
+  useDeleteTimelineEvent,
+  useTimelineEvents,
+  useUpdateTimelineEvent,
+} from "@/lib/crud/hooks";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
-import { mapChatMessages } from "@/lib/supabase/mappers/dashboard";
-import { MENSAGENS_MODULE, ENTREVISTAS_MODULE } from "@/lib/crud/modules";
+import { ENTREVISTAS_MODULE } from "@/lib/crud/modules";
 
 export function MensagensModulePage() {
   const { shell } = useDashboardShell();
-  const messagesQuery = useChatMessages("dashboard");
-
-  const initialMessages = mapChatMessages(messagesQuery.data ?? []);
 
   return (
-    <ModuleCrudShell config={MENSAGENS_MODULE}>
-      <CareerChatPanel
-        context="dashboard"
-        userName={shell.user.firstName}
-        initialMessages={initialMessages}
-      />
-    </ModuleCrudShell>
+    <DashboardLayout
+      user={shell.user}
+      notifications={shell.notifications}
+      unreadNotifications={shell.unreadNotifications}
+      unreadMessages={shell.unreadMessages}
+    >
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">Mensagens</h1>
+          <p className="mt-1.5 max-w-2xl text-sm text-[#9CA3AF]">
+            Conversas com o copiloto Jobe sobre vagas, currículo e entrevistas.
+          </p>
+        </div>
+        <MessagesInbox context="dashboard" userName={shell.user.firstName} />
+      </div>
+    </DashboardLayout>
   );
 }
 
 export function AssistenteModulePage() {
   const { shell } = useDashboardShell();
-  const messagesQuery = useChatMessages("assistant");
-
-  const initialMessages = mapChatMessages(messagesQuery.data ?? []);
 
   return (
-    <CareerChatPanel
-      context="assistant"
-      userName={shell.user.firstName}
-      initialMessages={initialMessages}
-      className="h-[min(80vh,720px)]"
-    />
+    <DashboardLayout
+      user={shell.user}
+      notifications={shell.notifications}
+      unreadNotifications={shell.unreadNotifications}
+      unreadMessages={shell.unreadMessages}
+    >
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight text-white">
+            Assistente de carreira
+          </h1>
+          <p className="mt-1.5 max-w-2xl text-sm text-[#9CA3AF]">
+            Copiloto full-screen para planejar sua carreira, revisar currículo e preparar entrevistas.
+          </p>
+        </div>
+        <MessagesInbox
+          context="assistant"
+          userName={shell.user.firstName}
+          className="lg:grid-cols-[300px_1fr]"
+        />
+      </div>
+    </DashboardLayout>
   );
 }
 
 export function EntrevistasModulePage() {
   return (
+    <Suspense fallback={null}>
+      <EntrevistasModuleContent />
+    </Suspense>
+  );
+}
+
+function EntrevistasModuleContent() {
+  const searchParams = useSearchParams();
+  const jobId = searchParams.get("jobId") ?? undefined;
+  const roleTitle = searchParams.get("role") ?? undefined;
+  const companyName = searchParams.get("company") ?? undefined;
+
+  const timelineQuery = useTimelineEvents("interview_invite");
+  const createEvent = useCreateTimelineEvent();
+  const updateEvent = useUpdateTimelineEvent();
+  const deleteEvent = useDeleteTimelineEvent();
+  const [interviews] = ENTREVISTAS_MODULE.entities;
+
+  return (
     <ModuleCrudShell config={ENTREVISTAS_MODULE}>
-      <InterviewSimulator />
+      <InterviewSimulator
+        jobId={jobId}
+        roleTitle={roleTitle}
+        companyName={companyName}
+      />
+
+      <div className="rounded-2xl border border-white/[0.08] bg-[#111315]/50 p-1">
+        <p className="px-4 pt-4 text-xs font-medium uppercase tracking-wider text-[#6B7280]">
+          Convites reais
+        </p>
+        <EntityCrudSection
+          config={interviews}
+          items={timelineQuery.data ?? []}
+          isLoading={timelineQuery.isLoading}
+          isMutating={createEvent.isPending || updateEvent.isPending}
+          onCreate={async (payload) => {
+            await createEvent.mutateAsync({
+              title: String(payload.title ?? ""),
+              description: String(payload.description ?? ""),
+              href: String(payload.href ?? "/dashboard/entrevistas"),
+              event_kind: "interview_invite",
+            });
+          }}
+          onUpdate={async (id, payload) => {
+            await updateEvent.mutateAsync({ id, input: payload });
+          }}
+          onDelete={async (id) => {
+            await deleteEvent.mutateAsync(id);
+          }}
+        />
+      </div>
     </ModuleCrudShell>
   );
 }

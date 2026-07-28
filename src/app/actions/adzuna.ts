@@ -15,6 +15,8 @@ import {
   mapAdzunaJobsToRecommendations,
   parseAdzunaJobId,
 } from "@/lib/integrations/adzuna/mapper";
+import { enrichAdzunaJobView } from "@/lib/integrations/adzuna/enrich";
+import { upsertExternalJobFromRecommendation } from "@/lib/external-jobs/upsert-external-job";
 import {
   applyMatchToJob,
   loadUserMatchesForJobs,
@@ -107,8 +109,13 @@ export async function fetchAdzunaJobDetailAction(
       return { success: true, data: null };
     }
 
+    const enrichedJob = await enrichAdzunaJobView(job);
+    const recommendation = mapAdzunaJobToRecommendation(enrichedJob);
+
     const { supabase, user } = await getOptionalAuth();
-    let detail = mapAdzunaJobToDetail(job);
+    await upsertExternalJobFromRecommendation(supabase, recommendation);
+
+    let detail = mapAdzunaJobToDetail(enrichedJob);
 
     if (user) {
       const matchMap = await loadUserMatchesForJobs(supabase, user.id, [id]);
@@ -119,7 +126,7 @@ export async function fetchAdzunaJobDetailAction(
           loadUserProfile(supabase, user.id),
           loadProfileGoals(supabase, user.id),
         ]);
-        const recommendation = mapAdzunaJobToRecommendation(job);
+        const recommendation = mapAdzunaJobToRecommendation(enrichedJob);
         const computed = await computeJobMatch(recommendation, profile, goals);
         match = await upsertUserJobMatch(supabase, user.id, recommendation, computed);
       }

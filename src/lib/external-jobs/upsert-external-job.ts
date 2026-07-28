@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fromExtendedTable } from "@/lib/supabase/extended-client";
+import { detectAtsProvider } from "@/lib/integrations/ats/detect-provider";
 import { enrichJobFromGreenhouseUrl } from "@/lib/integrations/ats/providers/greenhouse/client";
 import type { ExternalJobInput, ExternalJobRow } from "@/lib/external-jobs/types";
 import type { JobRecommendation } from "@/types/jobs";
@@ -87,7 +88,8 @@ export async function upsertExternalJobFromRecommendation(
   }
 
   let enrichedJob = job;
-  if (job.externalUrl?.includes("greenhouse.io")) {
+  const atsProvider = detectAtsProvider(job.externalUrl);
+  if (atsProvider === "greenhouse" && job.externalUrl) {
     const enriched = await enrichJobFromGreenhouseUrl(job.externalUrl);
     if (enriched) {
       enrichedJob = {

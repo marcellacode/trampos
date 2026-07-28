@@ -12,5 +12,5 @@ export const AUTH_BRAND = {
   tagline:
     "Sua carreira agora tem uma Inteligência Artificial trabalhando por você.",
   description:
-    "Enquanto você dorme, nossa IA procura vagas, adapta seu currículo e acompanha empresas automaticamente.",
+    "Enquanto você dorme, nossa IA procura vagas, adapta seu currículo e prepara candidaturas assistidas.",
 } as const;

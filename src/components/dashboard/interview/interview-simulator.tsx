@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
-import { Mic, Sparkles } from "lucide-react";
+import { Mic, Sparkles, Square } from "lucide-react";
 import {
+  endInterviewSessionAction,
   listInterviewSessionsAction,
   startInterviewSessionAction,
   submitInterviewAnswerAction,
@@ -11,13 +12,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-export function InterviewSimulator() {
+export interface InterviewSimulatorProps {
+  jobId?: string;
+  roleTitle?: string;
+  companyName?: string;
+}
+
+export function InterviewSimulator({
+  jobId,
+  roleTitle,
+  companyName,
+}: InterviewSimulatorProps) {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<InterviewMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const [score, setScore] = useState<number | null>(null);
+  const [feedbackSummary, setFeedbackSummary] = useState<string | null>(null);
   const [pastSessions, setPastSessions] = useState<
     {
       id: string;
@@ -29,6 +41,8 @@ export function InterviewSimulator() {
     }[]
   >([]);
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  const hasJobContext = Boolean(jobId || roleTitle || companyName);
 
   useEffect(() => {
     void listInterviewSessionsAction().then((r) => {
@@ -42,14 +56,19 @@ export function InterviewSimulator() {
 
   const startSession = useCallback(async () => {
     setLoading(true);
-    const result = await startInterviewSessionAction();
+    const result = await startInterviewSessionAction({
+      jobId,
+      roleTitle,
+      companyName,
+    });
     setLoading(false);
     if (!result.success) return;
     setSessionId(result.data.sessionId);
     setMessages(result.data.messages);
     setDone(false);
     setScore(null);
-  }, []);
+    setFeedbackSummary(null);
+  }, [jobId, roleTitle, companyName]);
 
   const handleSubmit = useCallback(
     async (e: FormEvent) => {
@@ -66,10 +85,23 @@ export function InterviewSimulator() {
       if (result.data.done) {
         setDone(true);
         setScore(result.data.score ?? null);
+        setFeedbackSummary(result.data.feedbackSummary ?? null);
       }
     },
     [sessionId, input, loading, done]
   );
+
+  const handleEndEarly = useCallback(async () => {
+    if (!sessionId || loading) return;
+    setLoading(true);
+    const result = await endInterviewSessionAction(sessionId);
+    setLoading(false);
+    if (!result.success) return;
+    setMessages(result.data.messages);
+    setDone(true);
+    setScore(result.data.score);
+    setFeedbackSummary(result.data.feedbackSummary);
+  }, [sessionId, loading]);
 
   return (
     <div className="space-y-6">
@@ -81,13 +113,15 @@ export function InterviewSimulator() {
               <h2 className="text-lg font-semibold text-white">Simulador de entrevista IA</h2>
             </div>
             <p className="mt-1 text-sm text-[#9CA3AF]">
-              Pratique respostas com feedback personalizado via Groq.
+              {hasJobContext && roleTitle
+                ? `Treino para ${roleTitle}${companyName ? ` na ${companyName}` : ""}.`
+                : "Pratique respostas com feedback personalizado via Groq."}
             </p>
           </div>
           {!sessionId && (
             <Button onClick={() => void startSession()} disabled={loading}>
               <Sparkles className="mr-2 h-4 w-4" />
-              Iniciar simulação
+              {hasJobContext ? "Iniciar treino da vaga" : "Iniciar simulação"}
             </Button>
           )}
         </div>
@@ -103,7 +137,8 @@ export function InterviewSimulator() {
                   "max-w-[90%] rounded-xl px-4 py-2.5 text-sm",
                   msg.role === "user" && "ml-auto bg-[#4F7CFF]/20 text-white",
                   msg.role === "interviewer" && "bg-white/[0.04] text-white",
-                  msg.role === "feedback" && "border border-[#22C55E]/20 bg-[#22C55E]/10 text-[#BBF7D0]"
+                  msg.role === "feedback" &&
+                    "border border-[#22C55E]/20 bg-[#22C55E]/10 text-[#BBF7D0]"
                 )}
               >
                 {msg.role === "feedback" && (
@@ -115,9 +150,14 @@ export function InterviewSimulator() {
               </div>
             ))}
             {done && score != null && (
-              <p className="text-center text-sm font-medium text-[#4F7CFF]">
-                Pontuação final: {score}/100
-              </p>
+              <div className="rounded-xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 p-4 text-center">
+                <p className="text-sm font-medium text-[#4F7CFF]">
+                  Pontuação final: {score}/100
+                </p>
+                {feedbackSummary && (
+                  <p className="mt-2 text-xs text-[#9CA3AF]">{feedbackSummary}</p>
+                )}
+              </div>
             )}
             <div ref={bottomRef} />
           </div>
@@ -134,6 +174,15 @@ export function InterviewSimulator() {
                 />
                 <Button type="submit" disabled={loading || !input.trim()}>
                   Enviar
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={loading}
+                  onClick={() => void handleEndEarly()}
+                  aria-label="Encerrar entrevista"
+                >
+                  <Square className="h-4 w-4" />
                 </Button>
               </div>
             </form>

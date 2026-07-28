@@ -39,7 +39,7 @@ export const HOW_IT_WORKS_STEPS = [
   },
   {
     step: 6,
-    title: "Agenda entrevistas",
+    title: "Organiza entrevistas",
     description: "Organiza sua agenda e prepara entrevistas com simulador IA.",
     icon: "Calendar" as const,
   },
@@ -153,7 +153,7 @@ export const FAQ_ITEMS = [
   {
     question: "Qual a diferença para o LinkedIn ou Indeed?",
     answer:
-      "LinkedIn e Indeed são plataformas de busca — você ainda precisa fazer todo o trabalho. Jobera é um agente autônomo que trabalha ativamente por você: busca, adapta, aplica e acompanha.",
+      "LinkedIn e Indeed são plataformas de busca — você ainda precisa fazer todo o trabalho. Jobera é um agente proativo que busca vagas, adapta currículo, prepara candidaturas assistidas e treina entrevistas — com você no controle de cada envio.",
   },
   {
     question: "Existe plano gratuito?",
