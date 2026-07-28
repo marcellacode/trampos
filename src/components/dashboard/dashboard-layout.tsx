@@ -48,7 +48,7 @@ export function DashboardLayout({
   }, []);
 
   return (
-    <div className={cn("min-h-screen bg-[#08090A] text-white", className)}>
+    <div className={cn("min-h-screen bg-background text-foreground", className)}>
       <Sidebar
         user={user}
         open={sidebarOpen}
@@ -57,7 +57,7 @@ export function DashboardLayout({
 
       <div
         className={cn(
-          "flex min-h-screen flex-col transition-[margin] duration-300 lg:ml-[260px]",
+          "flex min-h-screen flex-col transition-[margin] duration-300 lg:ml-[240px]",
           chatOpen && "xl:mr-[340px]"
         )}
       >

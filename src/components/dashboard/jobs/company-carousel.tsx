@@ -27,11 +27,11 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
         <div>
           <h2
             id="companies-heading"
-            className="text-base font-semibold text-white"
+            className="text-base font-semibold text-foreground"
           >
             Empresas que combinam com você
           </h2>
-          <p className="mt-0.5 text-sm text-[#9CA3AF]">
+          <p className="mt-0.5 text-sm text-muted-foreground">
             Cultura, benefícios e fit alinhados ao seu perfil
           </p>
         </div>
@@ -39,7 +39,7 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
           <button
             type="button"
             onClick={() => scroll(-1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             aria-label="Anterior"
           >
             <ChevronLeft className="h-4 w-4" />
@@ -47,7 +47,7 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
           <button
             type="button"
             onClick={() => scroll(1)}
-            className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+            className="flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             aria-label="Próximo"
           >
             <ChevronRight className="h-4 w-4" />
@@ -68,7 +68,7 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
             viewport={{ once: true }}
             transition={{ delay: index * 0.05 }}
             whileHover={{ y: -4 }}
-            className="w-[260px] shrink-0 rounded-2xl border border-white/[0.08] bg-[#111315] p-5 transition-shadow hover:border-white/[0.14] hover:shadow-[0_0_32px_rgba(79,124,255,0.1)]"
+            className="w-[260px] shrink-0 rounded-2xl border border-border bg-card p-5 transition-shadow hover:border-white/[0.14] hover:shadow-[0_0_32px_rgba(79,124,255,0.1)]"
           >
             <Link href={company.href} className="block">
               <div className="flex items-start justify-between">
@@ -82,23 +82,23 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
                   {company.logo}
                 </div>
                 {company.hasMatch ? (
-                  <span className="rounded-lg bg-[#22C55E]/10 px-2 py-1 text-xs font-semibold text-[#22C55E]">
+                  <span className="rounded-lg bg-success/10 px-2 py-1 text-xs font-semibold text-success">
                     {company.compatibility}%
                   </span>
                 ) : null}
               </div>
 
-              <h3 className="mt-4 text-sm font-semibold text-white">
+              <h3 className="mt-4 text-sm font-semibold text-foreground">
                 {company.name}
               </h3>
 
               <div className="mt-3 flex flex-wrap gap-2">
-                <span className="inline-flex items-center gap-1 rounded-lg border border-white/[0.06] bg-white/[0.03] px-2 py-1 text-[10px] text-[#9CA3AF]">
+                <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-muted/40 px-2 py-1 text-[10px] text-muted-foreground">
                   <Building2 className="h-3 w-3" aria-hidden="true" />
                   {company.environment}
                 </span>
                 {company.remote && (
-                  <span className="inline-flex items-center gap-1 rounded-lg border border-[#4F7CFF]/20 bg-[#4F7CFF]/8 px-2 py-1 text-[10px] text-[#4F7CFF]">
+                  <span className="inline-flex items-center gap-1 rounded-lg border border-primary/20 bg-primary/8 px-2 py-1 text-[10px] text-primary">
                     <Globe className="h-3 w-3" aria-hidden="true" />
                     Remoto
                   </span>
@@ -109,7 +109,7 @@ export function CompanyCarousel({ companies, className }: CompanyCarouselProps) 
                 {company.benefits.slice(0, 3).map((b) => (
                   <span
                     key={b}
-                    className="rounded-md bg-white/[0.04] px-2 py-0.5 text-[10px] text-[#9CA3AF]"
+                    className="rounded-md bg-muted/50 px-2 py-0.5 text-[10px] text-muted-foreground"
                   >
                     {b}
                   </span>

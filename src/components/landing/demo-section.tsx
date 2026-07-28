@@ -25,28 +25,26 @@ export function DemoSection({
 
   return (
     <section
-      className="relative py-24 sm:py-32"
+      className="landing-section relative"
       aria-labelledby="demo-heading"
     >
-      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-[#4F7CFF]/5 to-transparent" aria-hidden="true" />
-
       <Container>
         <SectionHeader
-          label="Vaga real"
+          label="Jobe em ação"
           title={`${jobTitle} · ${companyName}`}
           description="Resumo gerado a partir do catálogo de vagas da plataforma."
         />
 
         <FadeInView>
-          <div className="mx-auto max-w-2xl">
-            <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#111315] shadow-2xl">
-              <div className="flex items-center gap-3 border-b border-white/8 px-6 py-4">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/30">
-                  <Bot className="h-5 w-5 text-[#4F7CFF]" aria-hidden="true" />
+          <div className="mx-auto mt-10 max-w-2xl">
+            <div className="glass-card overflow-hidden glow-primary">
+              <div className="flex items-center gap-3 border-b border-white/10 px-6 py-4">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/15 ring-1 ring-primary/30">
+                  <Bot className="h-5 w-5 text-primary" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="font-medium text-white">Jobe</p>
-                  <p className="text-xs text-[#22C55E]">Catálogo ativo</p>
+                  <p className="font-medium text-foreground">Jobe</p>
+                  <p className="text-xs text-success">Catálogo ativo</p>
                 </div>
               </div>
 
@@ -58,11 +56,11 @@ export function DemoSection({
                   transition={{ delay: 0.2 }}
                   className="flex justify-end gap-3"
                 >
-                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-[#4F7CFF] px-4 py-3 text-sm text-white">
+                  <div className="max-w-[80%] rounded-2xl rounded-tr-sm bg-primary px-4 py-3 text-sm text-primary-foreground">
                     {userMessage}
                   </div>
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10">
-                    <User className="h-4 w-4 text-white" aria-hidden="true" />
+                    <User className="h-4 w-4 text-foreground" aria-hidden="true" />
                   </div>
                 </motion.div>
 
@@ -73,10 +71,10 @@ export function DemoSection({
                   transition={{ delay: 0.6 }}
                   className="flex gap-3"
                 >
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#4F7CFF]/10">
-                    <Bot className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                    <Bot className="h-4 w-4 text-primary" aria-hidden="true" />
                   </div>
-                  <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-white/8 bg-white/5 px-4 py-3 text-sm leading-relaxed text-white/90">
+                  <div className="max-w-[85%] rounded-2xl rounded-tl-sm border border-white/10 bg-white/5 px-4 py-3 text-sm leading-relaxed text-foreground/90">
                     {assistantMessage}
                   </div>
                 </motion.div>

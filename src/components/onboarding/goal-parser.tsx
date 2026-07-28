@@ -62,7 +62,7 @@ export function GoalParser({
         <motion.h2
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+          className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
         >
           O que você procura hoje?
         </motion.h2>
@@ -70,7 +70,7 @@ export function GoalParser({
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="text-sm text-[#9CA3AF] sm:text-base"
+          className="text-sm text-muted-foreground sm:text-base"
         >
           Escreva livremente. A IA interpreta automaticamente seus objetivos.
         </motion.p>
@@ -91,10 +91,10 @@ export function GoalParser({
           onChange={(e) => onTextChange(e.target.value)}
           rows={5}
           placeholder="Quero trabalhar como Desenvolvedora Front-end React, remoto, recebendo acima de R$8.000."
-          className="w-full resize-none rounded-2xl border border-white/[0.1] bg-[#111315]/90 px-5 py-4 text-base leading-relaxed text-white outline-none transition-shadow placeholder:text-white/30 focus:border-[#4F7CFF]/50 focus:ring-2 focus:ring-[#4F7CFF]/25 focus:shadow-[0_0_40px_rgba(79,124,255,0.15)]"
+          className="w-full resize-none rounded-2xl border border-border bg-card/90 px-5 py-4 text-base leading-relaxed text-foreground outline-none transition-shadow placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/25 focus:shadow-sm"
           aria-describedby="goal-hint"
         />
-        <div className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-[#4F7CFF]/15 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-[#A8C0FF]">
+        <div className="pointer-events-none absolute bottom-3 right-3 flex items-center gap-1.5 rounded-full bg-primary/15 px-2.5 py-1 text-[10px] font-medium uppercase tracking-wider text-[#A8C0FF]">
           <Sparkles className="h-3 w-3" aria-hidden="true" />
           IA ativa
         </div>
@@ -112,7 +112,7 @@ export function GoalParser({
             exit={{ opacity: 0, height: 0 }}
             className="space-y-3 overflow-hidden"
           >
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Interpretado pela IA
             </p>
             <div
@@ -133,7 +133,7 @@ export function GoalParser({
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => removeChip(chip.id)}
-                    className="group inline-flex items-center gap-1.5 rounded-full border border-[#4F7CFF]/30 bg-[#4F7CFF]/12 px-3.5 py-1.5 text-sm font-medium text-[#C5D4FF] transition-colors hover:border-red-400/40 hover:bg-red-500/10 hover:text-red-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/60"
+                    className="group inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/12 px-3.5 py-1.5 text-sm font-medium text-primary transition-colors hover:border-red-400/40 hover:bg-red-500/10 hover:text-destructive focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
                     aria-label={`Remover ${chip.label}`}
                   >
                     {chip.label}

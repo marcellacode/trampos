@@ -13,33 +13,33 @@ export function BestSendTimeCard({ data, className }: BestSendTimeCardProps) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-white/[0.06] bg-white/[0.02] p-4",
+        "rounded-xl border border-border bg-muted/30 p-4",
         className
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Melhor horário
           </p>
-          <p className="mt-1 text-[10px] text-[#9CA3AF]/80">
+          <p className="mt-1 text-[10px] text-muted-foreground/80">
             Melhor momento para enviar
           </p>
         </div>
         <Rocket
-          className="h-4 w-4 shrink-0 text-[#4F7CFF]"
+          className="h-4 w-4 shrink-0 text-primary"
           aria-hidden="true"
         />
       </div>
 
-      <div className="mt-4 rounded-lg border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 px-4 py-3">
-        <p className="text-xs font-medium text-[#4F7CFF]">{data.dayLabel}</p>
-        <p className="mt-0.5 text-lg font-semibold tracking-tight text-white">
+      <div className="mt-4 rounded-lg border border-primary/20 bg-primary/5 px-4 py-3">
+        <p className="text-xs font-medium text-primary">{data.dayLabel}</p>
+        <p className="mt-0.5 text-lg font-semibold tracking-tight text-foreground">
           {data.timeRange}
         </p>
       </div>
 
-      <p className="mt-3 text-sm text-white/75">{data.insight}</p>
+      <p className="mt-3 text-sm text-foreground/75">{data.insight}</p>
     </div>
   );
 }

@@ -64,9 +64,9 @@ export function MessagesInbox({
         className
       )}
     >
-      <aside className="rounded-2xl border border-white/[0.08] bg-[#111315] p-4">
-        <h3 className="text-sm font-semibold text-white">Caixa de entrada</h3>
-        <p className="mt-1 text-xs text-[#9CA3AF]">
+      <aside className="rounded-2xl border border-border bg-card p-4">
+        <h3 className="text-sm font-semibold text-foreground">Caixa de entrada</h3>
+        <p className="mt-1 text-xs text-muted-foreground">
           {context === "assistant"
             ? "Histórico com o assistente de carreira"
             : "Histórico com o copiloto Jobe"}
@@ -81,12 +81,12 @@ export function MessagesInbox({
               {group.messages.slice(-3).map((msg) => (
                 <div
                   key={msg.id}
-                  className="rounded-lg border border-white/[0.06] bg-white/[0.02] px-3 py-2"
+                  className="rounded-lg border border-border bg-muted/30 px-3 py-2"
                 >
-                  <p className="text-[10px] font-medium text-[#4F7CFF]">
+                  <p className="text-[10px] font-medium text-primary">
                     {msg.role === "user" ? "Você" : "Jobe"}
                   </p>
-                  <p className="mt-0.5 line-clamp-2 text-xs text-[#9CA3AF]">
+                  <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
                     {msg.content}
                   </p>
                 </div>
@@ -95,7 +95,7 @@ export function MessagesInbox({
           ))}
 
           {previewMessages.length === 0 && (
-            <li className="rounded-lg border border-dashed border-white/[0.08] px-3 py-6 text-center text-xs text-[#9CA3AF]">
+            <li className="rounded-lg border border-dashed border-border px-3 py-6 text-center text-xs text-muted-foreground">
               Nenhuma mensagem ainda. Inicie a conversa ao lado.
             </li>
           )}

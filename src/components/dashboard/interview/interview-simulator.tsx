@@ -105,14 +105,14 @@ export function InterviewSimulator({
 
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 p-5">
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
         <div className="flex items-start justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
-              <Mic className="h-5 w-5 text-[#4F7CFF]" />
-              <h2 className="text-lg font-semibold text-white">Simulador de entrevista IA</h2>
+              <Mic className="h-5 w-5 text-primary" />
+              <h2 className="text-lg font-semibold text-foreground">Simulador de entrevista IA</h2>
             </div>
-            <p className="mt-1 text-sm text-[#9CA3AF]">
+            <p className="mt-1 text-sm text-muted-foreground">
               {hasJobContext && roleTitle
                 ? `Treino para ${roleTitle}${companyName ? ` na ${companyName}` : ""}.`
                 : "Pratique respostas com feedback personalizado via Groq."}
@@ -128,21 +128,21 @@ export function InterviewSimulator({
       </div>
 
       {sessionId && (
-        <div className="flex h-[480px] flex-col rounded-2xl border border-white/[0.08] bg-[#111315]">
+        <div className="flex h-[480px] flex-col rounded-2xl border border-border bg-card">
           <div className="flex-1 space-y-3 overflow-y-auto p-5">
             {messages.map((msg, i) => (
               <div
                 key={`${msg.role}-${i}`}
                 className={cn(
                   "max-w-[90%] rounded-xl px-4 py-2.5 text-sm",
-                  msg.role === "user" && "ml-auto bg-[#4F7CFF]/20 text-white",
-                  msg.role === "interviewer" && "bg-white/[0.04] text-white",
+                  msg.role === "user" && "ml-auto bg-primary/20 text-primary-foreground",
+                  msg.role === "interviewer" && "bg-muted/50 text-foreground",
                   msg.role === "feedback" &&
-                    "border border-[#22C55E]/20 bg-[#22C55E]/10 text-[#BBF7D0]"
+                    "border border-[#22C55E]/20 bg-success/10 text-[#BBF7D0]"
                 )}
               >
                 {msg.role === "feedback" && (
-                  <span className="mb-1 block text-[10px] font-semibold uppercase text-[#22C55E]">
+                  <span className="mb-1 block text-[10px] font-semibold uppercase text-success">
                     Feedback
                   </span>
                 )}
@@ -150,12 +150,12 @@ export function InterviewSimulator({
               </div>
             ))}
             {done && score != null && (
-              <div className="rounded-xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 p-4 text-center">
-                <p className="text-sm font-medium text-[#4F7CFF]">
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-center">
+                <p className="text-sm font-medium text-primary">
                   Pontuação final: {score}/100
                 </p>
                 {feedbackSummary && (
-                  <p className="mt-2 text-xs text-[#9CA3AF]">{feedbackSummary}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{feedbackSummary}</p>
                 )}
               </div>
             )}
@@ -163,13 +163,13 @@ export function InterviewSimulator({
           </div>
 
           {!done && (
-            <form onSubmit={handleSubmit} className="border-t border-white/[0.06] p-4">
+            <form onSubmit={handleSubmit} className="border-t border-border p-4">
               <div className="flex gap-2">
                 <input
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="Sua resposta..."
-                  className="flex-1 rounded-xl border border-white/[0.08] bg-black/20 px-4 py-2.5 text-sm text-white outline-none"
+                  className="flex-1 rounded-xl border border-border bg-black/20 px-4 py-2.5 text-sm text-foreground outline-none"
                   disabled={loading}
                 />
                 <Button type="submit" disabled={loading || !input.trim()}>
@@ -189,7 +189,7 @@ export function InterviewSimulator({
           )}
 
           {done && (
-            <div className="border-t border-white/[0.06] p-4 text-center">
+            <div className="border-t border-border p-4 text-center">
               <Button variant="outline" onClick={() => void startSession()}>
                 Nova simulação
               </Button>
@@ -199,11 +199,11 @@ export function InterviewSimulator({
       )}
 
       {pastSessions.length > 0 && (
-        <div className="rounded-2xl border border-white/[0.08] bg-[#111315] p-5">
-          <h3 className="text-sm font-semibold text-white">Sessões anteriores</h3>
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <h3 className="text-sm font-semibold text-foreground">Sessões anteriores</h3>
           <ul className="mt-3 space-y-2">
             {pastSessions.map((s) => (
-              <li key={s.id} className="flex justify-between text-xs text-[#9CA3AF]">
+              <li key={s.id} className="flex justify-between text-xs text-muted-foreground">
                 <span>
                   {s.roleTitle} — {s.companyName}
                 </span>

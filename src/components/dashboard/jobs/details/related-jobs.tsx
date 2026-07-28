@@ -28,7 +28,7 @@ export function RelatedJobs({ jobs }: RelatedJobsProps) {
             <Link
               key={job.id}
               href={job.href}
-              className="group flex items-center gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all hover:-translate-y-0.5 hover:border-[#4F7CFF]/20"
+              className="group flex items-center gap-3 rounded-xl border border-border bg-muted/30 p-4 transition-all hover:-translate-y-0.5 hover:border-primary/20"
             >
               <div
                 className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-xs font-bold"
@@ -40,10 +40,10 @@ export function RelatedJobs({ jobs }: RelatedJobsProps) {
                 {job.logo}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-white group-hover:text-[#4F7CFF]">
+                <p className="truncate text-sm font-medium text-foreground group-hover:text-primary">
                   {job.role}
                 </p>
-                <p className="text-xs text-[#9CA3AF]">
+                <p className="text-xs text-muted-foreground">
                   {job.company} · {job.salary}
                 </p>
               </div>
@@ -57,7 +57,7 @@ export function RelatedJobs({ jobs }: RelatedJobsProps) {
                   </span>
                 ) : null}
                 <ArrowUpRight
-                  className="h-4 w-4 text-[#9CA3AF] transition-colors group-hover:text-[#4F7CFF]"
+                  className="h-4 w-4 text-muted-foreground transition-colors group-hover:text-primary"
                   aria-hidden="true"
                 />
               </div>

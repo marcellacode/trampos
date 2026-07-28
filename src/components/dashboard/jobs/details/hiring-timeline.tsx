@@ -24,7 +24,7 @@ export function HiringTimeline({ stages }: HiringTimelineProps) {
 
       <div className="relative">
         <div
-          className="absolute left-4 top-0 hidden h-full w-px bg-gradient-to-b from-[#4F7CFF] via-[#8B5CF6] to-transparent sm:block"
+          className="absolute left-4 top-0 hidden h-full w-px bg-gradient-to-b from-primary via-[#8B5CF6] to-transparent sm:block"
           aria-hidden="true"
         />
 
@@ -38,17 +38,17 @@ export function HiringTimeline({ stages }: HiringTimelineProps) {
               transition={{ delay: index * 0.08 }}
               className="relative flex items-start gap-4 pb-6 last:pb-0"
             >
-              <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[#4F7CFF]/40 bg-[#4F7CFF]/10 text-xs font-bold text-[#4F7CFF]">
+              <div className="relative z-10 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-primary/40 bg-primary/10 text-xs font-bold text-primary">
                 {index + 1}
               </div>
 
-              <div className="flex flex-1 items-center justify-between gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3">
+              <div className="flex flex-1 items-center justify-between gap-4 rounded-xl border border-border bg-muted/30 px-4 py-3">
                 <div>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-sm font-medium text-foreground">
                     {stage.label}
                   </p>
                   {stage.avgDays > 0 && (
-                    <p className="mt-0.5 flex items-center gap-1 text-xs text-[#9CA3AF]">
+                    <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
                       <Clock className="h-3 w-3" aria-hidden="true" />~
                       {stage.avgDays} {stage.avgDays === 1 ? "dia" : "dias"}
                     </p>
@@ -56,7 +56,7 @@ export function HiringTimeline({ stages }: HiringTimelineProps) {
                 </div>
                 {index < stages.length - 1 && (
                   <span
-                    className="hidden text-[#9CA3AF]/40 sm:inline"
+                    className="hidden text-muted-foreground/40 sm:inline"
                     aria-hidden="true"
                   >
                     ↓

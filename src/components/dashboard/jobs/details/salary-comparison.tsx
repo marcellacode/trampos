@@ -93,18 +93,18 @@ export function SalaryComparison({ data }: SalaryComparisonProps) {
                 const item = payload[0].payload;
                 if (item.name === "Sua expectativa") {
                   return (
-                    <div className="rounded-lg border border-white/10 bg-[#16191C] px-3 py-2 text-xs shadow-xl">
-                      <p className="font-medium text-white">{item.name}</p>
-                      <p className="text-[#9CA3AF]">
+                    <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-xl">
+                      <p className="font-medium text-foreground">{item.name}</p>
+                      <p className="text-muted-foreground">
                         {formatSalary(item.min)}
                       </p>
                     </div>
                   );
                 }
                 return (
-                  <div className="rounded-lg border border-white/10 bg-[#16191C] px-3 py-2 text-xs shadow-xl">
-                    <p className="font-medium text-white">{item.name}</p>
-                    <p className="text-[#9CA3AF]">
+                  <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-xl">
+                    <p className="font-medium text-foreground">{item.name}</p>
+                    <p className="text-muted-foreground">
                       {formatSalary(item.min)} –{" "}
                       {formatSalary(item.min + item.range)}
                     </p>
@@ -128,21 +128,21 @@ export function SalaryComparison({ data }: SalaryComparisonProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 rounded-xl border border-[#22C55E]/20 bg-[#22C55E]/5 px-4 py-3">
-        <p className="text-sm text-white/90">{data.insight}</p>
+      <div className="mt-4 rounded-xl border border-[#22C55E]/20 bg-success/5 px-4 py-3">
+        <p className="text-sm text-foreground/90">{data.insight}</p>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-4 text-[10px] text-[#9CA3AF]">
+      <div className="mt-4 flex flex-wrap gap-4 text-[10px] text-muted-foreground">
         <span>
-          <strong className="text-[#4F7CFF]">Vaga</strong> ·{" "}
+          <strong className="text-primary">Vaga</strong> ·{" "}
           {formatSalary(data.jobMin)} – {formatSalary(data.jobMax)}
         </span>
         <span>
-          <strong className="text-[#9CA3AF]">Mercado</strong> ·{" "}
+          <strong className="text-muted-foreground">Mercado</strong> ·{" "}
           {formatSalary(data.marketMin)} – {formatSalary(data.marketMax)}
         </span>
         <span>
-          <strong className="text-[#22C55E]">Expectativa</strong> ·{" "}
+          <strong className="text-success">Expectativa</strong> ·{" "}
           {formatSalary(data.userExpectation)}
         </span>
       </div>

@@ -30,30 +30,30 @@ export function WhyMatch({ job }: WhyMatchProps) {
   const warnings = job.reasons.filter((r) => r.type === "warning");
 
   return (
-    <ReportCard glow className="border-[#4F7CFF]/20">
+    <ReportCard glow className="border-primary/20">
       <ReportSectionHeader
         title="Por que essa vaga é ideal?"
         subtitle="Análise personalizada da IA sobre seu fit com a oportunidade"
         badge={<AIBadge />}
       />
 
-      <p className="mb-6 text-sm leading-relaxed text-white/90">
+      <p className="mb-6 text-sm leading-relaxed text-foreground/90">
         {job.whyMatchSummary}
       </p>
 
       <div className="grid gap-6 lg:grid-cols-2">
         <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#22C55E]">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-success">
             Motivos
           </p>
           <ul className="space-y-2.5" role="list">
             {matches.map((reason) => (
               <li
                 key={reason.id}
-                className="flex items-start gap-2.5 text-sm text-white/90"
+                className="flex items-start gap-2.5 text-sm text-foreground/90"
               >
                 <Check
-                  className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]"
+                  className="mt-0.5 h-4 w-4 shrink-0 text-success"
                   aria-hidden="true"
                 />
                 {reason.text}
@@ -70,7 +70,7 @@ export function WhyMatch({ job }: WhyMatchProps) {
                 {warnings.map((reason) => (
                   <li
                     key={reason.id}
-                    className="flex items-start gap-2.5 text-sm text-white/90"
+                    className="flex items-start gap-2.5 text-sm text-foreground/90"
                   >
                     <AlertTriangle
                       className="mt-0.5 h-4 w-4 shrink-0 text-[#F59E0B]"
@@ -85,7 +85,7 @@ export function WhyMatch({ job }: WhyMatchProps) {
         </div>
 
         <div>
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Gráfico de pesos
           </p>
           <div className="h-52 w-full">
@@ -109,11 +109,11 @@ export function WhyMatch({ job }: WhyMatchProps) {
                   content={({ active, payload }) => {
                     if (!active || !payload?.[0]) return null;
                     return (
-                      <div className="rounded-lg border border-white/10 bg-[#16191C] px-3 py-2 text-xs shadow-xl">
-                        <p className="font-medium text-white">
+                      <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-xl">
+                        <p className="font-medium text-foreground">
                           {payload[0].payload.label}
                         </p>
-                        <p className="text-[#9CA3AF]">
+                        <p className="text-muted-foreground">
                           Peso: {payload[0].value}%
                         </p>
                       </div>

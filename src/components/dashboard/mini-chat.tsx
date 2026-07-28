@@ -75,20 +75,20 @@ export function MiniChat({
           exit={{ opacity: 0, x: 24 }}
           transition={{ type: "spring", stiffness: 320, damping: 32 }}
           className={cn(
-            "fixed inset-y-0 right-0 z-40 flex w-full max-w-[340px] flex-col border-l border-white/[0.06] bg-[#0C0D0F] xl:static xl:z-0",
+            "fixed inset-y-0 right-0 z-40 flex w-full max-w-[340px] flex-col border-l border-border bg-card xl:static xl:z-0",
             className
           )}
           aria-label={AUTH_BRAND.assistantName}
         >
-          <div className="flex h-16 items-center justify-between border-b border-white/[0.06] px-4">
+          <div className="flex h-16 items-center justify-between border-b border-border px-4">
             <div className="flex items-center gap-2.5">
-              <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7CFF]/15 ring-1 ring-[#4F7CFF]/30">
-                <Sparkles className="h-3.5 w-3.5 text-[#4F7CFF]" aria-hidden="true" />
-                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-[#22C55E] ring-2 ring-[#0C0D0F]" />
+              <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
+                <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+                <span className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-success ring-2 ring-card" />
               </div>
               <div>
-                <p className="text-sm font-medium text-white">{AUTH_BRAND.assistantName}</p>
-                <p className="text-[11px] text-[#22C55E]">
+                <p className="text-sm font-medium text-foreground">{AUTH_BRAND.assistantName}</p>
+                <p className="text-[11px] text-success">
                   {loading ? "Digitando..." : "Online · trabalhando"}
                 </p>
               </div>
@@ -96,7 +96,7 @@ export function MiniChat({
             <button
               type="button"
               onClick={onClose}
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
               aria-label={`Fechar ${AUTH_BRAND.assistantName}`}
             >
               <X className="h-4 w-4" />
@@ -112,12 +112,12 @@ export function MiniChat({
                 className={cn(
                   "max-w-[90%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed",
                   msg.role === "assistant"
-                    ? "rounded-tl-md bg-white/[0.04] text-white/90"
-                    : "ml-auto rounded-tr-md bg-[#4F7CFF]/20 text-white"
+                    ? "rounded-tl-md bg-muted/50 text-foreground/90"
+                    : "ml-auto rounded-tr-md bg-primary/20 text-primary-foreground"
                 )}
               >
                 {msg.content}
-                <span className="mt-1.5 block text-[10px] text-[#9CA3AF]">
+                <span className="mt-1.5 block text-[10px] text-muted-foreground">
                   {msg.timestamp}
                 </span>
               </motion.div>
@@ -126,7 +126,7 @@ export function MiniChat({
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="max-w-[90%] rounded-2xl rounded-tl-md bg-white/[0.04] px-3.5 py-2.5 text-sm text-[#9CA3AF]"
+                className="max-w-[90%] rounded-2xl rounded-tl-md bg-muted/50 px-3.5 py-2.5 text-sm text-muted-foreground"
               >
                 Jobe está pensando...
               </motion.div>
@@ -135,21 +135,21 @@ export function MiniChat({
 
           <form
             onSubmit={handleSubmit}
-            className="border-t border-white/[0.06] p-3"
+            className="border-t border-border p-3"
           >
-            <div className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 focus-within:border-[#4F7CFF]/40">
+            <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/40 px-3 py-2 focus-within:border-primary/40">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={`Pergunte algo, ${userName.split(" ")[0]}...`}
-                className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
+                className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                 aria-label={`Mensagem para ${AUTH_BRAND.assistantName}`}
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || loading}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#4F7CFF] text-white transition-opacity disabled:opacity-40"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-opacity disabled:opacity-40"
                 aria-label="Enviar"
               >
                 <Send className="h-3.5 w-3.5" />

@@ -41,29 +41,29 @@ function SelectCard({
       aria-pressed={selected}
       className={cn(
         "group relative flex w-full flex-col items-start gap-1 overflow-hidden rounded-2xl border p-4 text-left transition-colors sm:p-5",
-        "bg-[#111315]/70 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08090A]",
+        "bg-card/70 backdrop-blur-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         selected
-          ? "border-[#4F7CFF]/60 shadow-[0_0_28px_rgba(79,124,255,0.2)]"
-          : "border-white/[0.08] hover:border-[#4F7CFF]/35"
+          ? "border-primary/60 shadow-[0_0_28px_rgba(79,124,255,0.2)]"
+          : "border-border hover:border-primary/35"
       )}
     >
       {selected && (
         <div
-          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#4F7CFF]/15 via-transparent to-transparent"
+          className="pointer-events-none absolute inset-0 bg-gradient-to-br from-primary/15 via-transparent to-transparent"
           aria-hidden="true"
         />
       )}
 
       <div className="relative flex w-full items-start justify-between gap-3">
         <div>
-          <p className="text-sm font-semibold text-white sm:text-base">{title}</p>
-          <p className="mt-1 text-xs text-[#9CA3AF] sm:text-sm">{description}</p>
+          <p className="text-sm font-semibold text-foreground sm:text-base">{title}</p>
+          <p className="mt-1 text-xs text-muted-foreground sm:text-sm">{description}</p>
         </div>
         <span
           className={cn(
             "flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors",
             selected
-              ? "border-[#4F7CFF] bg-[#4F7CFF] text-white"
+              ? "border-primary bg-primary text-primary-foreground"
               : "border-white/20 text-transparent"
           )}
           aria-hidden="true"
@@ -104,11 +104,11 @@ export function AvailabilityCards({
         <motion.h2
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-3xl font-semibold tracking-tight text-white sm:text-4xl"
+          className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl"
         >
           Disponibilidade
         </motion.h2>
-        <p className="text-sm text-[#9CA3AF] sm:text-base">
+        <p className="text-sm text-muted-foreground sm:text-base">
           Como e quando você quer trabalhar.
         </p>
       </div>
@@ -116,7 +116,7 @@ export function AvailabilityCards({
       <section aria-labelledby="availability-heading" className="space-y-4">
         <h3
           id="availability-heading"
-          className="text-sm font-medium text-white"
+          className="text-sm font-medium text-foreground"
         >
           Quando pode começar?
         </h3>
@@ -135,7 +135,7 @@ export function AvailabilityCards({
       </section>
 
       <section aria-labelledby="work-model-heading" className="space-y-4">
-        <h3 id="work-model-heading" className="text-sm font-medium text-white">
+        <h3 id="work-model-heading" className="text-sm font-medium text-foreground">
           Modelo de trabalho
         </h3>
         <div className="grid gap-3 sm:grid-cols-2">
@@ -155,7 +155,7 @@ export function AvailabilityCards({
       </section>
 
       <section aria-labelledby="contract-heading" className="space-y-4">
-        <h3 id="contract-heading" className="text-sm font-medium text-white">
+        <h3 id="contract-heading" className="text-sm font-medium text-foreground">
           Tipo de contratação
         </h3>
         <div className="grid gap-3 sm:grid-cols-2">

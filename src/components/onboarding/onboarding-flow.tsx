@@ -309,7 +309,7 @@ export function OnboardingFlow() {
                 <motion.h1
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]"
+                  className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]"
                 >
                   Vamos construir seu{" "}
                   <span className="text-gradient-primary">copiloto</span> de
@@ -319,7 +319,7 @@ export function OnboardingFlow() {
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.08 }}
-                  className="text-base text-[#9CA3AF] sm:text-lg"
+                  className="text-base text-muted-foreground sm:text-lg"
                 >
                   Quanto mais conhecermos você, melhores serão as oportunidades
                   encontradas.
@@ -327,7 +327,7 @@ export function OnboardingFlow() {
               </div>
 
               <div className="space-y-4">
-                <h2 className="text-center text-sm font-medium text-white/70">
+                <h2 className="text-center text-sm font-medium text-muted-foreground">
                   Como deseja começar?
                 </h2>
 
@@ -388,14 +388,14 @@ export function OnboardingFlow() {
 
           {step === "import" && showGithubInput && (
             <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8">
-              <h2 className="text-center text-xl font-semibold text-white">
+              <h2 className="text-center text-xl font-semibold text-foreground">
                 Seu username no GitHub
               </h2>
               <input
                 value={githubUsername}
                 onChange={(e) => setGithubUsername(e.target.value)}
                 placeholder="ex: octocat"
-                className="rounded-xl border border-white/10 bg-[#111315] px-4 py-3 text-white outline-none focus:border-[#4F7CFF]/50"
+                className="rounded-xl border border-border bg-card px-4 py-3 text-foreground outline-none focus:border-primary/50"
               />
               <button
                 type="button"
@@ -407,7 +407,7 @@ export function OnboardingFlow() {
                     { onSuccess: () => setStep("summary") }
                   );
                 }}
-                className="rounded-xl bg-[#4F7CFF] py-3 font-medium text-white disabled:opacity-50"
+                className="rounded-xl bg-primary py-3 font-medium text-primary-foreground disabled:opacity-50"
               >
                 Analisar perfil
               </button>
@@ -416,7 +416,7 @@ export function OnboardingFlow() {
 
           {step === "import" && showLinkedinInput && (
             <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8">
-              <h2 className="text-center text-xl font-semibold text-white">
+              <h2 className="text-center text-xl font-semibold text-foreground">
                 Cole o texto do seu perfil
               </h2>
               <textarea
@@ -424,7 +424,7 @@ export function OnboardingFlow() {
                 onChange={(e) => setLinkedinText(e.target.value)}
                 placeholder="Cole aqui experiências, skills e resumo do LinkedIn..."
                 rows={8}
-                className="rounded-xl border border-white/10 bg-[#111315] px-4 py-3 text-sm text-white outline-none focus:border-[#4F7CFF]/50"
+                className="rounded-xl border border-border bg-card px-4 py-3 text-sm text-foreground outline-none focus:border-primary/50"
               />
               <button
                 type="button"
@@ -436,7 +436,7 @@ export function OnboardingFlow() {
                     { onSuccess: () => setStep("summary") }
                   );
                 }}
-                className="rounded-xl bg-[#4F7CFF] py-3 font-medium text-white disabled:opacity-50"
+                className="rounded-xl bg-primary py-3 font-medium text-primary-foreground disabled:opacity-50"
               >
                 Analisar perfil
               </button>
@@ -446,10 +446,10 @@ export function OnboardingFlow() {
           {step === "import" && showUpload && (
             <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8">
               <div className="space-y-2 text-center">
-                <h2 className="text-3xl font-semibold tracking-tight text-white">
+                <h2 className="text-3xl font-semibold tracking-tight text-foreground">
                   Enviar currículo
                 </h2>
-                <p className="text-sm text-[#9CA3AF]">
+                <p className="text-sm text-muted-foreground">
                   Arraste um PDF ou DOCX. A IA extrai tudo em segundos.
                 </p>
               </div>
@@ -529,7 +529,7 @@ export function OnboardingFlow() {
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setStep("dna")}
-                  className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-[#4F7CFF] px-8 text-sm font-semibold text-white shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-[#638BFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08090A]"
+                  className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 >
                   Ver meu DNA Profissional
                 </motion.button>

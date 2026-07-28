@@ -31,10 +31,10 @@ function CustomTooltip({
   if (!active || !payload?.[0]) return null;
   const item = payload[0].payload;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#16191C] px-3 py-2 text-xs shadow-xl">
-      <p className="font-medium text-white">{item.tech}</p>
-      <p className="mt-0.5 text-[#22C55E]">+{item.change}% demanda</p>
-      <p className="text-[#9CA3AF]">Índice: {item.demand}</p>
+    <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-xl">
+      <p className="font-medium text-foreground">{item.tech}</p>
+      <p className="mt-0.5 text-success">+{item.change}% demanda</p>
+      <p className="text-muted-foreground">Índice: {item.demand}</p>
     </div>
   );
 }
@@ -46,16 +46,16 @@ export function MarketRadar({ trends, className }: MarketRadarProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-[#111315] p-6",
+        "rounded-2xl border border-border bg-card p-6",
         className
       )}
       aria-labelledby="market-heading"
     >
       <div className="mb-1">
-        <h2 id="market-heading" className="text-base font-semibold text-white">
+        <h2 id="market-heading" className="text-base font-semibold text-foreground">
           Radar do Mercado
         </h2>
-        <p className="mt-1 text-sm text-[#9CA3AF]">
+        <p className="mt-1 text-sm text-muted-foreground">
           Tecnologias em alta na sua área
         </p>
       </div>
@@ -96,15 +96,15 @@ export function MarketRadar({ trends, className }: MarketRadarProps) {
         {trends.map((trend, index) => (
           <li
             key={trend.id}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/[0.06] bg-white/[0.02] px-2.5 py-1.5 text-xs"
+            className="inline-flex items-center gap-2 rounded-lg border border-border bg-muted/30 px-2.5 py-1.5 text-xs"
           >
             <span
               className="h-2 w-2 rounded-full"
               style={{ backgroundColor: BAR_COLORS[index % BAR_COLORS.length] }}
               aria-hidden="true"
             />
-            <span className="font-medium text-white">{trend.tech}</span>
-            <span className="text-[#22C55E]">+{trend.change}%</span>
+            <span className="font-medium text-foreground">{trend.tech}</span>
+            <span className="text-success">+{trend.change}%</span>
           </li>
         ))}
       </ul>

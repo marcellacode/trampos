@@ -103,11 +103,11 @@ function JobDetailsContent({ job }: { job: JobDetail }) {
           prepareDisabled={apply.isDone}
         />
         <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
-          <div className="rounded-2xl border border-white/[0.08] bg-[#111315] p-6">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+          <div className="rounded-2xl border border-border bg-card p-6">
+            <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Descrição
             </p>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-white/90">
+            <p className="whitespace-pre-line text-sm leading-relaxed text-foreground/90">
               {job.description || job.aiSummary || "Descrição não disponível."}
             </p>
           </div>
@@ -221,15 +221,15 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
       {isLoading && <JobDetailsSkeleton />}
 
       {isError && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-16 text-center">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
           <AlertCircle
             className="mb-4 h-10 w-10 text-[#EF4444]"
             aria-hidden="true"
           />
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-foreground">
             Erro ao carregar o dossiê
           </h2>
-          <p className="mt-2 text-sm text-[#9CA3AF]">
+          <p className="mt-2 text-sm text-muted-foreground">
             Não conseguimos gerar o relatório desta vaga. Tente novamente.
           </p>
           <Button onClick={() => refetch()} className="mt-6 gap-2">
@@ -240,11 +240,11 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
       )}
 
       {!isLoading && !isError && !job && (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-16 text-center">
-          <h2 className="text-lg font-semibold text-white">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-16 text-center">
+          <h2 className="text-lg font-semibold text-foreground">
             Vaga não encontrada
           </h2>
-          <p className="mt-2 text-sm text-[#9CA3AF]">
+          <p className="mt-2 text-sm text-muted-foreground">
             O dossiê desta oportunidade ainda não está disponível.
           </p>
           <Button

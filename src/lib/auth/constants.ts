@@ -9,8 +9,7 @@ export const AUTH_BRAND = {
   suffix: "era",
   fullName: "Jobera",
   assistantName: "Jobe",
-  tagline:
-    "Sua carreira agora tem uma Inteligência Artificial trabalhando por você.",
+  tagline: "Organize sua busca por emprego em um só lugar.",
   description:
-    "Enquanto você dorme, nossa IA procura vagas, adapta seu currículo e prepara candidaturas assistidas.",
+    "Monitore vagas, veja compatibilidade com seu perfil e prepare candidaturas com mais clareza.",
 } as const;

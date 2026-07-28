@@ -22,7 +22,7 @@ export function AISuggestions({
     <section className={cn(className)} aria-labelledby="suggestions-heading">
       <h2
         id="suggestions-heading"
-        className="mb-4 text-base font-semibold text-white"
+        className="mb-4 text-base font-semibold text-foreground"
       >
         Sugestões da IA
       </h2>
@@ -46,7 +46,7 @@ export function AISuggestions({
             >
               <Link
                 href={item.href}
-                className="group flex h-full flex-col rounded-2xl border border-white/[0.08] bg-[#111315] p-5 transition-all hover:border-white/[0.14] hover:shadow-[0_0_32px_rgba(79,124,255,0.08)]"
+                className="group flex h-full flex-col rounded-2xl border border-border bg-card p-5 transition-all hover:border-white/[0.14] hover:shadow-[0_0_32px_rgba(79,124,255,0.08)]"
               >
                 <div className="mb-4 flex items-start justify-between">
                   <div
@@ -59,10 +59,10 @@ export function AISuggestions({
                       aria-hidden="true"
                     />
                   </div>
-                  <ArrowUpRight className="h-4 w-4 text-[#9CA3AF] opacity-0 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 group-hover:text-white" />
+                  <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100 group-hover:text-foreground" />
                 </div>
-                <h3 className="text-sm font-semibold text-white">{item.title}</h3>
-                <p className="mt-1.5 flex-1 text-xs leading-relaxed text-[#9CA3AF]">
+                <h3 className="text-sm font-semibold text-foreground">{item.title}</h3>
+                <p className="mt-1.5 flex-1 text-xs leading-relaxed text-muted-foreground">
                   {item.description}
                 </p>
                 <span

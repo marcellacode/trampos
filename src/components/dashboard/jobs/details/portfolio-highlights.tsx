@@ -29,8 +29,8 @@ export function PortfolioHighlights({ projects }: PortfolioHighlightsProps) {
             className={cn(
               "group relative overflow-hidden rounded-xl border p-4 transition-all hover:-translate-y-0.5",
               project.highlight
-                ? "border-[#4F7CFF]/30 bg-[#4F7CFF]/5"
-                : "border-white/[0.06] bg-white/[0.02]"
+                ? "border-primary/30 bg-primary/5"
+                : "border-border bg-muted/30"
             )}
           >
             <div
@@ -40,14 +40,14 @@ export function PortfolioHighlights({ projects }: PortfolioHighlightsProps) {
               <Globe2
                 className={cn(
                   "h-8 w-8",
-                  project.highlight ? "text-[#4F7CFF]" : "text-[#9CA3AF]/40"
+                  project.highlight ? "text-primary" : "text-muted-foreground/40"
                 )}
               />
             </div>
-            <p className="text-sm font-medium text-white">{project.name}</p>
-            <p className="mt-1 text-xs text-[#9CA3AF]">{project.description}</p>
+            <p className="text-sm font-medium text-foreground">{project.name}</p>
+            <p className="mt-1 text-xs text-muted-foreground">{project.description}</p>
             {project.highlight && (
-              <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-[#4F7CFF]">
+              <span className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wider text-primary">
                 <ExternalLink className="h-3 w-3" aria-hidden="true" />
                 Destacar
               </span>

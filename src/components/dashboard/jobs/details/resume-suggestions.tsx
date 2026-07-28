@@ -62,7 +62,7 @@ export function ResumeSuggestions({
       />
 
       {suggestions.length === 0 && !loading && (
-        <p className="text-sm text-[#9CA3AF]">
+        <p className="text-sm text-muted-foreground">
           Gere adaptações personalizadas para ver sugestões específicas desta vaga.
         </p>
       )}
@@ -74,7 +74,7 @@ export function ResumeSuggestions({
           return (
             <li
               key={s.id}
-              className="flex items-start gap-3 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+              className="flex items-start gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3"
             >
               <div
                 className={cn(
@@ -88,10 +88,10 @@ export function ResumeSuggestions({
                 <Icon className="h-3.5 w-3.5" aria-hidden="true" />
               </div>
               <div>
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
                   {config.label}
                 </p>
-                <p className="mt-0.5 text-sm text-white/90">{s.text}</p>
+                <p className="mt-0.5 text-sm text-foreground/90">{s.text}</p>
               </div>
             </li>
           );

@@ -20,7 +20,7 @@ export function CopilotStatus({ className }: CopilotStatusProps) {
       className={cn(
         "flex items-center gap-2 rounded-xl border px-2.5 py-1.5 sm:gap-3 sm:px-3 sm:py-2",
         isActive
-          ? "border-[#22C55E]/20 bg-[#22C55E]/[0.06]"
+          ? "border-[#22C55E]/20 bg-success/[0.06]"
           : "border-[#FBBF24]/20 bg-[#FBBF24]/[0.06]",
         className
       )}
@@ -35,8 +35,8 @@ export function CopilotStatus({ className }: CopilotStatusProps) {
       <div className="flex min-w-0 items-center gap-1.5 sm:gap-2">
         {isActive ? (
           <span className="relative flex h-2 w-2 shrink-0">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#22C55E] opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#22C55E]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
           </span>
         ) : (
           <span className="inline-flex h-2 w-2 shrink-0 rounded-full bg-[#FBBF24]" />
@@ -45,7 +45,7 @@ export function CopilotStatus({ className }: CopilotStatusProps) {
         <span
           className={cn(
             "truncate text-xs font-medium sm:text-[13px]",
-            isActive ? "text-[#22C55E]" : "text-[#FBBF24]"
+            isActive ? "text-success" : "text-[#FBBF24]"
           )}
         >
           {isActive ? "Copiloto Ativo" : "Pausado"}
@@ -55,16 +55,16 @@ export function CopilotStatus({ className }: CopilotStatusProps) {
       {isActive ? (
         <>
           <span className="hidden h-3 w-px bg-white/10 sm:block" aria-hidden="true" />
-          <p className="hidden min-w-0 text-[11px] text-[#9CA3AF] sm:block">
+          <p className="hidden min-w-0 text-[11px] text-muted-foreground sm:block">
             Próxima verificação:{" "}
-            <span className="font-medium text-white/80">
+            <span className="font-medium text-foreground/80">
               {formatVerificationCountdown(secondsUntilVerification)}
             </span>
           </p>
           <button
             type="button"
             onClick={pause}
-            className="ml-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+            className="ml-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             aria-label="Pausar copiloto"
           >
             <Pause className="h-3 w-3" />

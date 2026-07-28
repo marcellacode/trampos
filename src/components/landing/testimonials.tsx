@@ -70,27 +70,27 @@ function TestimonialsCarousel({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: direction > 0 ? -50 : 50 }}
               transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-              className="relative rounded-2xl border border-white/10 bg-[#111315] p-8 sm:p-10"
+              className="relative rounded-2xl border border-border bg-card p-8 sm:p-10"
               role="group"
               aria-roledescription="slide"
               aria-label={`Depoimento ${current + 1} de ${testimonials.length}`}
             >
-              <Quote className="mb-6 h-8 w-8 text-[#4F7CFF]/30" aria-hidden="true" />
+              <Quote className="mb-6 h-8 w-8 text-primary/30" aria-hidden="true" />
 
-              <blockquote className="text-lg leading-relaxed text-white/90 sm:text-xl">
+              <blockquote className="text-lg leading-relaxed text-foreground/90 sm:text-xl">
                 &ldquo;{testimonial.text}&rdquo;
               </blockquote>
 
               <div className="mt-8 flex items-center gap-4">
                 <div
-                  className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#4F7CFF] to-[#8B5CF6] text-sm font-bold text-white"
+                  className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/70 text-sm font-bold text-foreground"
                   aria-hidden="true"
                 >
                   {testimonial.avatar}
                 </div>
                 <div>
-                  <p className="font-semibold text-white">{testimonial.name}</p>
-                  <p className="text-sm text-[#9CA3AF]">
+                  <p className="font-semibold text-foreground">{testimonial.name}</p>
+                  <p className="text-sm text-muted-foreground">
                     {testimonial.role} · {testimonial.company}
                   </p>
                 </div>
@@ -102,7 +102,7 @@ function TestimonialsCarousel({
             <button
               type="button"
               onClick={() => navigate(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="Depoimento anterior"
             >
               <ChevronLeft className="h-5 w-5" />
@@ -121,8 +121,8 @@ function TestimonialsCarousel({
                     setCurrent(i);
                   }}
                   className={cn(
-                    "h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]",
-                    i === current ? "w-6 bg-[#4F7CFF]" : "w-2 bg-white/20 hover:bg-white/40"
+                    "h-2 rounded-full transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
+                    i === current ? "w-6 bg-primary" : "w-2 bg-white/20 hover:bg-white/40"
                   )}
                 />
               ))}
@@ -131,7 +131,7 @@ function TestimonialsCarousel({
             <button
               type="button"
               onClick={() => navigate(1)}
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 text-white transition-colors hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]"
+              className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
               aria-label="Próximo depoimento"
             >
               <ChevronRight className="h-5 w-5" />

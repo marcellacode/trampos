@@ -43,8 +43,8 @@ export function SmartFilters({
   return (
     <div className={cn("space-y-3", className)}>
       <div className="flex items-center gap-2">
-        <Sparkles className="h-3.5 w-3.5 text-[#4F7CFF]" aria-hidden="true" />
-        <span className="text-xs font-medium text-[#9CA3AF]">
+        <Sparkles className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+        <span className="text-xs font-medium text-muted-foreground">
           Filtros inteligentes
         </span>
       </div>
@@ -60,22 +60,22 @@ export function SmartFilters({
               exit={{ opacity: 0, scale: 0.85 }}
               type="button"
               onClick={() => removeFilter(filter.id)}
-              className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#4F7CFF]/25 bg-[#4F7CFF]/10 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:border-[#4F7CFF]/40 hover:bg-[#4F7CFF]/15"
+              className="group inline-flex shrink-0 items-center gap-1.5 rounded-full border border-primary/25 bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:border-primary/40 hover:bg-primary/15"
             >
               {filter.label}
-              <X className="h-3 w-3 text-[#9CA3AF] transition-colors group-hover:text-white" />
+              <X className="h-3 w-3 text-muted-foreground transition-colors group-hover:text-foreground" />
             </motion.button>
           ))}
         </AnimatePresence>
 
-        <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-white/[0.12] bg-white/[0.02] px-3 py-1.5">
-          <Plus className="h-3 w-3 text-[#9CA3AF]" aria-hidden="true" />
+        <div className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-dashed border-white/[0.12] bg-muted/30 px-3 py-1.5">
+          <Plus className="h-3 w-3 text-muted-foreground" aria-hidden="true" />
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Digite e a IA filtra..."
-            className="w-36 bg-transparent text-xs text-white outline-none placeholder:text-[#9CA3AF] sm:w-44"
+            className="w-36 bg-transparent text-xs text-foreground outline-none placeholder:text-muted-foreground sm:w-44"
             aria-label="Criar filtro com IA"
           />
         </div>

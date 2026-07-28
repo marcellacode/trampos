@@ -33,13 +33,13 @@ const DIFF_CONFIG = {
     icon: TrendingUp,
     label: "Acima",
     color: "#22C55E",
-    bg: "bg-[#22C55E]/10 border-[#22C55E]/20",
+    bg: "bg-success/10 border-[#22C55E]/20",
   },
   match: {
     icon: Minus,
     label: "Compatível",
     color: "#4F7CFF",
-    bg: "bg-[#4F7CFF]/10 border-[#4F7CFF]/20",
+    bg: "bg-primary/10 border-primary/20",
   },
   below: {
     icon: TrendingDown,
@@ -60,7 +60,7 @@ export function TechComparison({ data }: TechComparisonProps) {
       <div className="overflow-x-auto">
         <table className="w-full min-w-[480px]">
           <thead>
-            <tr className="border-b border-white/[0.06] text-left text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF]">
+            <tr className="border-b border-border text-left text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               <th className="pb-3 pr-4">Tecnologia</th>
               <th className="pb-3 pr-4">Nível exigido</th>
               <th className="pb-3 pr-4">Seu nível</th>
@@ -79,17 +79,17 @@ export function TechComparison({ data }: TechComparisonProps) {
                   className="border-b border-white/[0.04] last:border-0"
                 >
                   <td className="py-3.5 pr-4">
-                    <span className="text-sm font-medium text-white">
+                    <span className="text-sm font-medium text-foreground">
                       {tech.name}
                     </span>
                   </td>
                   <td className="py-3.5 pr-4">
-                    <span className="text-sm capitalize text-[#9CA3AF]">
+                    <span className="text-sm capitalize text-muted-foreground">
                       {tech.requiredLevel}
                     </span>
                   </td>
                   <td className="py-3.5 pr-4">
-                    <span className="text-sm capitalize text-white/90">
+                    <span className="text-sm capitalize text-foreground/90">
                       {tech.userLevel}
                     </span>
                   </td>

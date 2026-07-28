@@ -1,102 +1,100 @@
 export const NAV_LINKS = [
+  { label: "Vagas", href: "#vagas" },
   { label: "Como funciona", href: "#como-funciona" },
-  { label: "Recursos", href: "#recursos" },
-  { label: "Para Empresas", href: "#empresas" },
-  { label: "Preços", href: "#precos" },
-  { label: "Contato", href: "#contato" },
+  { label: "Para candidatos", href: "#recursos" },
 ] as const;
 
 export const HOW_IT_WORKS_STEPS = [
   {
     step: 1,
-    title: "Conte seus objetivos",
-    description: "Defina cargo, salário, modalidade e preferências.",
+    title: "Defina seu objetivo",
+    description: "Cargo, faixa salarial, modalidade e preferências.",
     icon: "Target" as const,
   },
   {
     step: 2,
-    title: "Nossa IA entende seu perfil",
-    description: "Análise profunda de skills, experiência e fit cultural.",
+    title: "Importe seu perfil",
+    description: "Currículo, LinkedIn ou GitHub para montar seu perfil.",
     icon: "Brain" as const,
   },
   {
     step: 3,
-    title: "Ela procura milhares de vagas",
-    description: "Monitoramento contínuo em centenas de fontes.",
+    title: "Receba vagas compatíveis",
+    description: "Monitoramento contínuo com score de compatibilidade.",
     icon: "Search" as const,
   },
   {
     step: 4,
-    title: "Personaliza seu currículo",
-    description: "Adaptação automática para cada vaga específica.",
+    title: "Adapte o currículo",
+    description: "Versão personalizada para cada vaga que você escolher.",
     icon: "FileText" as const,
   },
   {
     step: 5,
-    title: "Se candidata",
-    description: "A IA prepara a candidatura; você conclui no site da empresa.",
+    title: "Candidate-se",
+    description: "Prepare a candidatura e conclua no site da empresa.",
     icon: "Send" as const,
   },
   {
     step: 6,
-    title: "Organiza entrevistas",
-    description: "Organiza sua agenda e prepara entrevistas com simulador IA.",
+    title: "Prepare entrevistas",
+    description: "Simulador com perguntas baseadas na vaga.",
     icon: "Calendar" as const,
   },
   {
     step: 7,
-    title: "Você recebe propostas",
-    description: "Acompanhe ofertas e negocie com suporte da IA.",
+    title: "Acompanhe tudo",
+    description: "Timeline, status e próximos passos em um painel.",
     icon: "Trophy" as const,
   },
 ] as const;
 
 export const FEATURES = [
   {
-    title: "IA encontra vagas",
+    title: "Discovery de vagas",
     description:
-      "Monitora milhares de vagas diariamente e identifica as mais compatíveis com seu perfil.",
+      "Vagas de múltiplas fontes reunidas com filtros e busca inteligente.",
     icon: "Sparkles" as const,
   },
   {
-    title: "Currículo Inteligente",
+    title: "Currículo por vaga",
     description:
-      "Adapta automaticamente seu currículo para cada vaga, destacando as skills certas.",
+      "Gere versões do currículo destacando as skills mais relevantes.",
     icon: "FileText" as const,
   },
   {
-    title: "Entrevistas IA",
+    title: "Simulador de entrevista",
     description:
-      "Simula entrevistas reais e fornece feedback personalizado para você se preparar.",
+      "Pratique com perguntas contextualizadas e receba feedback.",
     icon: "MessageSquare" as const,
   },
   {
-    title: "Mercado em tempo real",
+    title: "Score de compatibilidade",
     description:
-      "Insights sobre salários, demanda e tendências do mercado para sua área.",
+      "Veja o quanto seu perfil combina com cada oportunidade.",
     icon: "TrendingUp" as const,
   },
   {
-    title: "Candidatura assistida",
+    title: "Candidatura organizada",
     description:
-      "Prepara candidaturas personalizadas com currículo adaptado; você aprova cada envio.",
+      "Acompanhe status, prazos e histórico sem planilhas.",
     icon: "Zap" as const,
   },
   {
-    title: "Dashboard de carreira",
+    title: "Painel de carreira",
     description:
-      "Visualize todo o progresso, métricas e próximos passos em um só lugar.",
+      "KPIs, timeline e recomendações em uma visão única.",
     icon: "LayoutDashboard" as const,
   },
 ] as const;
 
 export const COMPARISON_FEATURES = [
-  { label: "IA adapta currículo", indeed: false, linkedin: false, jobera: true },
-  { label: "Candidatura assistida por IA", indeed: false, linkedin: false, jobera: true },
-  { label: "Feedback inteligente", indeed: false, linkedin: false, jobera: true },
-  { label: "Compatibilidade %", indeed: false, linkedin: false, jobera: true },
-  { label: "Treino para entrevista", indeed: false, linkedin: false, jobera: true },
-  { label: "Monitoramento diário", indeed: false, linkedin: true, jobera: true },
+  { label: "Currículo adaptado por vaga", indeed: false, linkedin: false, jobera: true },
+  { label: "Score de compatibilidade", indeed: false, linkedin: false, jobera: true },
+  { label: "Simulador de entrevista", indeed: false, linkedin: false, jobera: true },
+  { label: "Timeline de candidaturas", indeed: false, linkedin: true, jobera: true },
+  { label: "Monitoramento de vagas", indeed: false, linkedin: true, jobera: true },
+  { label: "Múltiplas fontes de vagas", indeed: true, linkedin: false, jobera: true },
 ] as const;
 
 export type TestimonialItem = {
@@ -111,63 +109,51 @@ export const TESTIMONIALS: TestimonialItem[] = [];
 
 export const FAQ_ITEMS = [
   {
-    question: "Como a IA encontra vagas compatíveis com meu perfil?",
+    question: "Como funciona o score de compatibilidade?",
     answer:
-      "Nossa IA analisa seu currículo, experiências, skills e objetivos de carreira. Em seguida, monitora vagas em múltiplas fontes e calcula um score de compatibilidade para cada oportunidade.",
+      "Analisamos seu perfil (experiências, skills e objetivos) e comparamos com os requisitos de cada vaga. O resultado é um percentual que indica o quão alinhado você está com a oportunidade.",
   },
   {
-    question: "A IA realmente envia candidaturas por mim?",
+    question: "A plataforma envia candidaturas automaticamente?",
     answer:
-      "A IA prepara currículo adaptado e carta de apresentação para cada vaga. Você revisa, abre o site da empresa e conclui a candidatura — mantendo controle total.",
+      "Não. Preparamos currículo e materiais para cada vaga, mas você revisa e conclui a candidatura no site da empresa — mantendo controle total.",
   },
   {
     question: "Meu currículo é adaptado para cada vaga?",
     answer:
-      "Exatamente. Para cada vaga selecionada, a IA reescreve seu currículo destacando as experiências e skills mais relevantes, aumentando significativamente suas chances.",
+      "Sim. Para vagas selecionadas, geramos uma versão do currículo destacando experiências e skills mais relevantes para aquela oportunidade.",
   },
   {
-    question: "Quanto tempo leva para ver resultados?",
+    question: "De onde vêm as vagas?",
     answer:
-      "A maioria dos usuários recebe as primeiras respostas em 7-14 dias. A IA trabalha 24/7, então quanto antes você começar, mais rápido verá oportunidades.",
+      "Agregamos oportunidades de fontes externas (Adzuna, Remotive, RemoteOK, entre outras) e do catálogo interno, atualizadas periodicamente.",
   },
   {
     question: "É seguro compartilhar meus dados?",
     answer:
-      "Absolutamente. Utilizamos criptografia de ponta a ponta e seguimos a LGPD. Seus dados nunca são compartilhados com terceiros sem seu consentimento explícito.",
+      "Utilizamos criptografia e seguimos a LGPD. Seus dados não são compartilhados com terceiros sem consentimento.",
   },
   {
-    question: "Funciona para qualquer área de atuação?",
+    question: "Funciona para qualquer área?",
     answer:
-      "Sim! Temos sucesso em tecnologia, marketing, finanças, design, vendas, engenharia e dezenas de outras áreas. A IA se adapta ao mercado específico de cada setor.",
+      "Sim. O perfil e os filtros se adaptam à sua área — tecnologia, marketing, finanças, design, vendas e outras.",
   },
   {
-    question: "Posso cancelar a qualquer momento?",
+    question: "Como funciona o simulador de entrevistas?",
     answer:
-      "Sim, sem multas ou burocracia. Você pode cancelar sua assinatura a qualquer momento diretamente no dashboard, e continuará tendo acesso até o fim do período pago.",
-  },
-  {
-    question: "Como funciona o treino para entrevistas?",
-    answer:
-      "Nossa IA simula entrevistas reais baseadas na vaga e empresa específica. Ela faz perguntas técnicas e comportamentais, avalia suas respostas e fornece feedback detalhado para melhorar.",
-  },
-  {
-    question: "Qual a diferença para o LinkedIn ou Indeed?",
-    answer:
-      "LinkedIn e Indeed são plataformas de busca — você ainda precisa fazer todo o trabalho. Jobera é um agente proativo que busca vagas, adapta currículo, prepara candidaturas assistidas e treina entrevistas — com você no controle de cada envio.",
+      "Com base na vaga e empresa, geramos perguntas técnicas e comportamentais. Você responde e recebe feedback para melhorar.",
   },
   {
     question: "Existe plano gratuito?",
     answer:
-      "Sim! O plano gratuito inclui análise de perfil, monitoramento de vagas e 5 candidaturas por mês. Planos pagos desbloqueiam aplicações ilimitadas e recursos avançados.",
+      "Sim. O plano gratuito inclui perfil, monitoramento de vagas e recursos básicos de candidatura.",
   },
 ] as const;
 
 export const DASHBOARD_NAV = [
   { label: "Dashboard", icon: "LayoutDashboard" as const, active: true },
   { label: "Vagas", icon: "Briefcase" as const },
-  { label: "IA", icon: "Sparkles" as const },
   { label: "Currículo", icon: "FileText" as const },
-  { label: "Mercado", icon: "TrendingUp" as const },
   { label: "Entrevistas", icon: "Video" as const },
   { label: "Agenda", icon: "Calendar" as const },
 ] as const;
@@ -176,18 +162,14 @@ export const FOOTER_LINKS = {
   produto: [
     { label: "Como funciona", href: "#como-funciona" },
     { label: "Recursos", href: "#recursos" },
-    { label: "Preços", href: "#precos" },
-    { label: "Para Empresas", href: "#empresas" },
+    { label: "FAQ", href: "#faq" },
   ],
   empresa: [
     { label: "Sobre", href: "#" },
-    { label: "Blog", href: "#" },
-    { label: "Carreiras", href: "#" },
     { label: "Contato", href: "#contato" },
   ],
   legal: [
     { label: "Termos de Uso", href: "#" },
     { label: "Privacidade", href: "#" },
-    { label: "Cookies", href: "#" },
   ],
 } as const;

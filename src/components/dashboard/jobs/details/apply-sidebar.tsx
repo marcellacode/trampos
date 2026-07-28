@@ -41,10 +41,10 @@ function ChecklistItem({ item }: { item: ApplyChecklistItem }) {
   return (
     <li className="flex items-center gap-2.5 text-sm">
       {item.status === "done" ? (
-        <Check className="h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden="true" />
+        <Check className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
       ) : item.status === "auto" ? (
         <Sparkles
-          className="h-4 w-4 shrink-0 text-[#4F7CFF]"
+          className="h-4 w-4 shrink-0 text-primary"
           aria-hidden="true"
         />
       ) : (
@@ -53,15 +53,15 @@ function ChecklistItem({ item }: { item: ApplyChecklistItem }) {
       <span
         className={cn(
           item.status === "done"
-            ? "text-white/90"
+            ? "text-foreground/90"
             : item.status === "auto"
-              ? "text-[#4F7CFF]"
-              : "text-[#9CA3AF]"
+              ? "text-primary"
+              : "text-muted-foreground"
         )}
       >
         {item.label}
         {item.status === "auto" && (
-          <span className="ml-1 text-xs text-[#9CA3AF]">· Será criada</span>
+          <span className="ml-1 text-xs text-muted-foreground">· Será criada</span>
         )}
       </span>
     </li>
@@ -77,8 +77,8 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
         : "#9CA3AF";
 
   return (
-    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-      <p className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+    <div className="rounded-xl border border-border bg-muted/30 p-4">
+      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
         Chance estimada
       </p>
       <p className="mt-1 text-lg font-bold" style={{ color: levelColor }}>
@@ -90,7 +90,7 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
             key={i}
             className={cn(
               "h-3.5 w-3.5",
-              i < data.stars ? "fill-[#F59E0B] text-[#F59E0B]" : "text-white/10"
+              i < data.stars ? "fill-[#F59E0B] text-[#F59E0B]" : "text-foreground/10"
             )}
             aria-hidden="true"
           />
@@ -98,8 +98,8 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
       </div>
       <ul className="mt-3 space-y-1" role="list">
         {data.reasons.slice(0, 2).map((reason, i) => (
-          <li key={i} className="flex items-start gap-2 text-xs text-[#9CA3AF]">
-            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4F7CFF]" />
+          <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary" />
             {reason}
           </li>
         ))}
@@ -126,19 +126,19 @@ function PreviewBlock({
   }
 
   return (
-    <div className="rounded-lg border border-white/[0.06] bg-black/20 p-3">
+    <div className="rounded-lg border border-border bg-black/20 p-3">
       <div className="mb-2 flex items-center justify-between gap-2">
-        <p className="text-xs font-semibold text-white">{title}</p>
+        <p className="text-xs font-semibold text-foreground">{title}</p>
         <button
           type="button"
           onClick={() => void handleCopy()}
-          className="inline-flex items-center gap-1 text-[10px] text-[#9CA3AF] transition-colors hover:text-white"
+          className="inline-flex items-center gap-1 text-[10px] text-muted-foreground transition-colors hover:text-foreground"
         >
           <Copy className="h-3 w-3" aria-hidden="true" />
           {copied ? "Copiado!" : "Copiar"}
         </button>
       </div>
-      <pre className="max-h-32 overflow-y-auto whitespace-pre-wrap font-sans text-xs text-[#9CA3AF]">
+      <pre className="max-h-32 overflow-y-auto whitespace-pre-wrap font-sans text-xs text-muted-foreground">
         {text.slice(0, 800)}
         {text.length > 800 ? "…" : ""}
       </pre>
@@ -179,7 +179,7 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
 
   return (
     <aside className={cn("space-y-4", className)}>
-      <ReportCard className="sticky top-24 border-[#4F7CFF]/15 p-5">
+      <ReportCard className="sticky top-24 border-primary/15 p-5">
         <div className="flex flex-col items-center">
           <CompatibilityCard value={job.compatibility} hasMatch={job.hasMatch} size={120} />
         </div>
@@ -188,13 +188,13 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           <ApprovalSection data={job.approvalProbability} />
         </div>
 
-        <div className="mt-4 rounded-xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 p-4">
+        <div className="mt-4 rounded-xl border border-primary/20 bg-primary/5 p-4">
           <div className="mb-2 flex items-center gap-2">
-            <Bot className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
-            <p className="text-xs font-semibold text-white">Resumo IA</p>
+            <Bot className="h-4 w-4 text-primary" aria-hidden="true" />
+            <p className="text-xs font-semibold text-foreground">Resumo IA</p>
             <AIBadge />
           </div>
-          <p className="text-sm font-medium text-white">{job.aiSummary}</p>
+          <p className="text-sm font-medium text-foreground">{job.aiSummary}</p>
         </div>
 
         {showPreview && (
@@ -230,7 +230,7 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
         {state === "prepared" && isExternal && applyUrl && (
           <Button
             variant="outline"
-            className="mt-2 h-10 w-full border-white/10 bg-transparent"
+            className="mt-2 h-10 w-full border-border bg-transparent"
             onClick={() => void confirmExternal()}
           >
             <Check className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -239,26 +239,26 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
         )}
 
         {state === "prepared" && isExternal && (
-          <p className="mt-2 text-center text-xs text-[#9CA3AF]">
+          <p className="mt-2 text-center text-xs text-muted-foreground">
             A IA preparou currículo e carta. Copie, cole no site e confirme quando
             terminar.
           </p>
         )}
 
         {isDone && (
-          <p className="mt-2 text-center text-xs text-[#22C55E]">
+          <p className="mt-2 text-center text-xs text-success">
             Candidatura registrada com sucesso.
           </p>
         )}
 
-        <div className="mt-4 flex items-center gap-1.5 text-xs text-[#9CA3AF]">
+        <div className="mt-4 flex items-center gap-1.5 text-xs text-muted-foreground">
           <Clock className="h-3.5 w-3.5" aria-hidden="true" />
           Melhor horário: {job.bestSendTime.dayLabel}, {job.bestSendTime.timeRange}
         </div>
 
         {job.applyChecklist.length > 0 && (
-          <div className="mt-5 border-t border-white/[0.06] pt-4">
-            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+          <div className="mt-5 border-t border-border pt-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Checklist
             </p>
             <ul className="space-y-2.5" role="list">
@@ -284,20 +284,20 @@ export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps)
 
   return (
     <>
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#0C0D0F]/95 p-4 backdrop-blur-xl lg:hidden">
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border bg-card/95 p-4 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <button
             type="button"
             onClick={onToggle}
-            className="flex flex-col items-center gap-0.5 px-2 text-[#9CA3AF]"
+            className="flex flex-col items-center gap-0.5 px-2 text-muted-foreground"
           >
             {job.hasMatch ? (
               <>
-                <span className="text-lg font-bold text-[#22C55E]">{job.compatibility}%</span>
+                <span className="text-lg font-bold text-success">{job.compatibility}%</span>
                 <span className="text-[10px]">Compat.</span>
               </>
             ) : (
-              <span className="text-[10px] text-[#9CA3AF]">Sem match</span>
+              <span className="text-[10px] text-muted-foreground">Sem match</span>
             )}
           </button>
           <Button
@@ -330,7 +330,7 @@ export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps)
               animate={{ y: 0 }}
               exit={{ y: "100%" }}
               transition={{ type: "spring", damping: 28, stiffness: 300 }}
-              className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-white/[0.08] bg-[#111315] p-5 lg:hidden"
+              className="fixed inset-x-0 bottom-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-2xl border-t border-border bg-card p-5 lg:hidden"
             >
               <button
                 type="button"

@@ -101,14 +101,14 @@ function SocialButton({
       disabled={disabled || loading}
       aria-label={label}
       className={cn(
-        "relative flex h-11 w-full items-center justify-center gap-3 overflow-hidden rounded-xl border border-white/10 bg-white/[0.03] text-sm font-medium text-white transition-colors",
+        "relative flex h-11 w-full items-center justify-center gap-3 overflow-hidden rounded-xl border border-border bg-muted/40 text-sm font-medium text-foreground transition-colors",
         "hover:border-white/20 hover:bg-white/[0.06]",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/50 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111315]",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
         "disabled:cursor-not-allowed disabled:opacity-50"
       )}
     >
       {loading ? (
-        <Loader2 className="h-4 w-4 animate-spin text-[#4F7CFF]" aria-hidden="true" />
+        <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
       ) : (
         <Icon className="h-4 w-4" />
       )}
@@ -129,7 +129,7 @@ export function SocialButtons({ disabled, onError }: SocialButtonsProps) {
     <div className="space-y-4">
       <div className="relative flex items-center gap-3">
         <Separator className="flex-1 bg-white/8" />
-        <span className="shrink-0 text-xs uppercase tracking-wider text-[#9CA3AF]">
+        <span className="shrink-0 text-xs uppercase tracking-wider text-muted-foreground">
           ou
         </span>
         <Separator className="flex-1 bg-white/8" />

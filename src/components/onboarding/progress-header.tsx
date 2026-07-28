@@ -12,7 +12,7 @@ export function ProgressHeader({ step, totalSteps = 7 }: ProgressHeaderProps) {
   const progress = Math.min(100, Math.max(0, (step / totalSteps) * 100));
 
   return (
-    <header className="relative z-20 border-b border-white/[0.06] bg-[#08090A]/60 backdrop-blur-xl">
+    <header className="relative z-20 border-b border-border bg-background/60 backdrop-blur-xl">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
         <Logo />
 
@@ -21,9 +21,9 @@ export function ProgressHeader({ step, totalSteps = 7 }: ProgressHeaderProps) {
           role="group"
           aria-label="Progresso do onboarding"
         >
-          <p className="text-xs font-medium tracking-wide text-[#9CA3AF] sm:text-sm">
+          <p className="text-xs font-medium tracking-wide text-muted-foreground sm:text-sm">
             Passo{" "}
-            <span className="text-white" aria-current="step">
+            <span className="text-foreground" aria-current="step">
               {step}
             </span>{" "}
             de {totalSteps}
@@ -38,7 +38,7 @@ export function ProgressHeader({ step, totalSteps = 7 }: ProgressHeaderProps) {
             aria-label={`Progresso: passo ${step} de ${totalSteps}`}
           >
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-[#4F7CFF] to-[#6B93FF]"
+              className="h-full rounded-full bg-gradient-to-r from-primary to-primary/80"
               initial={false}
               animate={{ width: `${progress}%` }}
               transition={{ type: "spring", stiffness: 120, damping: 20 }}

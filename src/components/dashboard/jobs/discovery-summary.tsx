@@ -58,21 +58,21 @@ export function DiscoverySummaryBar({
           className={cn(
             "rounded-xl border px-4 py-3 transition-colors",
             item.accent
-              ? "border-[#4F7CFF]/30 bg-[#4F7CFF]/8"
+              ? "border-primary/30 bg-primary/8"
               : item.highlight
-                ? "border-[#22C55E]/20 bg-[#22C55E]/5"
-                : "border-white/[0.06] bg-white/[0.02]"
+                ? "border-[#22C55E]/20 bg-success/5"
+                : "border-border bg-muted/30"
           )}
         >
-          <p className="text-[11px] text-[#9CA3AF]">{item.label}</p>
+          <p className="text-[11px] text-muted-foreground">{item.label}</p>
           <p
             className={cn(
               "mt-1 text-lg font-semibold tabular-nums sm:text-xl",
               item.accent
-                ? "text-[#4F7CFF]"
+                ? "text-primary"
                 : item.highlight
-                  ? "text-[#22C55E]"
-                  : "text-white"
+                  ? "text-success"
+                  : "text-foreground"
             )}
           >
             <AnimatedCounter

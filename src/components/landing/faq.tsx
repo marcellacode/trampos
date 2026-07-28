@@ -6,6 +6,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
+import { motion } from "framer-motion";
 import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
 import { FAQ_ITEMS } from "@/lib/constants";
@@ -13,34 +14,42 @@ import { FAQ_ITEMS } from "@/lib/constants";
 export function FAQ() {
   return (
     <section
-      className="relative py-24 sm:py-32"
+      id="faq"
+      className="landing-section-alt border-t border-white/5"
       aria-labelledby="faq-heading"
     >
       <Container>
         <SectionHeader
           label="FAQ"
           title="Perguntas frequentes"
-          description="Tudo o que você precisa saber sobre o Jobera."
+          description="Tudo o que você precisa saber antes de começar."
+          className="mb-10"
         />
 
-        <div className="mx-auto max-w-3xl">
-          <Accordion className="space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-3xl"
+        >
+          <Accordion className="glass-card divide-y divide-white/10">
             {FAQ_ITEMS.map((item, i) => (
               <AccordionItem
                 key={i}
                 value={`item-${i}`}
-                className="overflow-hidden rounded-xl border border-white/8 bg-[#111315] px-6 transition-colors data-[state=open]:border-[#4F7CFF]/30"
+                className="border-0 px-5 last:border-b-0"
               >
-                <AccordionTrigger className="py-5 text-left text-base font-medium text-white hover:text-[#4F7CFF] hover:no-underline [&[data-state=open]]:text-[#4F7CFF]">
+                <AccordionTrigger className="py-5 text-left text-base font-medium text-foreground hover:text-primary hover:no-underline">
                   {item.question}
                 </AccordionTrigger>
-                <AccordionContent className="pb-5 text-sm leading-relaxed text-[#9CA3AF]">
+                <AccordionContent className="pb-5 text-sm leading-relaxed text-muted-foreground">
                   {item.answer}
                 </AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
-        </div>
+        </motion.div>
       </Container>
     </section>
   );

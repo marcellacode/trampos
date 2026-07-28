@@ -68,22 +68,22 @@ export function CareerChatPanel({
   );
 
   return (
-    <div className={cn("flex h-[min(70vh,640px)] flex-col rounded-2xl border border-white/[0.08] bg-[#111315]", className)}>
-      <div className="border-b border-white/[0.06] px-5 py-4">
+    <div className={cn("flex h-[min(70vh,640px)] flex-col rounded-2xl border border-border bg-card", className)}>
+      <div className="border-b border-border px-5 py-4">
         <div className="flex items-center gap-2">
-          <Sparkles className="h-4 w-4 text-[#4F7CFF]" />
-          <h2 className="text-sm font-semibold text-white">
+          <Sparkles className="h-4 w-4 text-primary" />
+          <h2 className="text-sm font-semibold text-foreground">
             {context === "assistant" ? "Assistente de carreira" : "Copiloto Jobe"}
           </h2>
         </div>
-        <p className="mt-1 text-xs text-[#9CA3AF]">
+        <p className="mt-1 text-xs text-muted-foreground">
           Olá, {userName.split(" ")[0]}. Pergunte sobre vagas, currículo ou entrevistas.
         </p>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
         {messages.length === 0 && (
-          <p className="text-sm text-[#9CA3AF]">
+          <p className="text-sm text-muted-foreground">
             Envie uma mensagem para começar a conversa com a IA.
           </p>
         )}
@@ -93,33 +93,33 @@ export function CareerChatPanel({
             className={cn(
               "max-w-[85%] rounded-2xl px-4 py-2.5 text-sm",
               msg.role === "user"
-                ? "ml-auto bg-[#4F7CFF]/20 text-white"
-                : "bg-white/[0.04] text-[#E5E7EB]"
+                ? "ml-auto bg-primary/20 text-primary-foreground"
+                : "bg-muted/50 text-[#E5E7EB]"
             )}
           >
             <p className="whitespace-pre-wrap">{msg.content}</p>
-            <span className="mt-1 block text-[10px] text-[#9CA3AF]">{msg.timestamp}</span>
+            <span className="mt-1 block text-[10px] text-muted-foreground">{msg.timestamp}</span>
           </div>
         ))}
         {loading && (
-          <p className="text-xs text-[#9CA3AF]">Jobe está digitando…</p>
+          <p className="text-xs text-muted-foreground">Jobe está digitando…</p>
         )}
         <div ref={bottomRef} />
       </div>
 
-      <form onSubmit={handleSubmit} className="border-t border-white/[0.06] p-4">
-        <div className="flex items-center gap-2 rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2">
+      <form onSubmit={handleSubmit} className="border-t border-border p-4">
+        <div className="flex items-center gap-2 rounded-xl border border-border bg-black/20 px-3 py-2">
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Digite sua mensagem..."
-            className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
+            className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="rounded-lg bg-[#4F7CFF] p-2 text-white disabled:opacity-40"
+            className="rounded-lg bg-primary p-2 text-primary-foreground disabled:opacity-40"
             aria-label="Enviar"
           >
             <Send className="h-4 w-4" />

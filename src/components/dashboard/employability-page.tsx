@@ -27,10 +27,10 @@ function EmployabilityContent() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight text-white">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Mapa de Empregabilidade
         </h1>
-        <p className="mt-1.5 max-w-2xl text-sm text-[#9CA3AF]">
+        <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
           Painel visual das competências que mais abrem portas nas vagas alinhadas
           ao seu objetivo. A IA estima o ganho de compatibilidade de cada
           investimento de aprendizado.
@@ -76,7 +76,7 @@ export function EmployabilityPage() {
     >
       <Suspense
         fallback={
-          <div className="h-64 animate-pulse rounded-2xl bg-white/[0.03]" />
+          <div className="h-64 animate-pulse rounded-2xl bg-muted/40" />
         }
       >
         {!isLoading && <EmployabilityContent />}

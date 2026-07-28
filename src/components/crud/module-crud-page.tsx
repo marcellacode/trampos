@@ -36,10 +36,10 @@ export function ModuleCrudShell({ config, children }: ModuleCrudShellProps) {
     >
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             {config.title}
           </h1>
-          <p className="mt-1.5 max-w-2xl text-sm text-[#9CA3AF]">
+          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
             {config.description}
           </p>
         </div>

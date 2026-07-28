@@ -6,7 +6,7 @@ function Skeleton({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        "animate-pulse rounded-xl bg-white/[0.06]",
+        "animate-pulse rounded-xl bg-muted",
         className
       )}
       aria-hidden="true"
@@ -17,7 +17,7 @@ function Skeleton({ className }: { className?: string }) {
 export function LoadingSkeletons() {
   return (
     <div className="space-y-8" aria-busy="true" aria-label="Carregando dashboard">
-      <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111315] p-6 sm:p-8">
+      <div className="overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8">
         <Skeleton className="mb-3 h-4 w-32" />
         <Skeleton className="mb-2 h-8 w-72 max-w-full" />
         <Skeleton className="h-4 w-56" />
@@ -38,7 +38,7 @@ export function LoadingSkeletons() {
         {Array.from({ length: 6 }).map((_, i) => (
           <div
             key={i}
-            className="rounded-2xl border border-white/[0.08] bg-[#111315] p-4"
+            className="rounded-2xl border border-border bg-card p-4"
           >
             <Skeleton className="mb-4 h-3 w-24" />
             <Skeleton className="mb-3 h-8 w-16" />

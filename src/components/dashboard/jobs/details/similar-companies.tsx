@@ -49,10 +49,10 @@ export function SimilarCompanies({ companies }: SimilarCompaniesProps) {
             onClick={() => scroll("left")}
             disabled={!canScrollLeft}
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] transition-colors",
+              "flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors",
               canScrollLeft
-                ? "text-white hover:bg-white/5"
-                : "cursor-not-allowed text-[#9CA3AF]/30"
+                ? "text-foreground hover:bg-muted/50"
+                : "cursor-not-allowed text-muted-foreground/30"
             )}
             aria-label="Anterior"
           >
@@ -63,10 +63,10 @@ export function SimilarCompanies({ companies }: SimilarCompaniesProps) {
             onClick={() => scroll("right")}
             disabled={!canScrollRight}
             className={cn(
-              "flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] transition-colors",
+              "flex h-8 w-8 items-center justify-center rounded-lg border border-border transition-colors",
               canScrollRight
-                ? "text-white hover:bg-white/5"
-                : "cursor-not-allowed text-[#9CA3AF]/30"
+                ? "text-foreground hover:bg-muted/50"
+                : "cursor-not-allowed text-muted-foreground/30"
             )}
             aria-label="Próximo"
           >
@@ -91,7 +91,7 @@ export function SimilarCompanies({ companies }: SimilarCompaniesProps) {
           >
             <Link
               href={company.href}
-              className="group block rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-all hover:-translate-y-1 hover:border-[#4F7CFF]/30 hover:shadow-[0_0_24px_rgba(79,124,255,0.1)]"
+              className="group block rounded-xl border border-border bg-muted/30 p-4 transition-all hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_0_24px_rgba(79,124,255,0.1)]"
             >
               <div
                 className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg text-sm font-bold"
@@ -102,7 +102,7 @@ export function SimilarCompanies({ companies }: SimilarCompaniesProps) {
               >
                 {company.logo}
               </div>
-              <p className="text-sm font-medium text-white group-hover:text-[#4F7CFF]">
+              <p className="text-sm font-medium text-foreground group-hover:text-primary">
                 {company.name}
               </p>
               <div className="mt-3">

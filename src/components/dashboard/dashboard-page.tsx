@@ -5,21 +5,21 @@ import { KPIGrid } from "@/components/dashboard/kpi-grid";
 import { RecommendationCard } from "@/components/dashboard/recommendation-card";
 import { GoalCard } from "@/components/dashboard/goal-card";
 import { CompaniesCard } from "@/components/dashboard/companies-card";
-import { JobsRanking } from "@/components/dashboard/jobs-ranking";
 import { EmployabilityMap } from "@/components/dashboard/employability-map";
-import { MarketRadar } from "@/components/dashboard/market-radar";
 import { AISuggestions } from "@/components/dashboard/ai-suggestions";
 import { LoadingSkeletons } from "@/components/dashboard/loading-skeletons";
 import {
   EmptyInterviewsState,
   EmptyJobsState,
   EmptyMessagesState,
+  EmptyTimelineState,
   NewUserState,
 } from "@/components/dashboard/empty-states";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { isDashboardEmpty } from "@/lib/dashboard/empty-data";
 import type { DashboardViewState } from "@/types/dashboard";
+import Link from "next/link";
 
 interface DashboardPageProps {
   viewState?: DashboardViewState;
@@ -44,8 +44,8 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
 
   if (isError || !data) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#08090A] px-4">
-        <p className="text-sm text-[#9CA3AF]">
+      <div className="flex min-h-screen items-center justify-center bg-background px-4">
+        <p className="text-sm text-muted-foreground">
           Não foi possível carregar o dashboard. Tente novamente.
         </p>
       </div>
@@ -65,6 +65,8 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
     );
   }
 
+  const matchedJobs = data.jobs.filter((j) => j.hasMatch);
+
   return (
     <DashboardLayout
       user={data.user}
@@ -73,7 +75,11 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
       unreadMessages={data.unreadMessages}
     >
       <div className="space-y-8">
-        <Timeline items={data.timeline} />
+        {data.timeline.length > 0 ? (
+          <Timeline items={data.timeline} />
+        ) : (
+          <EmptyTimelineState />
+        )}
 
         {data.kpis.length > 0 && <KPIGrid metrics={data.kpis} />}
 
@@ -83,41 +89,66 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
 
         <div className="grid gap-4 lg:grid-cols-2">
           <GoalCard goal={data.goal} />
-          {viewState === "empty-messages" ? (
-            <EmptyMessagesState />
-          ) : data.companies.length > 0 ? (
+          {data.companies.length > 0 ? (
             <CompaniesCard companies={data.companies} />
           ) : (
             <EmptyMessagesState />
           )}
         </div>
 
-        {viewState === "empty-jobs" || data.jobs.length === 0 ? (
-          <EmptyJobsState />
+        {matchedJobs.length > 0 ? (
+          <section aria-labelledby="matched-jobs-heading">
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2
+                  id="matched-jobs-heading"
+                  className="text-base font-bold text-foreground"
+                >
+                  Vagas com match
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Com base no seu perfil
+                </p>
+              </div>
+              <Link
+                href="/dashboard/vagas"
+                className="text-sm font-semibold text-primary hover:underline"
+              >
+                Buscar mais vagas
+              </Link>
+            </div>
+            <ul className="divide-y divide-border rounded-lg border border-border bg-card" role="list">
+              {matchedJobs.slice(0, 5).map((job) => (
+                <li key={job.id}>
+                  <Link
+                    href={job.href}
+                    className="flex items-center justify-between gap-4 px-4 py-3 hover:bg-muted/50"
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate font-medium text-primary">{job.role}</p>
+                      <p className="truncate text-sm text-muted-foreground">{job.company}</p>
+                    </div>
+                    <span className="shrink-0 text-sm font-semibold text-success">
+                      {job.compatibility}%
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
         ) : (
-          <JobsRanking jobs={data.jobs} />
+          <EmptyJobsState />
         )}
 
         {data.employability.length > 0 && (
           <EmployabilityMap skills={data.employability} compact />
         )}
 
-        {(data.market.length > 0 || data.suggestions.length > 0) && (
-          <div className="grid gap-4 lg:grid-cols-5">
-            {data.market.length > 0 && (
-              <MarketRadar trends={data.market} className="lg:col-span-3" />
-            )}
-            <div className="space-y-4 lg:col-span-2">
-              {viewState === "empty-interviews" ? (
-                <EmptyInterviewsState />
-              ) : (
-                data.suggestions.length > 0 && (
-                  <AISuggestions suggestions={data.suggestions} stacked />
-                )
-              )}
-            </div>
-          </div>
+        {data.suggestions.length > 0 && (
+          <AISuggestions suggestions={data.suggestions} stacked />
         )}
+
+        {viewState === "empty-interviews" && <EmptyInterviewsState />}
       </div>
     </DashboardLayout>
   );

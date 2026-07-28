@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
 import { Logo } from "@/components/shared/logo";
@@ -11,46 +11,39 @@ import { NAV_LINKS } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 
 export function Header() {
-  const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    const onScroll = () => setScrolled(window.scrollY > 16);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
-
-  useEffect(() => {
-    document.body.style.overflow = mobileOpen ? "hidden" : "";
-    return () => {
-      document.body.style.overflow = "";
-    };
-  }, [mobileOpen]);
 
   return (
     <header
       className={cn(
         "fixed top-0 right-0 left-0 z-50 transition-all duration-300",
         scrolled
-          ? "glass border-b border-white/8"
-          : "bg-transparent"
+          ? "border-b border-white/10 bg-background/70 shadow-lg shadow-black/20 backdrop-blur-xl"
+          : "border-b border-transparent bg-transparent"
       )}
       role="banner"
     >
       <Container>
         <nav
-          className="flex h-16 items-center justify-between lg:h-18"
+          className="flex h-16 items-center justify-between gap-4"
           aria-label="Navegação principal"
         >
           <Logo />
 
-          {/* Desktop nav */}
-          <ul className="hidden items-center gap-1 lg:flex" role="list">
+          <ul className="hidden items-center gap-1 md:flex" role="list">
             {NAV_LINKS.map((link) => (
               <li key={link.href}>
                 <Link
                   href={link.href}
-                  className="rounded-lg px-3 py-2 text-sm text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]"
+                  className="rounded-lg px-3.5 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-white/5 hover:text-foreground"
                 >
                   {link.label}
                 </Link>
@@ -58,29 +51,27 @@ export function Header() {
             ))}
           </ul>
 
-          {/* Desktop actions */}
-          <div className="hidden items-center gap-3 lg:flex">
+          <div className="hidden items-center gap-2 sm:flex">
             <Button
               variant="ghost"
-              className="text-[#9CA3AF] hover:text-white"
+              className="font-medium text-muted-foreground hover:text-foreground"
               render={<Link href="/login" />}
               nativeButton={false}
             >
               Entrar
             </Button>
             <Button
-              className="bg-[#4F7CFF] px-5 hover:bg-[#4F7CFF]/90 hover:shadow-lg hover:shadow-[#4F7CFF]/25"
+              className="rounded-xl px-5 font-semibold shadow-lg shadow-primary/20"
               render={<Link href="/onboarding" />}
               nativeButton={false}
             >
-              Começar grátis
+              Cadastrar currículo grátis
             </Button>
           </div>
 
-          {/* Mobile menu button */}
           <button
             type="button"
-            className="flex h-10 w-10 items-center justify-center rounded-lg text-white hover:bg-white/5 lg:hidden focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-foreground md:hidden"
             onClick={() => setMobileOpen(!mobileOpen)}
             aria-expanded={mobileOpen}
             aria-controls="mobile-menu"
@@ -91,7 +82,6 @@ export function Header() {
         </nav>
       </Container>
 
-      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -99,8 +89,8 @@ export function Header() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
-            className="glass border-b border-white/8 lg:hidden"
+            transition={{ duration: 0.25 }}
+            className="overflow-hidden border-t border-white/10 bg-background/95 backdrop-blur-xl md:hidden"
           >
             <Container className="py-4">
               <ul className="flex flex-col gap-1" role="list">
@@ -109,28 +99,28 @@ export function Header() {
                     <Link
                       href={link.href}
                       onClick={() => setMobileOpen(false)}
-                      className="block rounded-lg px-3 py-3 text-sm text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+                      className="block rounded-lg px-3 py-2.5 text-sm font-medium text-foreground hover:bg-white/5"
                     >
                       {link.label}
                     </Link>
                   </li>
                 ))}
               </ul>
-              <div className="mt-4 flex flex-col gap-2 border-t border-white/8 pt-4">
+              <div className="mt-4 flex flex-col gap-2 border-t border-white/10 pt-4">
                 <Button
-                  variant="ghost"
-                  className="w-full justify-center text-[#9CA3AF]"
+                  variant="outline"
+                  className="w-full justify-center rounded-xl border-white/10 bg-white/5"
                   render={<Link href="/login" onClick={() => setMobileOpen(false)} />}
                   nativeButton={false}
                 >
                   Entrar
                 </Button>
                 <Button
-                  className="w-full justify-center bg-[#4F7CFF] hover:bg-[#4F7CFF]/90"
+                  className="w-full justify-center rounded-xl font-semibold"
                   render={<Link href="/onboarding" onClick={() => setMobileOpen(false)} />}
                   nativeButton={false}
                 >
-                  Começar grátis
+                  Cadastrar currículo grátis
                 </Button>
               </div>
             </Container>

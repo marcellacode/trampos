@@ -1,82 +1,63 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
+import { Button } from "@/components/ui/button";
 
 export function CtaFinal() {
   return (
-    <section
-      className="relative py-24 sm:py-32"
-      aria-labelledby="cta-heading"
-    >
+    <section className="landing-section" aria-labelledby="cta-heading">
       <Container>
         <motion.div
-          initial={{ opacity: 0, scale: 0.98 }}
-          whileInView={{ opacity: 1, scale: 1 }}
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="relative overflow-hidden rounded-3xl border border-white/10 bg-[#111315] px-6 py-16 text-center sm:px-12 sm:py-20"
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-white/[0.04] to-glow/10 p-10 text-center sm:p-14 glow-primary"
         >
-          {/* Background effects */}
-          <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-            <div className="absolute top-0 left-1/2 h-[300px] w-[600px] -translate-x-1/2 rounded-full bg-[#4F7CFF]/20 blur-[100px]" />
-            <div className="absolute inset-0 grid-pattern opacity-20" />
-          </div>
+          <div
+            className="pointer-events-none absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-primary/30 blur-[80px]"
+            aria-hidden="true"
+          />
 
           <div className="relative">
-            <motion.h2
+            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/20 ring-1 ring-primary/30">
+              <Sparkles className="h-7 w-7 text-primary" aria-hidden="true" />
+            </div>
+
+            <h2
               id="cta-heading"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.1 }}
-              className="mx-auto max-w-2xl text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl"
+              className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
             >
-              Sua próxima oportunidade pode estar aparecendo agora.
-            </motion.h2>
+              Pronto para encontrar a vaga certa?
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
+              Cadastre seu currículo gratuitamente e deixe o Jobera encontrar
+              oportunidades compatíveis com seu perfil.
+            </p>
 
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-              className="mx-auto mt-4 max-w-lg text-lg text-[#9CA3AF]"
-            >
-              Enquanto você lê isso, nossa IA já está monitorando milhares de
-              vagas. Não perca mais tempo procurando — deixe a IA trabalhar por
-              você.
-            </motion.p>
-
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="mt-10"
-            >
+            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Button
                 size="lg"
-                className="group h-14 bg-[#4F7CFF] px-10 text-lg hover:bg-[#4F7CFF]/90 hover:shadow-xl hover:shadow-[#4F7CFF]/30"
+                className="h-12 min-w-[220px] rounded-xl font-semibold shadow-lg shadow-primary/25"
                 render={<Link href="/onboarding" />}
                 nativeButton={false}
               >
-                Começar gratuitamente
-                <ArrowRight className="ml-2 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                Cadastrar currículo grátis
+                <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
               </Button>
-            </motion.div>
-
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4 }}
-              className="mt-4 text-sm text-[#9CA3AF]"
-            >
-              Sem cartão de crédito · Plano gratuito disponível · Cancele quando quiser
-            </motion.p>
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-12 min-w-[220px] rounded-xl border-white/15 bg-white/5 font-semibold hover:bg-white/10"
+                render={<Link href="/dashboard/vagas" />}
+                nativeButton={false}
+              >
+                Buscar vagas
+              </Button>
+            </div>
           </div>
         </motion.div>
       </Container>

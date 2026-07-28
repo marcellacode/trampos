@@ -29,12 +29,12 @@ export function JobFAQSection({ faqs }: JobFAQSectionProps) {
           <AccordionItem
             key={faq.id}
             value={faq.id}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 not-last:border-b"
+            className="rounded-xl border border-border bg-muted/30 px-4 not-last:border-b"
           >
-            <AccordionTrigger className="py-3.5 text-sm font-medium text-white hover:no-underline">
+            <AccordionTrigger className="py-3.5 text-sm font-medium text-foreground hover:no-underline">
               {faq.question}
             </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-[#9CA3AF]">
+            <AccordionContent className="text-sm leading-relaxed text-muted-foreground">
               {faq.answer}
             </AccordionContent>
           </AccordionItem>

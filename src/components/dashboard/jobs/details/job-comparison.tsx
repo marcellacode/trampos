@@ -24,7 +24,7 @@ function BenefitsStars({ rating }: { rating: number }) {
           key={i}
           className={cn(
             "h-3.5 w-3.5",
-            i < rating ? "fill-current" : "fill-none text-white/15"
+            i < rating ? "fill-current" : "fill-none text-foreground/15"
           )}
           aria-hidden="true"
         />
@@ -77,7 +77,7 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
           {jobs.map((job) => (
             <div
               key={job.id}
-              className="flex items-center gap-2 rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2"
+              className="flex items-center gap-2 rounded-xl border border-border bg-muted/30 px-3 py-2"
             >
               <div
                 className="flex h-7 w-7 items-center justify-center rounded-lg text-[10px] font-bold"
@@ -86,8 +86,8 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
                 {job.logo}
               </div>
               <div>
-                <p className="text-xs font-medium text-white">{job.company}</p>
-                <p className="text-[10px] text-[#9CA3AF]">{job.salary}</p>
+                <p className="text-xs font-medium text-foreground">{job.company}</p>
+                <p className="text-[10px] text-muted-foreground">{job.salary}</p>
               </div>
             </div>
           ))}
@@ -96,7 +96,7 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
         <Button
           onClick={() => setOpen(true)}
           variant="outline"
-          className="mt-5 h-10 w-full gap-2 border-[#4F7CFF]/30 bg-[#4F7CFF]/5 text-[#4F7CFF] hover:bg-[#4F7CFF]/10"
+          className="mt-5 h-10 w-full gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
         >
           <GitCompare className="h-4 w-4" aria-hidden="true" />
           Comparar
@@ -122,24 +122,24 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.96, y: 16 }}
               transition={{ type: "spring", stiffness: 320, damping: 30 }}
-              className="fixed inset-x-4 top-[8%] z-50 mx-auto max-h-[84vh] max-w-3xl overflow-y-auto rounded-2xl border border-white/[0.1] bg-[#111315] shadow-2xl sm:inset-x-auto"
+              className="fixed inset-x-4 top-[8%] z-50 mx-auto max-h-[84vh] max-w-3xl overflow-y-auto rounded-2xl border border-border bg-card shadow-2xl sm:inset-x-auto"
             >
-              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-[#111315]/95 px-6 py-4 backdrop-blur-sm">
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card/95 px-6 py-4 backdrop-blur-sm">
                 <div>
                   <h2
                     id="job-comparison-title"
-                    className="text-lg font-semibold text-white"
+                    className="text-lg font-semibold text-foreground"
                   >
                     Comparar vagas
                   </h2>
-                  <p className="mt-0.5 text-xs text-[#9CA3AF]">
+                  <p className="mt-0.5 text-xs text-muted-foreground">
                     Análise comparativa com conclusão da IA
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+                  className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                   aria-label="Fechar comparação"
                 >
                   <X className="h-4 w-4" />
@@ -165,7 +165,7 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
                       >
                         {job.logo}
                       </div>
-                      <p className="text-xs font-semibold text-white">
+                      <p className="text-xs font-semibold text-foreground">
                         {job.company}
                       </p>
                     </div>
@@ -176,12 +176,12 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
                   {rows.map((row) => (
                     <div
                       key={row.label}
-                      className="grid gap-3 rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2.5 text-xs"
+                      className="grid gap-3 rounded-lg border border-white/[0.04] bg-muted/30 px-3 py-2.5 text-xs"
                       style={{
                         gridTemplateColumns: `minmax(100px, 1fr) repeat(${jobs.length}, minmax(0, 1fr))`,
                       }}
                     >
-                      <span className="font-medium text-[#9CA3AF]">
+                      <span className="font-medium text-muted-foreground">
                         {row.label}
                       </span>
                       {row.values.map((value, i) => {
@@ -198,10 +198,10 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
                           <span
                             key={job.id}
                             className={cn(
-                              "flex items-center justify-center text-center text-white/90",
+                              "flex items-center justify-center text-center text-foreground/90",
                               (isRecommended || isBestCompat) &&
                                 row.highlight &&
-                                "font-semibold text-[#22C55E]"
+                                "font-semibold text-success"
                             )}
                           >
                             {row.isStars ? (
@@ -216,19 +216,19 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
                   ))}
                 </div>
 
-                <div className="mt-6 rounded-xl border border-[#4F7CFF]/25 bg-[#4F7CFF]/8 p-4">
+                <div className="mt-6 rounded-xl border border-primary/25 bg-primary/8 p-4">
                   <div className="flex items-start gap-3">
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#4F7CFF]/15 ring-1 ring-[#4F7CFF]/30">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
                       <Sparkles
-                        className="h-4 w-4 text-[#4F7CFF]"
+                        className="h-4 w-4 text-primary"
                         aria-hidden="true"
                       />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-white">
+                      <p className="text-sm font-medium text-foreground">
                         Conclusão da IA
                       </p>
-                      <p className="mt-1 text-xs leading-relaxed text-[#9CA3AF]">
+                      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                         &ldquo;{data.aiConclusion}&rdquo;
                       </p>
                     </div>
@@ -239,7 +239,7 @@ export function JobComparisonSection({ data }: JobComparisonSectionProps) {
                   <Button
                     variant="outline"
                     onClick={() => setOpen(false)}
-                    className="h-9 border-white/10 bg-transparent"
+                    className="h-9 border-border bg-transparent"
                   >
                     Fechar
                   </Button>

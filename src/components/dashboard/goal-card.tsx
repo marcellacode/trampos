@@ -27,13 +27,13 @@ export function GoalCard({ goal, className }: GoalCardProps) {
       viewport={{ once: true }}
       whileHover={{ y: -2 }}
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-[#111315] p-6 transition-shadow hover:border-white/[0.12] hover:shadow-[0_0_40px_rgba(79,124,255,0.06)]",
+        "rounded-2xl border border-border bg-card p-6 transition-shadow hover:border-white/[0.12] hover:shadow-[0_0_40px_rgba(79,124,255,0.06)]",
         className
       )}
       aria-labelledby="goal-heading"
     >
       <div className="mb-5 flex items-center justify-between gap-3">
-        <h2 id="goal-heading" className="text-base font-semibold text-white">
+        <h2 id="goal-heading" className="text-base font-semibold text-foreground">
           Objetivo Profissional
         </h2>
         <Button
@@ -41,7 +41,7 @@ export function GoalCard({ goal, className }: GoalCardProps) {
           size="sm"
           render={<Link href="/dashboard/objetivos" />}
           nativeButton={false}
-          className="h-8 border-white/10 bg-transparent"
+          className="h-8 border-border bg-transparent"
         >
           <Pencil data-icon="inline-start" className="h-3.5 w-3.5" />
           Editar objetivo
@@ -52,13 +52,13 @@ export function GoalCard({ goal, className }: GoalCardProps) {
         {FIELDS.map(({ key, label, icon: Icon }) => (
           <div
             key={key}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3"
+            className="rounded-xl border border-border bg-muted/30 px-4 py-3"
           >
-            <div className="mb-1.5 flex items-center gap-2 text-[#9CA3AF]">
+            <div className="mb-1.5 flex items-center gap-2 text-muted-foreground">
               <Icon className="h-3.5 w-3.5" aria-hidden="true" />
               <span className="text-[11px] uppercase tracking-wider">{label}</span>
             </div>
-            <p className="text-sm font-medium text-white">{goal[key]}</p>
+            <p className="text-sm font-medium text-foreground">{goal[key]}</p>
           </div>
         ))}
       </div>

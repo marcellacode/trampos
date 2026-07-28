@@ -1,7 +1,7 @@
 "use client";
 
-import { Sparkles } from "lucide-react";
 import Link from "next/link";
+import { Sparkles } from "lucide-react";
 import { AUTH_BRAND } from "@/lib/auth/constants";
 import { cn } from "@/lib/utils";
 
@@ -14,17 +14,19 @@ export function Logo({ className, showText = true }: LogoProps) {
   return (
     <Link
       href="/"
-      className={cn("group flex items-center gap-2.5", className)}
+      className={cn(
+        "inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60",
+        className
+      )}
       aria-label={`${AUTH_BRAND.fullName} - Página inicial`}
     >
-      <div className="relative flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/30 transition-all group-hover:bg-[#4F7CFF]/20 group-hover:ring-[#4F7CFF]/50">
-        <Sparkles className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
-        <div className="absolute inset-0 rounded-lg bg-[#4F7CFF]/20 blur-md opacity-0 transition-opacity group-hover:opacity-100" />
+      <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/35">
+        <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
       </div>
       {showText && (
-        <span className="text-base font-semibold tracking-tight text-white">
+        <span className="text-lg font-semibold tracking-tight text-foreground">
           {AUTH_BRAND.name}
-          <span className="text-[#4F7CFF]">{AUTH_BRAND.suffix}</span>
+          <span className="text-primary">{AUTH_BRAND.suffix}</span>
         </span>
       )}
     </Link>

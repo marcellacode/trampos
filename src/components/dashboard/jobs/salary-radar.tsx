@@ -35,9 +35,9 @@ function CustomTooltip({
   if (!active || !payload?.[0]) return null;
   const item = payload[0].payload;
   return (
-    <div className="rounded-lg border border-white/10 bg-[#16191C] px-3 py-2 text-xs shadow-xl">
-      <p className="font-medium text-white">{item.tech}</p>
-      <p className="mt-1 text-[#9CA3AF]">
+    <div className="rounded-lg border border-border bg-card px-3 py-2 text-xs shadow-xl">
+      <p className="font-medium text-foreground">{item.tech}</p>
+      <p className="mt-1 text-muted-foreground">
         Min: {formatSalary(item.min)} · Média: {formatSalary(item.avg)} · Max:{" "}
         {formatSalary(item.max)}
       </p>
@@ -58,16 +58,16 @@ export function SalaryRadar({ data, className }: SalaryRadarProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-[#111315] p-6",
+        "rounded-2xl border border-border bg-card p-6",
         className
       )}
       aria-labelledby="salary-heading"
     >
       <div className="mb-1">
-        <h2 id="salary-heading" className="text-base font-semibold text-white">
+        <h2 id="salary-heading" className="text-base font-semibold text-foreground">
           Radar Salarial
         </h2>
-        <p className="mt-1 text-sm text-[#9CA3AF]">
+        <p className="mt-1 text-sm text-muted-foreground">
           Faixas salariais por tecnologia no seu mercado
         </p>
       </div>
@@ -114,10 +114,10 @@ export function SalaryRadar({ data, className }: SalaryRadarProps) {
         </ResponsiveContainer>
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-3 text-[10px] text-[#9CA3AF]">
+      <div className="mt-4 flex flex-wrap gap-3 text-[10px] text-muted-foreground">
         {data.map((d) => (
           <span key={d.tech}>
-            <strong className="text-white">{d.tech}</strong> ·{" "}
+            <strong className="text-foreground">{d.tech}</strong> ·{" "}
             {formatSalary(d.min)} – {formatSalary(d.max)}
           </span>
         ))}

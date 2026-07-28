@@ -40,7 +40,7 @@ function CrudField({
         onChange={(event) => onChange(event.target.value)}
         placeholder={field.placeholder}
         rows={3}
-        className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm text-white outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
+        className="w-full rounded-lg border border-input bg-transparent px-2.5 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
       />
     );
   }
@@ -51,7 +51,7 @@ function CrudField({
         id={id}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="h-8 w-full rounded-lg border border-input bg-[#111315] px-2.5 text-sm text-white outline-none focus-visible:border-ring"
+        className="h-8 w-full rounded-lg border border-input bg-card px-2.5 text-sm text-foreground outline-none focus-visible:border-ring"
       >
         <option value="">Selecione...</option>
         {field.options.map((option) => (
@@ -65,7 +65,7 @@ function CrudField({
 
   if (field.type === "checkbox") {
     return (
-      <label className="flex items-center gap-2 text-sm text-[#9CA3AF]">
+      <label className="flex items-center gap-2 text-sm text-muted-foreground">
         <Checkbox
           checked={value === "true"}
           onCheckedChange={(checked) => onChange(checked ? "true" : "false")}
@@ -82,7 +82,7 @@ function CrudField({
       value={value}
       onChange={(event) => onChange(event.target.value)}
       placeholder={field.placeholder}
-      className="border-white/10 bg-white/[0.03] text-white"
+      className="border-border bg-muted/40 text-foreground"
     />
   );
 }
@@ -173,15 +173,15 @@ export function CrudPanel({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-[#111315] p-5 sm:p-6",
+        "rounded-2xl border border-border bg-card p-5 sm:p-6",
         className
       )}
     >
       <div className="mb-5 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-white">{config.title}</h2>
+          <h2 className="text-lg font-semibold text-foreground">{config.title}</h2>
           {config.description && (
-            <p className="mt-1 text-sm text-[#9CA3AF]">{config.description}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{config.description}</p>
           )}
         </div>
         {mode === "list" && (
@@ -189,7 +189,7 @@ export function CrudPanel({
             type="button"
             size="sm"
             onClick={openCreate}
-            className="bg-[#4F7CFF] text-white hover:bg-[#4F7CFF]/90"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
           >
             <Plus className="h-4 w-4" />
             Adicionar
@@ -207,7 +207,7 @@ export function CrudPanel({
         <form onSubmit={handleSubmit} className="space-y-4">
           {config.fields.map((field) => (
             <div key={field.key} className="space-y-1.5">
-              <Label htmlFor={`crud-${field.key}`} className="text-[#9CA3AF]">
+              <Label htmlFor={`crud-${field.key}`} className="text-muted-foreground">
                 {field.label}
               </Label>
               <CrudField
@@ -224,7 +224,7 @@ export function CrudPanel({
             <Button
               type="submit"
               disabled={isMutating}
-              className="bg-[#4F7CFF] text-white hover:bg-[#4F7CFF]/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
             >
               {isMutating && <Loader2 className="h-4 w-4 animate-spin" />}
               {mode === "create" ? "Criar" : "Salvar"}
@@ -235,16 +235,16 @@ export function CrudPanel({
           </div>
         </form>
       ) : isLoading ? (
-        <div className="h-32 animate-pulse rounded-xl bg-white/[0.03]" />
+        <div className="h-32 animate-pulse rounded-xl bg-muted/40" />
       ) : items.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-white/10 px-4 py-10 text-center text-sm text-[#9CA3AF]">
+        <p className="rounded-xl border border-dashed border-border px-4 py-10 text-center text-sm text-muted-foreground">
           Nenhum registro ainda. Clique em Adicionar para criar o primeiro.
         </p>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full min-w-[480px] text-left text-sm">
             <thead>
-              <tr className="border-b border-white/[0.06] text-[#9CA3AF]">
+              <tr className="border-b border-border text-muted-foreground">
                 {config.columns.map((column) => (
                   <th key={column.key} className="px-3 py-2 font-medium">
                     {column.label}
@@ -263,7 +263,7 @@ export function CrudPanel({
                     className="border-b border-white/[0.04] last:border-0"
                   >
                     {config.columns.map((column) => (
-                      <td key={column.key} className="px-3 py-3 text-white/90">
+                      <td key={column.key} className="px-3 py-3 text-foreground/90">
                         {column.render
                           ? column.render(record[column.key], record)
                           : String(record[column.key] ?? "—")}

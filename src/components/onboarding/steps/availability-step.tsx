@@ -81,7 +81,7 @@ export function AvailabilityStep({
           whileHover={canContinue ? { scale: 1.02 } : undefined}
           whileTap={canContinue ? { scale: 0.98 } : undefined}
           disabled={!canContinue}
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-xl bg-[#4F7CFF] px-8 text-sm font-semibold text-white shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-[#638BFF] disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08090A]"
+          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Continuar
         </motion.button>

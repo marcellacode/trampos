@@ -70,13 +70,13 @@ export function JobSections({ sections, stack }: JobSectionsProps) {
               >
                 <Icon className="h-4 w-4" aria-hidden="true" />
               </div>
-              <h3 className="text-sm font-semibold text-white">{title}</h3>
+              <h3 className="text-sm font-semibold text-foreground">{title}</h3>
             </div>
             <ul className="space-y-2" role="list">
               {sections[key].map((item, i) => (
                 <li
                   key={i}
-                  className="flex items-start gap-2 text-sm text-white/85"
+                  className="flex items-start gap-2 text-sm text-foreground/85"
                 >
                   <span
                     className="mt-2 h-1 w-1 shrink-0 rounded-full"
@@ -92,16 +92,16 @@ export function JobSections({ sections, stack }: JobSectionsProps) {
 
         <ReportCard className="p-5 sm:col-span-2">
           <div className="mb-4 flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7CFF]/15 text-[#4F7CFF]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/15 text-primary">
               <Wrench className="h-4 w-4" aria-hidden="true" />
             </div>
-            <h3 className="text-sm font-semibold text-white">Tecnologias</h3>
+            <h3 className="text-sm font-semibold text-foreground">Tecnologias</h3>
           </div>
           <div className="flex flex-wrap gap-2">
             {stack.map((tech) => (
               <span
                 key={tech}
-                className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:border-[#4F7CFF]/30 hover:bg-[#4F7CFF]/5"
+                className="rounded-lg border border-border bg-muted/40 px-3 py-1.5 text-xs font-medium text-foreground/80 transition-colors hover:border-primary/30 hover:bg-primary/5"
               >
                 {tech}
               </span>

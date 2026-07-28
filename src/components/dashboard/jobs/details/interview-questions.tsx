@@ -48,16 +48,16 @@ export function InterviewQuestions({
         {questions.map((q) => (
           <div
             key={q.id}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4 transition-colors hover:border-[#4F7CFF]/20"
+            className="rounded-xl border border-border bg-muted/30 p-4 transition-colors hover:border-primary/20"
           >
             <div className="mb-2 flex items-center gap-2">
-              <span className="rounded-md border border-[#4F7CFF]/30 bg-[#4F7CFF]/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-[#4F7CFF]">
+              <span className="rounded-md border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-primary">
                 {q.tech}
               </span>
             </div>
-            <p className="flex items-start gap-2 text-sm text-white/90">
+            <p className="flex items-start gap-2 text-sm text-foreground/90">
               <MessageSquareQuote
-                className="mt-0.5 h-4 w-4 shrink-0 text-[#9CA3AF]"
+                className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground"
                 aria-hidden="true"
               />
               {q.question}
@@ -70,7 +70,7 @@ export function InterviewQuestions({
         render={<Link href={trainHref} />}
         nativeButton={false}
         variant="outline"
-        className="mt-5 h-10 w-full gap-2 border-[#4F7CFF]/30 bg-[#4F7CFF]/5 text-[#4F7CFF] hover:bg-[#4F7CFF]/10"
+        className="mt-5 h-10 w-full gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
       >
         <Sparkles className="h-4 w-4" aria-hidden="true" />
         Treinar entrevista

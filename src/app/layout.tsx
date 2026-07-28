@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -13,21 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Jobera — Sua IA trabalha para conseguir seu próximo emprego",
+  title: "Jobera — Copiloto de carreira com IA",
   description:
-    "A primeira plataforma onde uma IA trabalha para conseguir um emprego para você. Procura vagas, adapta currículo, prepara candidaturas assistidas e treina entrevistas.",
+    "Encontre vagas compatíveis com seu perfil, adapte currículo por vaga, simule entrevistas e organize candidaturas com inteligência artificial.",
   keywords: [
     "emprego",
-    "IA",
-    "inteligência artificial",
     "carreira",
     "vagas",
     "currículo",
+    "candidatura",
   ],
   openGraph: {
     title: "Jobera",
     description:
-      "Sua IA trabalha para conseguir seu próximo emprego.",
+      "Encontre vagas compatíveis com seu perfil e organize suas candidaturas.",
     type: "website",
   },
 };
@@ -40,9 +39,9 @@ export default function RootLayout({
   return (
     <html
       lang="pt-BR"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${inter.variable} ${geistMono.variable} h-full`}
     >
-      <body className="min-h-full flex flex-col bg-[#08090A] text-white">
+      <body className="min-h-full flex flex-col bg-background text-foreground">
         {children}
       </body>
     </html>

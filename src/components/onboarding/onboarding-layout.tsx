@@ -25,7 +25,7 @@ export function OnboardingLayout({
   return (
     <div
       className={cn(
-        "relative flex min-h-dvh flex-col overflow-hidden bg-[#08090A]",
+        "relative flex min-h-dvh flex-col overflow-hidden bg-background",
         className
       )}
     >

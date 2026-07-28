@@ -3,9 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { JobeChat } from "@/components/dashboard/jobe-chat";
-import { JobsRanking } from "@/components/dashboard/jobs-ranking";
 import {
-  CompanyCarousel,
   ComparisonModal,
   DiscoverySkeleton,
   DiscoveryState,
@@ -189,10 +187,10 @@ export function JobsDiscoveryPage() {
       {data && !isLoading && !isError && isEmpty && (
         <div className="space-y-8">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-white">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               Descobrir oportunidades
             </h1>
-            <p className="mt-1.5 text-sm leading-relaxed text-[#9CA3AF]">
+            <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">
               Encontramos vagas baseadas no seu perfil, não apenas nas suas
               pesquisas.
             </p>
@@ -213,11 +211,9 @@ export function JobsDiscoveryPage() {
             onChange={setFilters}
             onAiQuery={(q) => void handleAiFilter(q)}
           />
-          <JobsRanking jobs={visibleJobs.slice(0, 3)} />
-
           {compareIds.length > 0 && (
-            <div className="flex items-center justify-between rounded-xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 px-4 py-3">
-              <p className="text-xs text-[#9CA3AF]">
+            <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
+              <p className="text-xs text-muted-foreground">
                 {compareIds.length === 1
                   ? "1 vaga selecionada para comparação"
                   : "2 vagas selecionadas para comparação"}
@@ -226,7 +222,7 @@ export function JobsDiscoveryPage() {
                 <button
                   type="button"
                   onClick={handleCompareOpen}
-                  className="rounded-lg bg-[#4F7CFF] px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-[#4F7CFF]/90"
+                  className="rounded-lg bg-primary px-4 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
                 >
                   Comparar agora
                 </button>
@@ -238,11 +234,11 @@ export function JobsDiscoveryPage() {
             <div className="mb-5">
               <h2
                 id="recommended-heading"
-                className="text-base font-semibold text-white"
+                className="text-base font-semibold text-foreground"
               >
                 Recomendadas para você
               </h2>
-              <p className="mt-0.5 text-sm text-[#9CA3AF]">
+              <p className="mt-0.5 text-sm text-muted-foreground">
                 {searchQuery
                   ? `Resultados para "${searchQuery}"`
                   : "Ordenadas por compatibilidade com o seu perfil"}
@@ -275,10 +271,6 @@ export function JobsDiscoveryPage() {
               </div>
             )}
           </section>
-
-          {data.companies.length > 0 && (
-            <CompanyCarousel companies={data.companies} />
-          )}
 
           {(data.regions.length > 0 || data.salaryRadar.length > 0) && (
             <div className="grid gap-5 lg:grid-cols-2">

@@ -22,7 +22,7 @@ function EditableField({
 
   return (
     <label className="group block space-y-1.5" htmlFor={id}>
-      <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">
+      <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
         {label}
         <Pencil
           className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-60 group-focus-within:opacity-60"
@@ -35,7 +35,7 @@ function EditableField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           rows={3}
-          className="w-full resize-none rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#4F7CFF]/50 focus:ring-2 focus:ring-[#4F7CFF]/25"
+          className="w-full resize-none rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/25"
         />
       ) : (
         <input
@@ -43,7 +43,7 @@ function EditableField({
           type="text"
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2.5 text-sm text-white outline-none transition-colors placeholder:text-white/30 focus:border-[#4F7CFF]/50 focus:ring-2 focus:ring-[#4F7CFF]/25"
+          className="w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/25"
         />
       )}
     </label>
@@ -75,11 +75,11 @@ export function SummaryCards({
         animate={{ opacity: 1, y: 0 }}
         className="space-y-3 text-center"
       >
-        <p className="text-sm font-medium text-[#4F7CFF]">Encontramos</p>
-        <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-4xl">
+        <p className="text-sm font-medium text-primary">Encontramos</p>
+        <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
           Seu perfil preliminar
         </h2>
-        <p className="mx-auto max-w-lg text-sm text-[#9CA3AF] sm:text-base">
+        <p className="mx-auto max-w-lg text-sm text-muted-foreground sm:text-base">
           Revise e edite qualquer campo. A IA já fez o trabalho pesado.
         </p>
       </motion.div>
@@ -88,7 +88,7 @@ export function SummaryCards({
         initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
         transition={{ delay: 0.1 }}
-        className="space-y-5 rounded-2xl border border-white/[0.08] bg-[#111315]/80 p-5 backdrop-blur-sm sm:p-7"
+        className="space-y-5 rounded-2xl border border-border bg-card/80 p-5 backdrop-blur-sm sm:p-7"
       >
         <div className="grid gap-4 sm:grid-cols-2">
           <EditableField
@@ -120,7 +120,7 @@ export function SummaryCards({
         />
 
         <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">
+          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
             Competências
           </p>
           <div className="flex flex-wrap gap-2" role="list" aria-label="Competências">
@@ -128,7 +128,7 @@ export function SummaryCards({
               <span
                 key={skill}
                 role="listitem"
-                className="rounded-full border border-[#4F7CFF]/25 bg-[#4F7CFF]/10 px-3 py-1 text-xs font-medium text-[#A8C0FF]"
+                className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-[#A8C0FF]"
               >
                 {skill}
               </span>
@@ -147,36 +147,36 @@ export function SummaryCards({
                   .filter(Boolean)
               )
             }
-            className="mt-2 w-full rounded-xl border border-white/[0.08] bg-white/[0.03] px-3.5 py-2.5 text-sm text-white outline-none focus:border-[#4F7CFF]/50 focus:ring-2 focus:ring-[#4F7CFF]/25"
+            className="mt-2 w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/25"
             placeholder="React, TypeScript, Next.js..."
           />
         </div>
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Experiências ({profile.experiences.length})
             </p>
             <ul className="space-y-2">
               {profile.experiences.map((exp) => (
                 <li
                   key={exp.id}
-                  className="rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2.5"
+                  className="rounded-xl border border-border bg-muted/30 px-3 py-2.5"
                 >
-                  <p className="text-sm font-medium text-white">{exp.role}</p>
-                  <p className="text-xs text-[#9CA3AF]">
+                  <p className="text-sm font-medium text-foreground">{exp.role}</p>
+                  <p className="text-xs text-muted-foreground">
                     {exp.company} · {exp.period}
                   </p>
                 </li>
               ))}
               {profile.experiences.length === 0 && (
-                <li className="text-sm text-[#9CA3AF]">Nenhuma experiência detectada</li>
+                <li className="text-sm text-muted-foreground">Nenhuma experiência detectada</li>
               )}
             </ul>
           </div>
 
           <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">
+            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
               Idiomas · Projetos · Certificados
             </p>
             <ul className="space-y-1.5 text-sm text-[#C4C9D4]">
@@ -203,7 +203,7 @@ export function SummaryCards({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onContinue}
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-xl bg-[#4F7CFF] px-8 text-sm font-semibold text-white shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-[#638BFF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[#08090A]"
+          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           Continuar
         </motion.button>

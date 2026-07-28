@@ -26,7 +26,7 @@ export function CompatibilityBar({
 
   if (!hasMatch) {
     return (
-      <p className={cn("text-xs text-[#9CA3AF]", className)}>
+      <p className={cn("text-xs text-muted-foreground", className)}>
         Faça login para calcular compatibilidade personalizada.
       </p>
     );
@@ -46,7 +46,7 @@ export function CompatibilityBar({
   return (
     <div className={cn("space-y-1.5", className)}>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-[#9CA3AF]">Compatibilidade</span>
+        <span className="text-xs text-muted-foreground">Compatibilidade</span>
         <motion.span
           className="text-sm font-semibold tabular-nums"
           style={{ color }}
@@ -58,7 +58,7 @@ export function CompatibilityBar({
       </div>
       <div
         className={cn(
-          "overflow-hidden rounded-full bg-white/[0.06]",
+          "overflow-hidden rounded-full bg-muted",
           heights[size]
         )}
       >

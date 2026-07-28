@@ -53,9 +53,9 @@ export function LoginCard() {
       className="relative w-full max-w-[460px]"
     >
       <div className="absolute -inset-px rounded-[1.35rem] bg-gradient-to-b from-white/15 via-white/5 to-transparent opacity-80" />
-      <div className="absolute -inset-8 rounded-[2rem] bg-[#4F7CFF]/10 blur-3xl" />
+      <div className="absolute -inset-8 rounded-[2rem] bg-primary/10 blur-3xl" />
 
-      <div className="relative overflow-hidden rounded-[1.25rem] border border-white/10 bg-[#111315]/85 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-8">
+      <div className="relative overflow-hidden rounded-[1.25rem] border border-border bg-card/85 p-6 shadow-[0_24px_80px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-8">
         <div className="absolute inset-0 bg-gradient-to-br from-[#4F7CFF]/[0.07] via-transparent to-transparent" />
 
         <div className="relative space-y-6">
@@ -120,7 +120,7 @@ export function LoginCard() {
                 />
                 <Label
                   htmlFor="remember-me"
-                  className="cursor-pointer text-sm font-normal text-[#9CA3AF]"
+                  className="cursor-pointer text-sm font-normal text-muted-foreground"
                 >
                   Continuar conectado
                 </Label>
@@ -128,7 +128,7 @@ export function LoginCard() {
 
               <Link
                 href="/forgot-password"
-                className="text-sm text-[#4F7CFF] transition-colors hover:text-[#6B91FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/50 rounded"
+                className="text-sm text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
               >
                 Esqueci minha senha
               </Link>
@@ -155,10 +155,10 @@ export function LoginCard() {
               onClick={addRipple}
               disabled={isSubmitting || !isValid}
               className={cn(
-                "relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl text-sm font-semibold text-white transition-all",
-                "bg-[#4F7CFF] shadow-[0_0_24px_rgba(79,124,255,0.35)]",
+                "relative flex h-12 w-full items-center justify-center overflow-hidden rounded-xl text-sm font-semibold text-foreground transition-all",
+                "bg-primary shadow-[0_0_24px_rgba(79,124,255,0.35)]",
                 "hover:bg-[#5B86FF] hover:shadow-[0_0_32px_rgba(79,124,255,0.45)]",
-                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111315]",
+                "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background",
                 "disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none",
                 status === "success" && "bg-[#22C55E] shadow-[0_0_24px_rgba(34,197,94,0.35)]"
               )}

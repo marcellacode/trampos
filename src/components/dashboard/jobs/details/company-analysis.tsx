@@ -45,21 +45,21 @@ export function CompanyAnalysis({
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-lg font-semibold text-white">{company}</h3>
+              <h3 className="text-lg font-semibold text-foreground">{company}</h3>
               {profile.verified && (
                 <BadgeCheck
-                  className="h-4 w-4 text-[#22C55E]"
+                  className="h-4 w-4 text-success"
                   aria-label="Empresa verificada"
                 />
               )}
             </div>
-            <p className="mt-1 text-sm text-[#9CA3AF]">{profile.segment}</p>
+            <p className="mt-1 text-sm text-muted-foreground">{profile.segment}</p>
             <div className="mt-3 flex flex-wrap gap-4 text-sm">
-              <span className="inline-flex items-center gap-1.5 text-[#9CA3AF]">
+              <span className="inline-flex items-center gap-1.5 text-muted-foreground">
                 <Users className="h-3.5 w-3.5" aria-hidden="true" />
                 {profile.employees} funcionários
               </span>
-              <span className="inline-flex items-center gap-1.5 text-[#9CA3AF]">
+              <span className="inline-flex items-center gap-1.5 text-muted-foreground">
                 <Building2 className="h-3.5 w-3.5" aria-hidden="true" />
                 {profile.marketYears} anos de mercado
               </span>
@@ -92,14 +92,14 @@ export function CompanyAnalysis({
         ].map((item) => (
           <div
             key={item.label}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+            className="rounded-xl border border-border bg-muted/30 p-4"
           >
             <item.icon
-              className="mb-2 h-4 w-4 text-[#4F7CFF]"
+              className="mb-2 h-4 w-4 text-primary"
               aria-hidden="true"
             />
-            <p className="text-[10px] text-[#9CA3AF]">{item.label}</p>
-            <p className="mt-1 text-lg font-semibold text-white">
+            <p className="text-[10px] text-muted-foreground">{item.label}</p>
+            <p className="mt-1 text-lg font-semibold text-foreground">
               {item.value}
             </p>
           </div>

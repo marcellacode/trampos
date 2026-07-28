@@ -107,8 +107,8 @@ export function EmployabilityCrudSection() {
       {(missionsQuery.data ?? []).some(
         (item) => !item.is_completed
       ) && (
-        <div className="rounded-2xl border border-white/[0.08] bg-[#111315] p-4">
-          <p className="mb-3 text-sm text-[#9CA3AF]">
+        <div className="rounded-2xl border border-border bg-card p-4">
+          <p className="mb-3 text-sm text-muted-foreground">
             Concluir missões atualiza seu score de empregabilidade.
           </p>
           <div className="flex flex-wrap gap-2">

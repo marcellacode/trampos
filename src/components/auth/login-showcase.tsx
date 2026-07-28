@@ -20,7 +20,7 @@ export function LoginShowcase({
 }: LoginShowcaseProps) {
   return (
     <section
-      className="relative hidden h-screen flex-col justify-between overflow-hidden bg-[#08090A] p-10 lg:flex xl:p-14"
+      className="relative hidden h-screen flex-col justify-between overflow-hidden bg-background p-10 lg:flex xl:p-14"
       aria-label={`Apresentação ${AUTH_BRAND.fullName}`}
     >
       <BackgroundEffects />
@@ -28,15 +28,15 @@ export function LoginShowcase({
       <div className="relative z-10 shrink-0">
         <Link
           href="/"
-          className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/60"
+          className="inline-flex items-center gap-2.5 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60"
           aria-label={`${AUTH_BRAND.fullName} - Página inicial`}
         >
-          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/35">
-            <Sparkles className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
+          <div className="relative flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 ring-1 ring-primary/35">
+            <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
           </div>
-          <span className="text-lg font-semibold tracking-tight text-white">
+          <span className="text-lg font-semibold tracking-tight text-foreground">
             {AUTH_BRAND.name}
-            <span className="text-[#4F7CFF]">{AUTH_BRAND.suffix}</span>
+            <span className="text-primary">{AUTH_BRAND.suffix}</span>
           </span>
         </Link>
       </div>
@@ -48,14 +48,14 @@ export function LoginShowcase({
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
           className="shrink-0 space-y-5"
         >
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4F7CFF]/15 ring-1 ring-[#4F7CFF]/30 glow-primary">
-            <Sparkles className="h-7 w-7 text-[#4F7CFF]" aria-hidden="true" />
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30 glow-primary">
+            <Sparkles className="h-7 w-7 text-primary" aria-hidden="true" />
           </div>
 
-          <h2 className="text-3xl font-semibold tracking-tight text-white xl:text-4xl xl:leading-tight">
+          <h2 className="text-3xl font-semibold tracking-tight text-foreground xl:text-4xl xl:leading-tight">
             {AUTH_BRAND.tagline}
           </h2>
-          <p className="mx-auto max-w-md text-base leading-relaxed text-[#9CA3AF]">
+          <p className="mx-auto max-w-md text-base leading-relaxed text-muted-foreground">
             {AUTH_BRAND.description}
           </p>
         </motion.div>

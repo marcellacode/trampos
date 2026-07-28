@@ -49,12 +49,12 @@ export function DashboardModuleRouter() {
       unreadNotifications={shell.unreadNotifications}
       unreadMessages={shell.unreadMessages}
     >
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-24 text-center">
-        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/25">
-          <Construction className="h-5 w-5 text-[#4F7CFF]" aria-hidden="true" />
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-24 text-center">
+        <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/25">
+          <Construction className="h-5 w-5 text-primary" aria-hidden="true" />
         </div>
-        <h1 className="text-xl font-semibold text-white">{section || "Seção"}</h1>
-        <p className="mt-2 max-w-sm text-sm text-[#9CA3AF]">
+        <h1 className="text-xl font-semibold text-foreground">{section || "Seção"}</h1>
+        <p className="mt-2 max-w-sm text-sm text-muted-foreground">
           Módulo não encontrado.
         </p>
       </div>

@@ -2,7 +2,6 @@
 import type { DiscoveryData, JobRecommendation } from "@/types/jobs";
 import {
   fetchAllExternalJobs,
-  mergeExternalJobLists,
 } from "@/lib/discovery/fetch-external-jobs";
 import { fetchDiscoveryData } from "@/lib/supabase/queries/discovery";
 import { checkMatchSyncRateLimit } from "@/lib/matching/match-rate-limit";
@@ -28,13 +27,6 @@ function normalizeKey(value: string): string {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase()
     .trim();
-}
-
-function mergeJobLists(
-  primary: JobRecommendation[],
-  secondary: JobRecommendation[]
-): JobRecommendation[] {
-  return mergeExternalJobLists([primary, secondary]);
 }
 
 function filterJobsByQuery(
@@ -86,10 +78,11 @@ export async function fetchDiscoveryWithExternalJobs(
 
   const [discovery, externalJobs] = await Promise.all([
     fetchDiscoveryData(supabase, userId),
-    fetchAllExternalJobs({ ...options, perProvider: 8 }, defaults),
+    fetchAllExternalJobs({ ...options, perProvider: 12 }, defaults),
   ]);
 
-  let jobs = mergeJobLists(discovery.jobs, externalJobs);
+  // Real listings come from external providers only.
+  let jobs = externalJobs;
 
   if (options.what?.trim()) {
     jobs = filterJobsByQuery(jobs, options.what);
@@ -146,12 +139,11 @@ export async function fetchDiscoveryWithExternalJobs(
   }
 
   const matchedJobs = jobs.filter((j) => j.hasMatch);
-  const analyzed = Math.max(discovery.summary.analyzed, matchedJobs.length);
 
   return {
     ...discovery,
     summary: {
-      analyzed,
+      analyzed: jobs.length,
       compatible: matchedJobs.filter((j) => j.compatibility >= 60).length,
       veryCompatible: matchedJobs.filter((j) => j.compatibility >= 80).length,
       perfect: matchedJobs.filter((j) => j.compatibility >= 95).length,

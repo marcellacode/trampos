@@ -74,7 +74,7 @@ export function DiscoveryState({ state, onAction, className }: DiscoveryStatePro
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-16 text-center",
+        "relative flex flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-border bg-muted/30 px-6 py-16 text-center",
         className
       )}
     >
@@ -83,12 +83,12 @@ export function DiscoveryState({ state, onAction, className }: DiscoveryStatePro
         aria-hidden="true"
       />
 
-      <div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/25">
-        <Icon className="h-7 w-7 text-[#4F7CFF]" aria-hidden="true" />
+      <div className="relative mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 ring-1 ring-primary/25">
+        <Icon className="h-7 w-7 text-primary" aria-hidden="true" />
       </div>
 
-      <h3 className="relative text-lg font-semibold text-white">{config.title}</h3>
-      <p className="relative mt-2 max-w-md text-sm leading-relaxed text-[#9CA3AF]">
+      <h3 className="relative text-lg font-semibold text-foreground">{config.title}</h3>
+      <p className="relative mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
         {config.description}
       </p>
 
@@ -122,22 +122,22 @@ export function DiscoverySkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
       <div className="space-y-3">
-        <div className="h-8 w-64 rounded-lg bg-white/[0.06]" />
-        <div className="h-4 w-96 max-w-full rounded bg-white/[0.04]" />
+        <div className="h-8 w-64 rounded-lg bg-muted" />
+        <div className="h-4 w-96 max-w-full rounded bg-muted/50" />
       </div>
-      <div className="h-16 rounded-2xl bg-white/[0.04]" />
+      <div className="h-16 rounded-2xl bg-muted/50" />
       <div className="flex gap-2">
         {Array.from({ length: 5 }).map((_, i) => (
-          <div key={i} className="h-8 w-20 rounded-full bg-white/[0.04]" />
+          <div key={i} className="h-8 w-20 rounded-full bg-muted/50" />
         ))}
       </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {Array.from({ length: 4 }).map((_, i) => (
-          <div key={i} className="h-20 rounded-xl bg-white/[0.04]" />
+          <div key={i} className="h-20 rounded-xl bg-muted/50" />
         ))}
       </div>
       {Array.from({ length: 2 }).map((_, i) => (
-        <div key={i} className="h-80 rounded-2xl bg-white/[0.03]" />
+        <div key={i} className="h-80 rounded-2xl bg-muted/40" />
       ))}
     </div>
   );

@@ -80,8 +80,8 @@ export function UploadArea({
               : "rgba(255, 255, 255, 0.1)",
         }}
         className={cn(
-          "relative flex min-h-[220px] cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-dashed bg-[#111315]/70 px-6 py-10 text-center backdrop-blur-sm transition-colors",
-          dragging && "bg-[#4F7CFF]/5",
+          "relative flex min-h-[220px] cursor-pointer flex-col items-center justify-center gap-4 overflow-hidden rounded-2xl border border-dashed bg-card/70 px-6 py-10 text-center backdrop-blur-sm transition-colors",
+          dragging && "bg-primary/5",
           isUploading && "pointer-events-none opacity-70"
         )}
         role="button"
@@ -101,7 +101,7 @@ export function UploadArea({
         >
           <div
             className={cn(
-              "absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[#4F7CFF]/15 blur-3xl transition-opacity",
+              "absolute left-1/2 top-1/2 h-48 w-48 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl transition-opacity",
               dragging ? "opacity-100" : "opacity-40"
             )}
           />
@@ -109,24 +109,24 @@ export function UploadArea({
 
         <motion.div
           animate={{ y: dragging ? -6 : 0 }}
-          className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-[#4F7CFF]/15 ring-1 ring-[#4F7CFF]/30"
+          className="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/15 ring-1 ring-primary/30"
         >
           {isUploading ? (
-            <FileText className="h-6 w-6 animate-pulse text-[#4F7CFF]" />
+            <FileText className="h-6 w-6 animate-pulse text-primary" />
           ) : (
-            <Upload className="h-6 w-6 text-[#4F7CFF]" />
+            <Upload className="h-6 w-6 text-primary" />
           )}
         </motion.div>
 
         <div className="relative space-y-1.5">
-          <p className="text-base font-medium text-white sm:text-lg">
+          <p className="text-base font-medium text-foreground sm:text-lg">
             {isUploading
               ? "Enviando currículo..."
               : dragging
                 ? "Solte o arquivo aqui"
                 : "Arraste um PDF ou DOCX"}
           </p>
-          <p className="text-sm text-[#9CA3AF]">
+          <p className="text-sm text-muted-foreground">
             ou clique para selecionar · até 10MB
           </p>
         </div>
@@ -161,7 +161,7 @@ export function UploadArea({
         <button
           type="button"
           onClick={onCancel}
-          className="inline-flex items-center gap-1.5 text-sm text-[#9CA3AF] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/60 rounded-md"
+          className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 rounded-md"
         >
           <X className="h-3.5 w-3.5" aria-hidden="true" />
           Voltar às opções

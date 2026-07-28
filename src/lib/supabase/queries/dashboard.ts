@@ -2,6 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { EMPTY_DASHBOARD } from "@/lib/dashboard/empty-data";
 import type { DashboardData } from "@/types/dashboard";
 import {
+  isDemoCatalogCompanyId,
+  isDemoCatalogJobId,
+} from "@/lib/catalog/demo-ids";
+import {
   assembleDashboardData,
   mapAiSuggestions,
   mapChatMessages,
@@ -73,7 +77,7 @@ export async function fetchDashboardData(
     supabase
       .from("timeline_events")
       .select(
-        "id, title, description, href, actor, event_kind, created_at, is_live"
+        "id, title, description, href, actor, event_kind, created_at, is_live, job_id, company_id"
       )
       .eq("user_id", userId)
       .order("created_at", { ascending: false })
@@ -81,7 +85,7 @@ export async function fetchDashboardData(
     supabase
       .from("kpi_metrics")
       .select(
-        "id, label, value, suffix, prefix, delta_label, delta_positive, sparkline, color_token"
+        "id, metric_key, label, value, suffix, prefix, delta_label, delta_positive, sparkline, color_token"
       )
       .eq("user_id", userId)
       .order("recorded_at", { ascending: false })
@@ -89,7 +93,7 @@ export async function fetchDashboardData(
     supabase
       .from("dashboard_recommendations")
       .select(
-        "id, title, description, duration_label, company_name, cta_primary, cta_secondary, href"
+        "id, job_id, title, description, duration_label, company_name, cta_primary, cta_secondary, href"
       )
       .eq("user_id", userId)
       .eq("is_active", true)
@@ -101,6 +105,8 @@ export async function fetchDashboardData(
       .select(
         `
         id,
+        job_id,
+        company_id,
         role_title,
         status_label,
         last_activity_at,
@@ -169,11 +175,41 @@ export async function fetchDashboardData(
       .gt("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
   ]);
 
+  const demoKpiKeys = new Set([
+    "jobs_found",
+    "compatibility",
+    "applications",
+    "interviews",
+  ]);
+
+  const timelineRows = (timelineResult.data ?? []).filter(
+    (row) =>
+      (!row.job_id || !isDemoCatalogJobId(row.job_id)) &&
+      (!row.company_id || !isDemoCatalogCompanyId(row.company_id))
+  );
+
+  const applicationRows = (applicationsResult.data ?? []).filter(
+    (row) =>
+      (!row.job_id || !isDemoCatalogJobId(row.job_id)) &&
+      (!row.company_id || !isDemoCatalogCompanyId(row.company_id))
+  );
+
+  const kpiRows = (kpiResult.data ?? []).filter(
+    (row) => !demoKpiKeys.has(row.metric_key)
+  );
+
+  const recommendationRow =
+    recommendationResult.data &&
+    recommendationResult.data.job_id &&
+    isDemoCatalogJobId(recommendationResult.data.job_id)
+      ? null
+      : recommendationResult.data;
+
   return assembleDashboardData(profile as DbProfile, {
-    timeline: mapTimelineEvents(timelineResult.data ?? []),
-    kpis: mapKpiMetrics(kpiResult.data ?? []),
-    recommendation: mapRecommendation(recommendationResult.data),
-    companies: mapInterestedCompanies(applicationsResult.data ?? []),
+    timeline: mapTimelineEvents(timelineRows),
+    kpis: mapKpiMetrics(kpiRows),
+    recommendation: mapRecommendation(recommendationRow),
+    companies: mapInterestedCompanies(applicationRows),
     jobs: jobsResult,
     market: mapMarketTrends(marketResult.data ?? []),
     employability: mapEmployabilitySkills(employabilitySkillsResult.data ?? []),

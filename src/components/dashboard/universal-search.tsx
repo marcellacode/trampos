@@ -105,22 +105,22 @@ export function UniversalSearch({
         type="button"
         onClick={openSearch}
         className={cn(
-          "group flex items-center gap-2.5 rounded-xl border border-white/[0.08] bg-white/[0.03] text-left transition-all hover:border-white/[0.14] hover:bg-white/[0.05]",
+          "group flex items-center gap-2.5 rounded-xl border border-border bg-muted/40 text-left transition-all hover:border-white/[0.14] hover:bg-muted/60",
           compact ? "h-9 w-9 justify-center px-0" : "h-10 w-full max-w-xl px-3",
           className
         )}
         aria-label="Busca universal"
       >
         <Search
-          className="h-4 w-4 shrink-0 text-[#9CA3AF] transition-colors group-hover:text-white"
+          className="h-4 w-4 shrink-0 text-muted-foreground transition-colors group-hover:text-foreground"
           aria-hidden="true"
         />
         {!compact && (
           <>
-            <span className="flex-1 truncate text-sm text-[#9CA3AF]">
+            <span className="flex-1 truncate text-sm text-muted-foreground">
               Pergunte qualquer coisa...
             </span>
-            <kbd className="hidden items-center gap-0.5 rounded-md border border-white/[0.08] bg-white/[0.04] px-1.5 py-0.5 text-[10px] font-medium text-[#9CA3AF] sm:inline-flex">
+            <kbd className="hidden items-center gap-0.5 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground sm:inline-flex">
               {isMac ? (
                 <>
                   <Command className="h-2.5 w-2.5" />K
@@ -153,10 +153,10 @@ export function UniversalSearch({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.98 }}
               transition={{ type: "spring", stiffness: 380, damping: 28 }}
-              className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-white/[0.1] bg-[#111315] shadow-2xl shadow-black/50"
+              className="relative w-full max-w-xl overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-black/50"
             >
-              <div className="flex items-center gap-3 border-b border-white/[0.06] px-4 py-3">
-                <Sparkles className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
+              <div className="flex items-center gap-3 border-b border-border px-4 py-3">
+                <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
                 <input
                   ref={inputRef}
                   value={query}
@@ -165,28 +165,28 @@ export function UniversalSearch({
                     if (e.key === "Enter") void handleSubmit();
                   }}
                   placeholder="Pergunte qualquer coisa..."
-                  className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-[#9CA3AF]"
+                  className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                   aria-autocomplete="list"
                   aria-controls={listId}
                   disabled={loading}
                 />
                 {loading ? (
-                  <Loader2 className="h-4 w-4 animate-spin text-[#4F7CFF]" />
+                  <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 ) : (
-                  <kbd className="rounded-md border border-white/[0.08] px-1.5 py-0.5 text-[10px] text-[#9CA3AF]">
+                  <kbd className="rounded-md border border-border px-1.5 py-0.5 text-[10px] text-muted-foreground">
                     ESC
                   </kbd>
                 )}
               </div>
 
               {feedback && (
-                <div className="border-b border-white/[0.06] px-4 py-3 text-sm text-white/90">
+                <div className="border-b border-border px-4 py-3 text-sm text-foreground/90">
                   {feedback}
                 </div>
               )}
 
               <div id={listId} className="p-2">
-                <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-[#9CA3AF]/70">
+                <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
                   Sugestões
                 </p>
                 {SEARCH_EXAMPLES.map((example) => (
@@ -195,7 +195,7 @@ export function UniversalSearch({
                     type="button"
                     onClick={() => void handleSubmit(example)}
                     disabled={loading}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-[#9CA3AF] transition-colors hover:bg-white/[0.04] hover:text-white disabled:opacity-40"
+                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-40"
                   >
                     <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     <span className="flex-1">{example}</span>
@@ -204,14 +204,14 @@ export function UniversalSearch({
                 ))}
               </div>
 
-              <div className="border-t border-white/[0.06] px-4 py-2.5">
+              <div className="border-t border-border px-4 py-2.5">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={exampleIndex}
                     initial={{ opacity: 0, y: 4 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -4 }}
-                    className="text-xs text-[#9CA3AF]"
+                    className="text-xs text-muted-foreground"
                   >
                     Ex.: {SEARCH_EXAMPLES[exampleIndex]}
                   </motion.p>

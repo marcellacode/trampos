@@ -30,8 +30,8 @@ export function MensagensModulePage() {
     >
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">Mensagens</h1>
-          <p className="mt-1.5 max-w-2xl text-sm text-[#9CA3AF]">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">Mensagens</h1>
+          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
             Conversas com o copiloto Jobe sobre vagas, currículo e entrevistas.
           </p>
         </div>
@@ -53,10 +53,10 @@ export function AssistenteModulePage() {
     >
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-white">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
             Assistente de carreira
           </h1>
-          <p className="mt-1.5 max-w-2xl text-sm text-[#9CA3AF]">
+          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
             Copiloto full-screen para planejar sua carreira, revisar currículo e preparar entrevistas.
           </p>
         </div>
@@ -98,7 +98,7 @@ function EntrevistasModuleContent() {
         companyName={companyName}
       />
 
-      <div className="rounded-2xl border border-white/[0.08] bg-[#111315]/50 p-1">
+      <div className="rounded-2xl border border-border bg-card/50 p-1">
         <p className="px-4 pt-4 text-xs font-medium uppercase tracking-wider text-[#6B7280]">
           Convites reais
         </p>

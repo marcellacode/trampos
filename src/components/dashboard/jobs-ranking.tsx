@@ -42,21 +42,21 @@ export function JobsRanking({ jobs, className, limit }: JobsRankingProps) {
           />
           <h2
             id="jobs-ranking-heading"
-            className="text-base font-semibold text-white"
+            className="text-base font-semibold text-foreground"
           >
             Ranking das vagas
           </h2>
         </div>
         <Link
           href="/dashboard/vagas"
-          className="text-xs font-medium text-[#4F7CFF] transition-colors hover:text-[#6B93FF]"
+          className="text-xs font-medium text-primary transition-colors hover:text-[#6B93FF]"
         >
           Ver todas
         </Link>
       </div>
 
       <ol
-        className="divide-y divide-white/[0.06] rounded-2xl border border-white/[0.08] bg-[#111315]"
+        className="divide-y divide-white/[0.06] rounded-2xl border border-border bg-card"
         role="list"
       >
         {ranked.map((job, index) => {
@@ -68,7 +68,7 @@ export function JobsRanking({ jobs, className, limit }: JobsRankingProps) {
               <span
                 className={cn(
                   "flex w-8 shrink-0 items-center justify-center text-base tabular-nums",
-                  rank > 3 && "text-sm font-medium text-[#9CA3AF]"
+                  rank > 3 && "text-sm font-medium text-muted-foreground"
                 )}
                 aria-hidden="true"
               >
@@ -87,7 +87,7 @@ export function JobsRanking({ jobs, className, limit }: JobsRankingProps) {
                 </div>
               ) : null}
 
-              <span className="min-w-0 flex-1 truncate text-sm font-medium text-white">
+              <span className="min-w-0 flex-1 truncate text-sm font-medium text-foreground">
                 {job.company}
               </span>
 
@@ -99,7 +99,7 @@ export function JobsRanking({ jobs, className, limit }: JobsRankingProps) {
                   {job.compatibility}%
                 </span>
               ) : (
-                <span className="shrink-0 text-xs text-[#9CA3AF]">—</span>
+                <span className="shrink-0 text-xs text-muted-foreground">—</span>
               )}
             </>
           );
@@ -115,7 +115,7 @@ export function JobsRanking({ jobs, className, limit }: JobsRankingProps) {
               {job.href ? (
                 <Link
                   href={job.href}
-                  className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-white/[0.03]"
+                  className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-muted/40"
                 >
                   {content}
                 </Link>

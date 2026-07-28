@@ -17,23 +17,23 @@ export function MarketInsights({ insights, className }: MarketInsightsProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-[#111315] p-6",
+        "rounded-2xl border border-border bg-card p-6",
         className
       )}
       aria-labelledby="market-insights-heading"
     >
       <div className="mb-4 flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#22C55E]/10 ring-1 ring-[#22C55E]/25">
-          <TrendingUp className="h-4 w-4 text-[#22C55E]" aria-hidden="true" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-success/10 ring-1 ring-[#22C55E]/25">
+          <TrendingUp className="h-4 w-4 text-success" aria-hidden="true" />
         </div>
         <div>
           <h2
             id="market-insights-heading"
-            className="text-base font-semibold text-white"
+            className="text-base font-semibold text-foreground"
           >
             Mercado hoje
           </h2>
-          <p className="text-xs text-[#9CA3AF]">Demanda em alta nas últimas 24h</p>
+          <p className="text-xs text-muted-foreground">Demanda em alta nas últimas 24h</p>
         </div>
       </div>
 
@@ -45,10 +45,10 @@ export function MarketInsights({ insights, className }: MarketInsightsProps) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.05 }}
-            className="flex items-center justify-between rounded-xl border border-white/[0.04] bg-white/[0.02] px-4 py-3 transition-colors hover:border-white/[0.08] hover:bg-white/[0.04]"
+            className="flex items-center justify-between rounded-xl border border-white/[0.04] bg-muted/30 px-4 py-3 transition-colors hover:border-border hover:bg-muted/50"
           >
-            <span className="text-sm font-medium text-white">{insight.tech}</span>
-            <span className="inline-flex items-center gap-1 rounded-lg bg-[#22C55E]/10 px-2.5 py-1 text-xs font-semibold text-[#22C55E]">
+            <span className="text-sm font-medium text-foreground">{insight.tech}</span>
+            <span className="inline-flex items-center gap-1 rounded-lg bg-success/10 px-2.5 py-1 text-xs font-semibold text-success">
               <TrendingUp className="h-3 w-3" aria-hidden="true" />+
               {insight.change}%
             </span>

@@ -31,8 +31,8 @@ export function RotatingTestimonials({
   const current = testimonials[index];
 
   return (
-    <div className="rounded-2xl border border-white/[0.08] bg-[#111315]/70 p-6 backdrop-blur-sm">
-      <Quote className="mb-4 h-5 w-5 text-[#4F7CFF]/40" aria-hidden="true" />
+    <div className="rounded-2xl border border-border bg-card/70 p-6 backdrop-blur-sm">
+      <Quote className="mb-4 h-5 w-5 text-primary/40" aria-hidden="true" />
 
       <AnimatePresence mode="wait">
         <motion.blockquote
@@ -41,19 +41,19 @@ export function RotatingTestimonials({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
           transition={{ duration: 0.35 }}
-          className="text-sm leading-relaxed text-white/85"
+          className="text-sm leading-relaxed text-foreground/85"
         >
           &ldquo;{current.quote}&rdquo;
         </motion.blockquote>
       </AnimatePresence>
 
       <div className="mt-4 flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#4F7CFF]/15 text-xs font-semibold text-[#4F7CFF]">
+        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
           {current.avatar}
         </div>
         <div>
-          <p className="text-sm font-medium text-white">{current.name}</p>
-          <p className="text-xs text-[#9CA3AF]">
+          <p className="text-sm font-medium text-foreground">{current.name}</p>
+          <p className="text-xs text-muted-foreground">
             {current.role} · {current.company}
           </p>
         </div>
@@ -65,7 +65,7 @@ export function RotatingTestimonials({
             <div
               key={item.id}
               className={`h-1.5 rounded-full transition-all ${
-                i === index ? "w-4 bg-[#4F7CFF]" : "w-1.5 bg-white/20"
+                i === index ? "w-4 bg-primary" : "w-1.5 bg-white/20"
               }`}
             />
           ))}

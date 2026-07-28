@@ -24,7 +24,7 @@ function PriorityStars({ priority }: { priority: StudyTopic["priority"] }) {
       {Array.from({ length: 5 }, (_, i) => (
         <span
           key={i}
-          className={cn("text-sm leading-none", i >= priority && "text-white/15")}
+          className={cn("text-sm leading-none", i >= priority && "text-foreground/15")}
         >
           ★
         </span>
@@ -46,19 +46,19 @@ export function StudyTopics({ data }: StudyTopicsProps) {
         {data.topics.map((topic) => (
           <div
             key={topic.id}
-            className="flex items-center justify-between gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 transition-colors hover:border-[#4F7CFF]/20"
+            className="flex items-center justify-between gap-4 rounded-xl border border-border bg-muted/30 px-4 py-3 transition-colors hover:border-primary/20"
           >
             <div className="flex min-w-0 items-center gap-3">
               <BookOpen
-                className="h-4 w-4 shrink-0 text-[#4F7CFF]"
+                className="h-4 w-4 shrink-0 text-primary"
                 aria-hidden="true"
               />
-              <span className="truncate text-sm font-medium text-white/90">
+              <span className="truncate text-sm font-medium text-foreground/90">
                 {topic.title}
               </span>
             </div>
             <div className="flex shrink-0 items-center gap-2">
-              <span className="hidden text-[10px] font-semibold uppercase tracking-wider text-[#9CA3AF] sm:inline">
+              <span className="hidden text-[10px] font-semibold uppercase tracking-wider text-muted-foreground sm:inline">
                 Prioridade
               </span>
               <PriorityStars priority={topic.priority} />
@@ -71,7 +71,7 @@ export function StudyTopics({ data }: StudyTopicsProps) {
         render={<Link href="/dashboard/estudos" />}
         nativeButton={false}
         variant="outline"
-        className="mt-5 h-10 w-full gap-2 border-[#4F7CFF]/30 bg-[#4F7CFF]/5 text-[#4F7CFF] hover:bg-[#4F7CFF]/10"
+        className="mt-5 h-10 w-full gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
       >
         <Sparkles className="h-4 w-4" aria-hidden="true" />
         Criar plano de estudos

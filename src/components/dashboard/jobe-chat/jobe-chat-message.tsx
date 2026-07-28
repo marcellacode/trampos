@@ -42,21 +42,21 @@ export function JobeChatMessage({
           className={cn(
             "max-w-[95%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed whitespace-pre-line",
             isAssistant
-              ? "rounded-tl-md bg-white/[0.04] text-white/90"
-              : "rounded-tr-md bg-[#4F7CFF]/20 text-white",
+              ? "rounded-tl-md bg-muted/50 text-foreground/90"
+              : "rounded-tr-md bg-primary text-primary-foreground",
             message.status === "error" && "border border-[#EF4444]/30 text-[#FCA5A5]",
             message.status === "success" && "border border-[#22C55E]/30"
           )}
         >
           {message.status === "loading" ? (
-            <span className="inline-flex items-center gap-2 text-[#9CA3AF]">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#4F7CFF]" />
+            <span className="inline-flex items-center gap-2 text-muted-foreground">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-primary" />
               {message.content}
             </span>
           ) : (
             message.content
           )}
-          <span className="mt-1.5 block text-[10px] text-[#9CA3AF]">
+          <span className="mt-1.5 block text-[10px] text-muted-foreground">
             {message.timestamp}
           </span>
         </div>
@@ -82,9 +82,8 @@ export function JobeChatMessage({
               key={reply.id}
               type="button"
               onClick={() => onQuickReply(reply)}
-              className="rounded-full border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-[11px] text-[#9CA3AF] transition-colors hover:border-[#4F7CFF]/30 hover:text-white"
+              className="rounded-full border border-border bg-muted/40 px-3 py-1.5 text-[11px] text-muted-foreground transition-colors hover:border-primary/30 hover:text-foreground"
             >
-              {reply.emoji ? `${reply.emoji} ` : ""}
               {reply.label}
             </button>
           ))}
@@ -101,11 +100,11 @@ export function JobeChatMessage({
               className={cn(
                 "rounded-xl px-3 py-2 text-xs font-medium transition-colors",
                 action.variant === "primary" &&
-                  "bg-[#4F7CFF] text-white hover:bg-[#4F7CFF]/90",
+                  "bg-primary text-primary-foreground hover:bg-primary/90",
                 action.variant === "danger" &&
                   "border border-[#EF4444]/30 bg-[#EF4444]/10 text-[#FCA5A5] hover:bg-[#EF4444]/20",
                 (!action.variant || action.variant === "secondary") &&
-                  "border border-white/[0.08] bg-white/[0.03] text-white hover:border-[#4F7CFF]/30"
+                  "border border-border bg-muted/40 text-foreground hover:border-primary/30"
               )}
             >
               {action.label}
@@ -119,14 +118,14 @@ export function JobeChatMessage({
           <button
             type="button"
             onClick={() => onConfirm(message.confirmation!)}
-            className="flex-1 rounded-xl bg-[#4F7CFF] px-3 py-2 text-xs font-medium text-white transition-colors hover:bg-[#4F7CFF]/90"
+            className="flex-1 rounded-xl bg-primary px-3 py-2 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90"
           >
             {message.confirmation.confirmLabel}
           </button>
           <button
             type="button"
             onClick={onCancel}
-            className="flex-1 rounded-xl border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs font-medium text-[#9CA3AF] transition-colors hover:text-white"
+            className="flex-1 rounded-xl border border-border bg-muted/40 px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
           >
             {message.confirmation.cancelLabel}
           </button>

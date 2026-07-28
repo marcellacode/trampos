@@ -50,15 +50,15 @@ export function FloatingField({
           error
             ? "border-red-500/50 shadow-[0_0_0_3px_rgba(239,68,68,0.12)]"
             : focused
-              ? "border-[#4F7CFF]/60 shadow-[0_0_0_3px_rgba(79,124,255,0.18)]"
-              : "border-white/10 hover:border-white/20",
+              ? "border-primary/60 shadow-[0_0_0_3px_rgba(79,124,255,0.18)]"
+              : "border-border hover:border-border",
           disabled && "opacity-50"
         )}
       >
         <Icon
           className={cn(
             "pointer-events-none absolute left-3.5 top-1/2 z-10 h-4 w-4 -translate-y-1/2 transition-colors",
-            focused || hasValue ? "text-[#4F7CFF]" : "text-[#9CA3AF]"
+            focused || hasValue ? "text-primary" : "text-muted-foreground"
           )}
           aria-hidden="true"
         />
@@ -68,8 +68,8 @@ export function FloatingField({
           className={cn(
             "pointer-events-none absolute left-10 origin-left transition-all duration-200",
             floated
-              ? "top-2 text-[11px] font-medium text-[#4F7CFF]"
-              : "top-1/2 -translate-y-1/2 text-sm text-[#9CA3AF]"
+              ? "top-2 text-[11px] font-medium text-primary"
+              : "top-1/2 -translate-y-1/2 text-sm text-muted-foreground"
           )}
         >
           {label}
@@ -85,7 +85,7 @@ export function FloatingField({
           aria-invalid={!!error}
           aria-describedby={error ? errorId : undefined}
           className={cn(
-            "h-14 w-full rounded-xl bg-transparent pl-10 pr-11 text-sm text-white outline-none",
+            "h-14 w-full rounded-xl bg-transparent pl-10 pr-11 text-sm text-foreground outline-none",
             floated ? "pt-5 pb-2" : "py-0",
             "placeholder:text-transparent"
           )}
@@ -105,7 +105,7 @@ export function FloatingField({
             tabIndex={0}
             aria-label={showPassword ? "Ocultar senha" : "Mostrar senha"}
             onClick={() => setShowPassword((prev) => !prev)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/50"
+            className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
           >
             {showPassword ? (
               <EyeOff className="h-4 w-4" aria-hidden="true" />

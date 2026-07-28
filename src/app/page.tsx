@@ -1,13 +1,10 @@
 import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
+import { LandingBackground } from "@/components/landing/landing-background";
 import { CompanyLogos } from "@/components/landing/company-logos";
 import { FeaturedJobs } from "@/components/landing/featured-jobs";
 import { HowItWorks } from "@/components/landing/how-it-works";
-import { DemoSection } from "@/components/landing/demo-section";
 import { Features } from "@/components/landing/features";
-import { DashboardPreview } from "@/components/landing/dashboard-preview";
-import { Testimonials } from "@/components/landing/testimonials";
-import { Comparison } from "@/components/landing/comparison";
 import { FAQ } from "@/components/landing/faq";
 import { CtaFinal } from "@/components/landing/cta-final";
 import { Footer } from "@/components/landing/footer";
@@ -16,11 +13,7 @@ import {
   fetchLandingCompanies,
   fetchLandingStats,
 } from "@/lib/supabase/queries/discovery";
-import {
-  fetchLandingPlatformStats,
-  fetchRecentJobActivity,
-  fetchTestimonials,
-} from "@/lib/supabase/queries/content";
+import { fetchAllExternalJobs } from "@/lib/discovery/fetch-external-jobs";
 
 export default async function HomePage() {
   let landingStats = {
@@ -31,9 +24,6 @@ export default async function HomePage() {
     >["featuredJobs"],
   };
   let companies: Awaited<ReturnType<typeof fetchLandingCompanies>> = [];
-  let testimonials: Awaited<ReturnType<typeof fetchTestimonials>> = [];
-  let terminalActions: Awaited<ReturnType<typeof fetchRecentJobActivity>> = [];
-  let platformStats = { opportunities: 0, trends: 0 };
 
   if (
     process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -41,71 +31,92 @@ export default async function HomePage() {
   ) {
     try {
       const supabase = await createServerSupabaseClient();
-      [
-        landingStats,
-        companies,
-        testimonials,
-        terminalActions,
-        platformStats,
-      ] = await Promise.all([
+      [landingStats, companies] = await Promise.all([
         fetchLandingStats(supabase),
         fetchLandingCompanies(supabase),
-        fetchTestimonials(supabase),
-        fetchRecentJobActivity(supabase),
-        fetchLandingPlatformStats(supabase),
       ]);
     } catch {
       // Sections hide themselves when data is unavailable.
     }
   }
 
-  const featuredJob = landingStats.featuredJobs[0];
+  if (landingStats.featuredJobs.length === 0) {
+    try {
+      const external = await fetchAllExternalJobs(
+        { perProvider: 4 },
+        { what: "desenvolvedor", where: "Brasil" }
+      );
+      landingStats.featuredJobs = external.slice(0, 6);
+      landingStats.jobsCount = external.length;
+      if (companies.length === 0) {
+        companies = [
+          ...new Set(external.map((j) => j.company).filter(Boolean)),
+        ]
+          .slice(0, 12)
+          .map((name) => ({
+            name,
+            color: "#a1a1aa",
+            logo: name.slice(0, 2).toUpperCase(),
+          }));
+        landingStats.companiesCount = companies.length;
+      }
+    } catch {
+      // External providers unavailable — sections stay empty.
+    }
+  }
+
   const heroStats = [
-    {
-      value: String(landingStats.jobsCount),
-      label: "vagas ativas monitoradas",
-    },
-    {
-      value: String(landingStats.companiesCount),
-      label: "empresas no catálogo",
-    },
-    ...(platformStats.opportunities > 0
+    ...(landingStats.jobsCount > 0
+      ? [{ value: String(landingStats.jobsCount), label: "vagas indexadas" }]
+      : []),
+    ...(landingStats.companiesCount > 0
       ? [
           {
-            value: String(platformStats.opportunities),
-            label: "oportunidades mapeadas",
+            value: String(landingStats.companiesCount),
+            label: "empresas",
           },
         ]
       : []),
   ];
 
+  const terminalActions = [
+    { id: "scan", label: "Varrendo Adzuna, Remotive, RemoteOK..." },
+    ...landingStats.featuredJobs.slice(0, 5).map((job) => ({
+      id: job.id,
+      label: `${job.role} @ ${job.company}${
+        job.hasMatch && job.compatibility > 0
+          ? ` — ${job.compatibility}% match`
+          : ""
+      }`,
+    })),
+  ];
+
+  const topMatch = landingStats.featuredJobs.find(
+    (j) => j.hasMatch && j.compatibility > 0
+  );
+
   return (
     <>
+      <LandingBackground />
       <Header />
-      <main>
-        <Hero stats={heroStats} terminalActions={terminalActions} />
-        <CompanyLogos companies={companies} />
+      <main className="relative">
+        <Hero
+          stats={heroStats}
+          terminalActions={terminalActions}
+          featuredScore={
+            topMatch
+              ? {
+                  score: topMatch.compatibility,
+                  role: topMatch.role,
+                  company: topMatch.company,
+                }
+              : undefined
+          }
+        />
         <FeaturedJobs jobs={landingStats.featuredJobs} />
-        {featuredJob && (
-          <DemoSection
-            userMessage={`Quero uma vaga ${featuredJob.role} ${featuredJob.remote ? "remota" : ""} · ${featuredJob.salary}`.trim()}
-            assistantMessage={featuredJob.aiSummary}
-            jobTitle={featuredJob.role}
-            companyName={featuredJob.company}
-          />
-        )}
+        <CompanyLogos companies={companies} />
         <HowItWorks />
         <Features />
-        <DashboardPreview
-          stats={{
-            jobs: landingStats.jobsCount,
-            companies: landingStats.companiesCount,
-            trends: platformStats.trends,
-            opportunities: platformStats.opportunities,
-          }}
-        />
-        <Testimonials testimonials={testimonials} />
-        <Comparison />
         <FAQ />
         <CtaFinal />
       </main>

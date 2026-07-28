@@ -67,44 +67,44 @@ export function AIProcessing({
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-          className="absolute -inset-8 rounded-full border border-dashed border-[#4F7CFF]/25"
+          className="absolute -inset-8 rounded-full border border-dashed border-primary/25"
           aria-hidden="true"
         />
         <motion.div
           animate={{ scale: [1, 1.12, 1], opacity: [0.4, 0.7, 0.4] }}
           transition={{ duration: 2.4, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -inset-4 rounded-full bg-[#4F7CFF]/20 blur-2xl"
+          className="absolute -inset-4 rounded-full bg-primary/20 blur-2xl"
           aria-hidden="true"
         />
-        <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-[#111315] ring-1 ring-[#4F7CFF]/40 shadow-[0_0_40px_rgba(79,124,255,0.35)]">
-          <Sparkles className="h-8 w-8 text-[#4F7CFF]" aria-hidden="true" />
+        <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl bg-card ring-1 ring-primary/40 shadow-[0_0_40px_rgba(79,124,255,0.35)]">
+          <Sparkles className="h-8 w-8 text-primary" aria-hidden="true" />
         </div>
       </motion.div>
 
       <motion.h2
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-2xl font-semibold tracking-tight text-white sm:text-3xl"
+        className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl"
       >
         IA analisando {sourceLabel}
       </motion.h2>
 
       {fileName && (
-        <p className="mt-2 text-sm text-[#9CA3AF]">{fileName}</p>
+        <p className="mt-2 text-sm text-muted-foreground">{fileName}</p>
       )}
 
       <div className="mt-10 w-full space-y-5">
         <div
-          className="font-mono text-sm tracking-wider text-[#4F7CFF] sm:text-base"
+          className="font-mono text-sm tracking-wider text-primary sm:text-base"
           aria-hidden="true"
         >
           {"█".repeat(blocks)}
-          <span className="text-white/15">{"░".repeat(24 - blocks)}</span>
+          <span className="text-foreground/15">{"░".repeat(24 - blocks)}</span>
         </div>
 
         <div className="h-1.5 overflow-hidden rounded-full bg-white/[0.08]">
           <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[#4F7CFF] via-[#6B93FF] to-[#4F7CFF]"
+            className="h-full rounded-full bg-gradient-to-r from-primary via-primary/80 to-primary"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -117,14 +117,14 @@ export function AIProcessing({
               animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
               exit={{ opacity: 0, y: -10, filter: "blur(4px)" }}
               transition={{ duration: 0.35 }}
-              className="text-sm text-[#9CA3AF] sm:text-base"
+              className="text-sm text-muted-foreground sm:text-base"
             >
               {PROCESSING_MESSAGES[messageIndex]}
             </motion.p>
           </AnimatePresence>
         </div>
 
-        <p className="text-xs text-white/40">Tempo aproximado · 15 segundos</p>
+        <p className="text-xs text-foreground/40">Tempo aproximado · 15 segundos</p>
       </div>
     </div>
   );

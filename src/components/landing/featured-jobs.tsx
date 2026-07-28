@@ -1,8 +1,10 @@
+"use client";
+
 import Link from "next/link";
-import { ArrowRight, Briefcase, MapPin } from "lucide-react";
+import { MapPin, Banknote, Clock, ArrowUpRight } from "lucide-react";
+import { motion } from "framer-motion";
 import { Container } from "@/components/shared/container";
 import { SectionHeader } from "@/components/shared/section-header";
-import { FadeInView } from "@/components/shared/fade-in-view";
 import type { JobRecommendation } from "@/types/jobs";
 
 interface FeaturedJobsProps {
@@ -14,68 +16,97 @@ export function FeaturedJobs({ jobs }: FeaturedJobsProps) {
 
   return (
     <section
-      className="relative py-24 sm:py-32"
+      id="vagas"
+      className="landing-section"
       aria-labelledby="featured-jobs-heading"
     >
       <Container>
         <SectionHeader
-          label="Vagas reais"
-          title="Oportunidades monitoradas pela IA"
-          description="Vagas ativas do catálogo Jobera, atualizadas em tempo real."
+          label="Oportunidades reais"
+          title="Vagas em destaque"
+          description="Confira oportunidades abertas agora, com score de compatibilidade quando disponível."
+          className="mb-10"
         />
 
-        <FadeInView>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {jobs.map((job) => (
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" role="list">
+          {jobs.map((job, index) => (
+            <motion.li
+              key={job.id}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{
+                duration: 0.5,
+                delay: index * 0.08,
+                ease: [0.22, 1, 0.36, 1],
+              }}
+            >
               <Link
-                key={job.id}
                 href={job.href}
-                className="group rounded-2xl border border-white/10 bg-[#111315]/80 p-5 transition-colors hover:border-[#4F7CFF]/30 hover:bg-[#111315]"
+                className="group glass-card flex h-full flex-col p-5 transition-all hover:border-primary/30 hover:bg-white/[0.06] hover:shadow-primary/10"
               >
-                <div className="flex items-start gap-4">
-                  <div
-                    className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-sm font-semibold"
-                    style={{
-                      backgroundColor: `${job.color}22`,
-                      color: job.color,
-                    }}
-                  >
-                    {job.logo}
-                  </div>
+                <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium text-white">
+                    <h3 className="text-base font-semibold text-foreground transition-colors group-hover:text-primary sm:text-lg">
                       {job.role}
-                    </p>
-                    <p className="truncate text-sm text-[#9CA3AF]">
+                    </h3>
+                    <p className="mt-0.5 text-sm font-medium text-muted-foreground">
                       {job.company}
                     </p>
                   </div>
+                  <ArrowUpRight
+                    className="h-4 w-4 shrink-0 text-muted-foreground opacity-0 transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-primary group-hover:opacity-100"
+                    aria-hidden="true"
+                  />
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-[#9CA3AF]">
+                <div className="mt-4 flex flex-wrap gap-x-4 gap-y-1.5 text-sm text-muted-foreground">
                   <span className="inline-flex items-center gap-1">
-                    <Briefcase className="h-3.5 w-3.5" aria-hidden="true" />
-                    {job.salary}
-                  </span>
-                  <span className="inline-flex items-center gap-1">
-                    <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
+                    <MapPin className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
                     {job.location}
+                    {job.remote && (
+                      <span className="ml-1 text-success">· Remoto</span>
+                    )}
                   </span>
+                  {job.salary && job.salary !== "—" && (
+                    <span className="inline-flex items-center gap-1">
+                      <Banknote className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      {job.salary}
+                    </span>
+                  )}
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="text-xs text-[#22C55E]">
-                    {job.remote ? "Remoto" : "Presencial/Híbrido"}
+                <div className="mt-auto flex items-center justify-between pt-4">
+                  <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                    <Clock className="h-3.5 w-3.5" aria-hidden="true" />
+                    Vaga ativa
                   </span>
-                  <span className="inline-flex items-center gap-1 text-xs font-medium text-[#4F7CFF] opacity-0 transition-opacity group-hover:opacity-100">
-                    Ver vaga
-                    <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
-                  </span>
+                  {job.hasMatch && job.compatibility > 0 && (
+                    <span className="rounded-full border border-primary/30 bg-primary/10 px-2.5 py-0.5 text-xs font-semibold text-primary">
+                      {job.compatibility}% compatível
+                    </span>
+                  )}
                 </div>
               </Link>
-            ))}
-          </div>
-        </FadeInView>
+            </motion.li>
+          ))}
+        </ul>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3 }}
+          className="mt-10 text-center"
+        >
+          <Link
+            href="/dashboard/vagas"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+          >
+            Ver todas as vagas
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          </Link>
+        </motion.div>
       </Container>
     </section>
   );

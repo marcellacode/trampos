@@ -26,7 +26,7 @@ export function LoginPage({ activities, testimonials }: LoginPageProps) {
   }, [router]);
 
   return (
-    <main className="relative min-h-screen bg-[#08090A] lg:h-screen lg:overflow-hidden">
+    <main className="relative min-h-screen bg-background lg:h-screen lg:overflow-hidden">
       <div className="grid min-h-screen lg:h-screen lg:grid-cols-2">
         <LoginShowcase activities={activities} testimonials={testimonials} />
 
@@ -39,7 +39,7 @@ export function LoginPage({ activities, testimonials }: LoginPageProps) {
             aria-hidden="true"
           >
             <div className="absolute inset-0 grid-pattern opacity-30" />
-            <div className="absolute left-1/2 top-0 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-[#4F7CFF]/20 blur-[100px]" />
+            <div className="absolute left-1/2 top-0 h-[320px] w-[320px] -translate-x-1/2 rounded-full bg-primary/20 blur-[100px]" />
           </div>
 
           <div className="relative z-10 w-full max-w-[460px]">

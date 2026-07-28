@@ -47,20 +47,20 @@ export function JobHero({
         <nav aria-label="Breadcrumb" className="flex items-center gap-1.5 text-sm">
           <Link
             href="/dashboard/vagas"
-            className="text-[#9CA3AF] transition-colors hover:text-white"
+            className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Vagas
           </Link>
-          <ChevronRight className="h-3.5 w-3.5 text-[#9CA3AF]/60" aria-hidden="true" />
-          <span className="text-[#9CA3AF]">{job.role}</span>
-          <ChevronRight className="h-3.5 w-3.5 text-[#9CA3AF]/60" aria-hidden="true" />
-          <span className="font-medium text-white">{job.company}</span>
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" aria-hidden="true" />
+          <span className="text-muted-foreground">{job.role}</span>
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground/60" aria-hidden="true" />
+          <span className="font-medium text-foreground">{job.company}</span>
         </nav>
         <Button
           render={<Link href="/dashboard/vagas" />}
           nativeButton={false}
           variant="ghost"
-          className="h-8 gap-1.5 text-[#9CA3AF] hover:text-white"
+          className="h-8 gap-1.5 text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="h-3.5 w-3.5" aria-hidden="true" />
           Voltar
@@ -72,7 +72,7 @@ export function JobHero({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="relative overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111315] p-6 sm:p-8"
+        className="relative overflow-hidden rounded-2xl border border-border bg-card p-6 sm:p-8"
       >
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,rgba(79,124,255,0.1),transparent_50%)]"
@@ -93,8 +93,8 @@ export function JobHero({
               {job.logo}
             </div>
             <div>
-              <p className="text-sm text-[#9CA3AF]">{job.company}</p>
-              <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl lg:text-3xl">
+              <p className="text-sm text-muted-foreground">{job.company}</p>
+              <h1 className="mt-1 text-xl font-bold text-foreground sm:text-2xl lg:text-3xl">
                 {job.role}
               </h1>
               {isExternal && (
@@ -102,20 +102,20 @@ export function JobHero({
                   Fonte externa · Adzuna
                 </span>
               )}
-              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#9CA3AF]">
+              <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                   {job.location}
                 </span>
-                <span className="rounded-md border border-white/[0.08] bg-white/[0.03] px-2 py-0.5 text-xs font-medium text-white/80">
+                <span className="rounded-md border border-border bg-muted/40 px-2 py-0.5 text-xs font-medium text-foreground/80">
                   {job.remote ? "Remoto" : "Presencial/Híbrido"}
                 </span>
-                <span className="font-medium text-white">{job.salary}</span>
+                <span className="font-medium text-foreground">{job.salary}</span>
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[#9CA3AF]">
+              <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                 <span>{job.publishedAt}</span>
                 {job.verified && (
-                  <span className="inline-flex items-center gap-1 text-[#22C55E]">
+                  <span className="inline-flex items-center gap-1 text-success">
                     <BadgeCheck className="h-3.5 w-3.5" aria-hidden="true" />
                     Empresa verificada
                   </span>
@@ -137,7 +137,7 @@ export function JobHero({
           </div>
         </div>
 
-        <div className="relative mt-6 flex flex-wrap gap-2 border-t border-white/[0.06] pt-6">
+        <div className="relative mt-6 flex flex-wrap gap-2 border-t border-border pt-6">
           <Button
             className="h-10 flex-1 gap-2 sm:flex-none sm:px-6"
             disabled={prepareLoading || prepareDisabled}
@@ -157,7 +157,7 @@ export function JobHero({
               }
               nativeButton={false}
               variant="outline"
-              className="h-10 border-white/10 bg-transparent sm:px-6"
+              className="h-10 border-border bg-transparent sm:px-6"
             >
               Ver original
             </Button>
@@ -166,8 +166,8 @@ export function JobHero({
             variant="outline"
             onClick={onSave}
             className={cn(
-              "h-10 border-white/10 bg-transparent",
-              saved && "border-[#4F7CFF]/40 text-[#4F7CFF]"
+              "h-10 border-border bg-transparent",
+              saved && "border-primary/40 text-primary"
             )}
           >
             <Bookmark
@@ -179,7 +179,7 @@ export function JobHero({
           <Button
             variant="outline"
             onClick={onShare}
-            className="h-10 border-white/10 bg-transparent"
+            className="h-10 border-border bg-transparent"
           >
             <Share2 className="h-4 w-4" aria-hidden="true" />
             Compartilhar

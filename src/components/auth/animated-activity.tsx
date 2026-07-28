@@ -33,8 +33,8 @@ export function AnimatedActivity({ activities }: AnimatedActivityProps) {
   }, [activities.length]);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-[#111315]/80 p-5 backdrop-blur-sm">
-      <p className="mb-4 text-left text-xs font-medium uppercase tracking-wider text-[#9CA3AF]">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card/80 p-5 backdrop-blur-sm">
+      <p className="mb-4 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
         Vagas monitoradas agora
       </p>
 
@@ -53,8 +53,8 @@ export function AnimatedActivity({ activities }: AnimatedActivityProps) {
               <div
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full ${
                   isComplete
-                    ? "bg-[#22C55E]/15 text-[#22C55E]"
-                    : "bg-[#4F7CFF]/15 text-[#4F7CFF]"
+                    ? "bg-success/15 text-success"
+                    : "bg-primary/15 text-primary"
                 }`}
               >
                 {isComplete ? (
@@ -63,18 +63,18 @@ export function AnimatedActivity({ activities }: AnimatedActivityProps) {
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="h-3 w-3 rounded-full border-2 border-[#4F7CFF]/30 border-t-[#4F7CFF]"
+                    className="h-3 w-3 rounded-full border-2 border-primary/30 border-t-primary"
                     aria-hidden="true"
                   />
                 )}
               </div>
-              <span className="truncate text-sm text-white/90">{item.label}</span>
+              <span className="truncate text-sm text-foreground/90">{item.label}</span>
             </motion.div>
           );
         })}
       </div>
 
-      <p className="mt-4 text-left text-xs text-[#9CA3AF]">
+      <p className="mt-4 text-left text-xs text-muted-foreground">
         {AUTH_BRAND.assistantName} monitora o catálogo em tempo real.
       </p>
     </div>

@@ -23,14 +23,14 @@ export function CultureRadar({ data }: CultureRadarProps) {
         {data.map((item, index) => (
           <div key={item.id}>
             <div className="mb-2 flex items-center justify-between">
-              <span className="text-sm font-medium text-white">
+              <span className="text-sm font-medium text-foreground">
                 {item.label}
               </span>
-              <span className="text-xs tabular-nums text-[#9CA3AF]">
+              <span className="text-xs tabular-nums text-muted-foreground">
                 {item.score}/10
               </span>
             </div>
-            <div className="mb-2 h-2 overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="mb-2 h-2 overflow-hidden rounded-full bg-muted">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: `${item.score * 10}%` }}
@@ -40,13 +40,13 @@ export function CultureRadar({ data }: CultureRadarProps) {
                   delay: index * 0.08,
                   ease: "easeOut",
                 }}
-                className="h-full rounded-full bg-gradient-to-r from-[#4F7CFF] to-[#8B5CF6]"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-primary/70"
                 style={{
                   boxShadow: "0 0 12px rgba(79,124,255,0.4)",
                 }}
               />
             </div>
-            <p className="text-xs leading-relaxed text-[#9CA3AF]">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               {item.description}
             </p>
           </div>

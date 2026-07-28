@@ -31,7 +31,7 @@ const LEVEL_COLORS: Record<ApprovalLevel, string> = {
 function StageIcon({ status }: { status: SimulationStageStatus }) {
   if (status === "pass") {
     return (
-      <Check className="h-4 w-4 shrink-0 text-[#22C55E]" aria-hidden="true" />
+      <Check className="h-4 w-4 shrink-0 text-success" aria-hidden="true" />
     );
   }
   if (status === "warning") {
@@ -70,16 +70,16 @@ export function ApprovalProbabilityCard({
   return (
     <div
       className={cn(
-        "rounded-xl border border-white/[0.06] bg-white/[0.02] p-4",
+        "rounded-xl border border-border bg-muted/30 p-4",
         className
       )}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
             Chance de Aprovação
           </p>
-          <p className="mt-1 text-[10px] text-[#9CA3AF]/80">
+          <p className="mt-1 text-[10px] text-muted-foreground/80">
             Probabilidade estimada
           </p>
         </div>
@@ -101,7 +101,7 @@ export function ApprovalProbabilityCard({
                   "h-3 w-3",
                   i < data.stars
                     ? "fill-[#F59E0B] text-[#F59E0B]"
-                    : "text-white/10"
+                    : "text-foreground/10"
                 )}
                 aria-hidden="true"
               />
@@ -111,15 +111,15 @@ export function ApprovalProbabilityCard({
       </div>
 
       <div className="mt-4">
-        <p className="mb-2 text-xs font-medium text-[#9CA3AF]">Porque:</p>
+        <p className="mb-2 text-xs font-medium text-muted-foreground">Porque:</p>
         <ul className="space-y-1.5" role="list">
           {data.reasons.map((reason, i) => (
             <li
               key={i}
-              className="flex items-start gap-2 text-sm text-white/85"
+              className="flex items-start gap-2 text-sm text-foreground/85"
             >
               <span
-                className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4F7CFF]"
+                className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-primary"
                 aria-hidden="true"
               />
               {reason}
@@ -128,10 +128,10 @@ export function ApprovalProbabilityCard({
         </ul>
       </div>
 
-      <div className="mt-4 border-t border-white/[0.06] pt-4">
+      <div className="mt-4 border-t border-border pt-4">
         <div className="mb-3 flex items-center gap-1.5">
-          <Bot className="h-3.5 w-3.5 text-[#4F7CFF]" aria-hidden="true" />
-          <p className="text-xs font-semibold text-white/90">Simulação</p>
+          <Bot className="h-3.5 w-3.5 text-primary" aria-hidden="true" />
+          <p className="text-xs font-semibold text-foreground/90">Simulação</p>
         </div>
 
         {!showResult && (
@@ -139,7 +139,7 @@ export function ApprovalProbabilityCard({
             variant="outline"
             onClick={handleSimulate}
             disabled={simulating}
-            className="h-8 w-full border-white/[0.08] bg-white/[0.02] text-xs text-white/80 hover:bg-white/[0.05] hover:text-white"
+            className="h-8 w-full border-border bg-muted/30 text-xs text-foreground/80 hover:bg-muted/60 hover:text-foreground"
           >
             {simulating ? (
               <span className="inline-flex items-center gap-2">
@@ -165,15 +165,15 @@ export function ApprovalProbabilityCard({
               exit={{ opacity: 0, y: 8 }}
               className="space-y-3"
             >
-              <div className="rounded-lg border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 p-3">
-                <p className="mb-2.5 text-xs font-medium text-[#4F7CFF]">
+              <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+                <p className="mb-2.5 text-xs font-medium text-primary">
                   Você provavelmente passará:
                 </p>
                 <ul className="space-y-1.5" role="list">
                   {data.simulation.stages.map((stage) => (
                     <li
                       key={stage.id}
-                      className="flex items-center gap-2 text-sm text-white/90"
+                      className="flex items-center gap-2 text-sm text-foreground/90"
                     >
                       <StageIcon status={stage.status} />
                       {stage.label}
@@ -186,7 +186,7 @@ export function ApprovalProbabilityCard({
                 <p className="text-[10px] font-medium uppercase tracking-wider text-[#F59E0B]">
                   Sugestão
                 </p>
-                <p className="mt-0.5 text-sm text-white/90">
+                <p className="mt-0.5 text-sm text-foreground/90">
                   {data.simulation.suggestion}
                 </p>
               </div>
@@ -194,7 +194,7 @@ export function ApprovalProbabilityCard({
               <button
                 type="button"
                 onClick={() => setShowResult(false)}
-                className="text-[10px] text-[#9CA3AF] transition-colors hover:text-white"
+                className="text-[10px] text-muted-foreground transition-colors hover:text-foreground"
               >
                 Simular novamente
               </button>

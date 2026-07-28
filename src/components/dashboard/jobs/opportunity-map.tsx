@@ -18,21 +18,21 @@ export function OpportunityMap({ regions, className }: OpportunityMapProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       className={cn(
-        "rounded-2xl border border-white/[0.08] bg-[#111315] p-6",
+        "rounded-2xl border border-border bg-card p-6",
         className
       )}
       aria-labelledby="map-heading"
     >
       <div className="mb-1">
-        <h2 id="map-heading" className="text-base font-semibold text-white">
+        <h2 id="map-heading" className="text-base font-semibold text-foreground">
           Mapa de Oportunidades
         </h2>
-        <p className="mt-1 text-sm text-[#9CA3AF]">
+        <p className="mt-1 text-sm text-muted-foreground">
           {total} vagas compatíveis distribuídas globalmente
         </p>
       </div>
 
-      <div className="relative mt-6 aspect-[2/1] overflow-hidden rounded-xl border border-white/[0.06] bg-[#0A0B0D]">
+      <div className="relative mt-6 aspect-[2/1] overflow-hidden rounded-xl border border-border bg-[#0A0B0D]">
         {/* Grid pattern */}
         <div
           className="absolute inset-0 opacity-30"
@@ -83,7 +83,7 @@ export function OpportunityMap({ regions, className }: OpportunityMapProps) {
               />
               <div className="relative flex flex-col items-center">
                 <span className="text-lg">{region.flag}</span>
-                <span className="mt-0.5 whitespace-nowrap rounded-md bg-[#16191C]/90 px-2 py-0.5 text-[10px] font-semibold text-white ring-1 ring-white/[0.08] backdrop-blur-sm">
+                <span className="mt-0.5 whitespace-nowrap rounded-md bg-card/90 px-2 py-0.5 text-[10px] font-semibold text-foreground ring-1 ring-white/[0.08] backdrop-blur-sm">
                   {region.count}
                 </span>
               </div>
@@ -96,14 +96,14 @@ export function OpportunityMap({ regions, className }: OpportunityMapProps) {
         {regions.map((region) => (
           <li
             key={region.id}
-            className="flex items-center gap-2 rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2"
+            className="flex items-center gap-2 rounded-lg border border-white/[0.04] bg-muted/30 px-3 py-2"
           >
             <span className="text-base">{region.flag}</span>
             <div className="min-w-0">
-              <p className="truncate text-xs font-medium text-white">
+              <p className="truncate text-xs font-medium text-foreground">
                 {region.country}
               </p>
-              <p className="text-[10px] text-[#9CA3AF]">{region.count} vagas</p>
+              <p className="text-[10px] text-muted-foreground">{region.count} vagas</p>
             </div>
           </li>
         ))}

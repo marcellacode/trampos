@@ -6,6 +6,7 @@ import {
   mapJobRecommendation,
   mapCompanyMatch,
 } from "@/lib/supabase/mappers/jobs";
+import { filterOutDemoCatalogJobs, isDemoCatalogJobId } from "@/lib/catalog/demo-ids";
 import type { DbCompany, DbJob, DbJobMatch } from "@/lib/supabase/types";
 import { sortByOrder, unwrapCompany, unwrapSingle } from "@/lib/supabase/types";
 
@@ -135,8 +136,10 @@ export async function fetchJobsForUser(
     matches = matchByJobId(matchRows as DbJobMatch[] | null);
   }
 
-  return ((jobs ?? []) as DbJob[]).map((job) =>
-    mapJobRecommendation(job, matches.get(job.id) ?? null)
+  return filterOutDemoCatalogJobs(
+    ((jobs ?? []) as DbJob[]).map((job) =>
+      mapJobRecommendation(job, matches.get(job.id) ?? null)
+    )
   );
 }
 
@@ -179,6 +182,7 @@ export async function fetchJobById(
   if (!job) return null;
 
   const typedJob = job as DbJob;
+  if (isDemoCatalogJobId(typedJob.id)) return null;
 
   let match: DbJobMatch | null = null;
   if (userId) {

@@ -33,14 +33,14 @@ function AnimatedUplift({ value, delay = 0 }: { value: number; delay?: number })
 
 export function CareerImpactSection({ data }: CareerImpactProps) {
   return (
-    <ReportCard glow className="border-[#4F7CFF]/20">
+    <ReportCard glow className="border-primary/20">
       <ReportSectionHeader
         title="Como essa vaga impacta sua carreira?"
         subtitle="A IA projeta sua evolução profissional ao aceitar esta oportunidade"
         badge={<AIBadge />}
       />
 
-      <p className="mb-5 text-sm text-[#9CA3AF]">
+      <p className="mb-5 text-sm text-muted-foreground">
         Aceitar esta vaga aumenta seu potencial futuro para:
       </p>
 
@@ -52,26 +52,26 @@ export function CareerImpactSection({ data }: CareerImpactProps) {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ delay: index * 0.08, duration: 0.35 }}
-            className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-4"
+            className="rounded-xl border border-border bg-muted/30 p-4"
           >
             <div className="flex items-center justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/25">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 ring-1 ring-primary/25">
                   <TrendingUp
-                    className="h-4 w-4 text-[#4F7CFF]"
+                    className="h-4 w-4 text-primary"
                     aria-hidden="true"
                   />
                 </div>
-                <span className="text-sm font-medium text-white">
+                <span className="text-sm font-medium text-foreground">
                   {role.role}
                 </span>
               </div>
-              <span className="text-lg font-semibold text-[#22C55E]">
+              <span className="text-lg font-semibold text-success">
                 <AnimatedUplift value={role.upliftPercent} delay={index * 120} />
               </span>
             </div>
 
-            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/[0.06]">
+            <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-muted">
               <motion.div
                 initial={{ width: 0 }}
                 whileInView={{ width: `${Math.min(role.upliftPercent * 3, 100)}%` }}
@@ -81,7 +81,7 @@ export function CareerImpactSection({ data }: CareerImpactProps) {
                   duration: 0.6,
                   ease: [0.22, 1, 0.36, 1],
                 }}
-                className="h-full rounded-full bg-gradient-to-r from-[#4F7CFF] to-[#22C55E]"
+                className="h-full rounded-full bg-gradient-to-r from-primary to-[#22C55E]"
               />
             </div>
           </motion.div>
@@ -89,7 +89,7 @@ export function CareerImpactSection({ data }: CareerImpactProps) {
       </div>
 
       {data.explanation && (
-        <p className="mt-5 rounded-xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 px-4 py-3 text-sm leading-relaxed text-white/90">
+        <p className="mt-5 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm leading-relaxed text-primary-foreground/90">
           {data.explanation}
         </p>
       )}

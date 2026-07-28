@@ -22,11 +22,11 @@ export function CompatibilityCard({
     return (
       <div className={cn("flex flex-col items-center", className)}>
         <div
-          className="flex flex-col items-center justify-center rounded-full border border-white/[0.08] bg-white/[0.02]"
+          className="flex flex-col items-center justify-center rounded-full border border-border bg-muted/30"
           style={{ width: size, height: size }}
         >
-          <span className="text-sm font-medium text-[#9CA3AF]">Sem match</span>
-          <span className="mt-1 text-[10px] text-[#9CA3AF]">
+          <span className="text-sm font-medium text-muted-foreground">Sem match</span>
+          <span className="mt-1 text-[10px] text-muted-foreground">
             Complete seu perfil
           </span>
         </div>
@@ -72,7 +72,7 @@ export function CompatibilityCard({
             {value}
             <span className="text-sm">%</span>
           </motion.span>
-          <span className="text-[10px] text-[#9CA3AF]">Compatibilidade</span>
+          <span className="text-[10px] text-muted-foreground">Compatibilidade</span>
         </div>
         <div
           className="pointer-events-none absolute inset-0 rounded-full opacity-40 blur-xl"

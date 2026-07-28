@@ -70,15 +70,15 @@ export type JobeFlowAction =
   | "cancel";
 
 export const MAIN_MENU_REPLIES: QuickReply[] = [
-  { id: "new-jobs", label: "Ver novas vagas", emoji: "🔍" },
-  { id: "update-resume", label: "Atualizar currículo", emoji: "📄" },
-  { id: "track-applications", label: "Acompanhar candidaturas", emoji: "📊" },
-  { id: "search-jobs", label: "Procurar vagas", emoji: "💼" },
-  { id: "help", label: "Tirar dúvidas", emoji: "❓" },
+  { id: "new-jobs", label: "Ver novas vagas" },
+  { id: "update-resume", label: "Atualizar currículo" },
+  { id: "track-applications", label: "Acompanhar candidaturas" },
+  { id: "search-jobs", label: "Procurar vagas" },
+  { id: "help", label: "Tirar dúvidas" },
 ];
 
 export const JOB_LIST_ACTIONS: JobeActionButton[] = [
-  { id: "apply-all", label: "🚀 Candidatar em todas", variant: "primary" },
-  { id: "apply-selected", label: "✅ Candidatar nas selecionadas", variant: "secondary" },
-  { id: "dismiss-all", label: "❌ Dispensar todas", variant: "danger" },
+  { id: "apply-all", label: "Candidatar em todas", variant: "primary" },
+  { id: "apply-selected", label: "Candidatar nas selecionadas", variant: "secondary" },
+  { id: "dismiss-all", label: "Dispensar todas", variant: "danger" },
 ];

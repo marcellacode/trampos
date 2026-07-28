@@ -19,7 +19,7 @@ export function AuthFooter({
   return (
     <footer
       className={cn(
-        "border-t border-white/8 pt-5 text-center text-sm text-[#9CA3AF]",
+        "border-t border-border pt-5 text-center text-sm text-muted-foreground",
         className
       )}
     >
@@ -27,7 +27,7 @@ export function AuthFooter({
         {prompt}{" "}
         <Link
           href={actionHref}
-          className="font-medium text-[#4F7CFF] transition-colors hover:text-[#6B91FF] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4F7CFF]/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#111315] rounded"
+          className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded"
         >
           {actionLabel}
         </Link>

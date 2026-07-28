@@ -38,23 +38,22 @@ export function Header({
   return (
     <header
       className={cn(
-        "sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-white/[0.06] bg-[#08090A]/80 px-4 backdrop-blur-xl sm:px-6",
+        "sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-border bg-card px-4 sm:px-6",
         className
       )}
     >
       <button
         type="button"
         onClick={onMenuClick}
-        className="flex h-9 w-9 items-center justify-center rounded-xl text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white lg:hidden"
+        className="flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground lg:hidden"
         aria-label="Abrir menu"
       >
         <Menu className="h-5 w-5" />
       </button>
 
       <div className="min-w-0 shrink-0">
-        <h1 className="truncate text-sm font-semibold text-white sm:text-base">
-          {greeting}, {user.firstName}{" "}
-          <span aria-hidden="true">👋</span>
+        <h1 className="truncate text-sm font-semibold text-foreground sm:text-base">
+          {greeting}, {user.firstName}
         </h1>
       </div>
 
@@ -73,13 +72,13 @@ export function Header({
           <button
             type="button"
             onClick={() => setNotifOpen((v) => !v)}
-            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             aria-label="Notificações"
             aria-expanded={notifOpen}
           >
             <Bell className="h-[18px] w-[18px]" />
             {unreadNotifications > 0 && (
-              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-[#4F7CFF] ring-2 ring-[#08090A]" />
+              <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-primary ring-2 ring-background" />
             )}
           </button>
           <NotificationCenter
@@ -91,12 +90,12 @@ export function Header({
 
         <Link
           href="/dashboard/mensagens"
-          className="relative flex h-9 w-9 items-center justify-center rounded-xl text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+          className="relative flex h-9 w-9 items-center justify-center rounded-xl text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
           aria-label="Mensagens"
         >
           <MessageSquare className="h-[18px] w-[18px]" />
           {unreadMessages > 0 && (
-            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-[#4F7CFF] px-1 text-[9px] font-semibold text-white">
+            <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[9px] font-semibold text-primary-foreground">
               {unreadMessages}
             </span>
           )}
@@ -108,8 +107,8 @@ export function Header({
           className={cn(
             "flex h-9 w-9 items-center justify-center rounded-xl transition-colors",
             chatOpen
-              ? "bg-[#4F7CFF]/15 text-[#4F7CFF]"
-              : "text-[#9CA3AF] hover:bg-white/5 hover:text-white"
+              ? "bg-primary/15 text-primary"
+              : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
           )}
           aria-label={AUTH_BRAND.assistantName}
           aria-pressed={chatOpen}
@@ -119,7 +118,7 @@ export function Header({
 
         <Link
           href="/dashboard/configuracoes"
-          className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-[#4F7CFF] to-[#8B5CF6] text-xs font-semibold text-white ring-2 ring-transparent transition-all hover:ring-[#4F7CFF]/40"
+          className="ml-1 flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-xs font-semibold text-primary transition-colors hover:bg-primary/15"
           aria-label="Perfil"
         >
           {user.initials}

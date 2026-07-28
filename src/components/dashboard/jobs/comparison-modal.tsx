@@ -91,21 +91,21 @@ export function ComparisonModal({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.96, y: 16 }}
             transition={{ type: "spring", stiffness: 320, damping: 30 }}
-            className="fixed inset-x-4 top-[10%] z-50 mx-auto max-h-[80vh] max-w-2xl overflow-y-auto rounded-2xl border border-white/[0.1] bg-[#111315] shadow-2xl sm:inset-x-auto"
+            className="fixed inset-x-4 top-[10%] z-50 mx-auto max-h-[80vh] max-w-2xl overflow-y-auto rounded-2xl border border-border bg-card shadow-2xl sm:inset-x-auto"
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/[0.06] bg-[#111315]/95 px-6 py-4 backdrop-blur-sm">
+            <div className="sticky top-0 z-10 flex items-center justify-between border-b border-border bg-card/95 px-6 py-4 backdrop-blur-sm">
               <div>
-                <h2 id="comparison-title" className="text-lg font-semibold text-white">
+                <h2 id="comparison-title" className="text-lg font-semibold text-foreground">
                   Comparar vagas
                 </h2>
-                <p className="mt-0.5 text-xs text-[#9CA3AF]">
+                <p className="mt-0.5 text-xs text-muted-foreground">
                   Análise lado a lado com recomendação da IA
                 </p>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9CA3AF] transition-colors hover:bg-white/5 hover:text-white"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
                 aria-label="Fechar comparação"
               >
                 <X className="h-4 w-4" />
@@ -123,8 +123,8 @@ export function ComparisonModal({
                   >
                     {a.logo}
                   </div>
-                  <p className="text-xs font-semibold text-white">{a.company}</p>
-                  <p className="mt-0.5 text-[10px] text-[#9CA3AF]">{a.role}</p>
+                  <p className="text-xs font-semibold text-foreground">{a.company}</p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">{a.role}</p>
                 </div>
                 <div className="text-center">
                   <div
@@ -133,8 +133,8 @@ export function ComparisonModal({
                   >
                     {b.logo}
                   </div>
-                  <p className="text-xs font-semibold text-white">{b.company}</p>
-                  <p className="mt-0.5 text-[10px] text-[#9CA3AF]">{b.role}</p>
+                  <p className="text-xs font-semibold text-foreground">{b.company}</p>
+                  <p className="mt-0.5 text-[10px] text-muted-foreground">{b.role}</p>
                 </div>
               </div>
 
@@ -143,29 +143,29 @@ export function ComparisonModal({
                 {rows.map((row) => (
                   <div
                     key={row.label}
-                    className="grid grid-cols-3 gap-3 rounded-lg border border-white/[0.04] bg-white/[0.02] px-3 py-2.5 text-xs"
+                    className="grid grid-cols-3 gap-3 rounded-lg border border-white/[0.04] bg-muted/30 px-3 py-2.5 text-xs"
                   >
-                    <span className="font-medium text-[#9CA3AF]">{row.label}</span>
+                    <span className="font-medium text-muted-foreground">{row.label}</span>
                     <span
                       className={cn(
-                        "text-center text-white/90",
+                        "text-center text-foreground/90",
                         row.label === "Compatibilidade" &&
                           a.hasMatch &&
                           b.hasMatch &&
                           a.compatibility >= b.compatibility &&
-                          "font-semibold text-[#22C55E]"
+                          "font-semibold text-success"
                       )}
                     >
                       {row.a}
                     </span>
                     <span
                       className={cn(
-                        "text-center text-white/90",
+                        "text-center text-foreground/90",
                         row.label === "Compatibilidade" &&
                           a.hasMatch &&
                           b.hasMatch &&
                           b.compatibility > a.compatibility &&
-                          "font-semibold text-[#22C55E]"
+                          "font-semibold text-success"
                       )}
                     >
                       {row.b}
@@ -175,19 +175,19 @@ export function ComparisonModal({
               </div>
 
               {/* AI Recommendation */}
-              <div className="mt-6 rounded-xl border border-[#4F7CFF]/25 bg-[#4F7CFF]/8 p-4">
+              <div className="mt-6 rounded-xl border border-primary/25 bg-primary/8 p-4">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#4F7CFF]/15 ring-1 ring-[#4F7CFF]/30">
-                    <Sparkles className="h-4 w-4 text-[#4F7CFF]" aria-hidden="true" />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/15 ring-1 ring-primary/30">
+                    <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-white">
+                    <p className="text-sm font-medium text-foreground">
                       Recomendação da IA
                     </p>
-                    <p className="mt-1 text-xs leading-relaxed text-[#9CA3AF]">
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
                       {recommended === a.id ? (
                         <>
-                          A <strong className="text-white">{a.company}</strong>
+                          A <strong className="text-foreground">{a.company}</strong>
                           {a.hasMatch ? (
                             <>
                               {" "}
@@ -204,7 +204,7 @@ export function ComparisonModal({
                         </>
                       ) : (
                         <>
-                          A <strong className="text-white">{b.company}</strong> oferece
+                          A <strong className="text-foreground">{b.company}</strong> oferece
                           melhor remuneração e visibilidade internacional. Ideal se
                           prioriza crescimento de carreira global.
                         </>
@@ -218,7 +218,7 @@ export function ComparisonModal({
                 <Button
                   variant="outline"
                   onClick={onClose}
-                  className="h-9 border-white/10 bg-transparent"
+                  className="h-9 border-border bg-transparent"
                 >
                   Fechar
                 </Button>
