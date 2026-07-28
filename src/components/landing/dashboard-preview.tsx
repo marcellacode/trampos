@@ -3,10 +3,17 @@
 import {
   Briefcase,
   Building2,
+  Calendar,
+  Crosshair,
+  FileText,
   Globe2,
   LayoutDashboard,
+  MessageSquare,
+  Mic,
+  Newspaper,
   Sparkles,
   TrendingUp,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -28,11 +35,14 @@ interface DashboardPreviewProps {
 const iconMap: Record<string, LucideIcon> = {
   LayoutDashboard,
   Briefcase,
-  Sparkles,
-  FileText: Sparkles,
+  Crosshair,
+  Calendar,
+  FileText,
   TrendingUp,
-  Video: TrendingUp,
-  Calendar: Globe2,
+  Mic,
+  Newspaper,
+  Users,
+  MessageSquare,
 };
 
 export function DashboardPreview({ stats }: DashboardPreviewProps) {
@@ -75,30 +85,37 @@ export function DashboardPreview({ stats }: DashboardPreviewProps) {
                 <div className="h-2 w-2 rounded-full bg-primary" aria-hidden="true" />
                 <span className="text-sm font-semibold text-foreground">Jobera</span>
               </div>
-              <nav>
-                <ul className="flex gap-1 overflow-x-auto lg:flex-col" role="list">
-                  {DASHBOARD_NAV.map((item) => {
-                    const Icon = iconMap[item.icon];
-                    return (
-                      <li key={item.label}>
-                        <button
-                          type="button"
-                          className={`flex w-full shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
-                            "active" in item && item.active
-                              ? "bg-primary/15 text-primary"
-                              : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-                          }`}
-                          aria-current={
-                            "active" in item && item.active ? "page" : undefined
-                          }
-                        >
-                          <Icon className="h-4 w-4" aria-hidden="true" />
-                          <span className="whitespace-nowrap">{item.label}</span>
-                        </button>
-                      </li>
-                    );
-                  })}
-                </ul>
+              <nav className="space-y-4">
+                {DASHBOARD_NAV.map((group) => (
+                  <div key={group.section}>
+                    <p className="mb-1.5 px-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+                      {group.section}
+                    </p>
+                    <ul className="flex gap-1 overflow-x-auto lg:flex-col" role="list">
+                      {group.items.map((item) => {
+                        const Icon = iconMap[item.icon];
+                        return (
+                          <li key={item.label}>
+                            <button
+                              type="button"
+                              className={`flex w-full shrink-0 items-center gap-2.5 rounded-lg px-3 py-2 text-sm transition-colors ${
+                                "active" in item && item.active
+                                  ? "bg-primary/15 text-primary"
+                                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                              }`}
+                              aria-current={
+                                "active" in item && item.active ? "page" : undefined
+                              }
+                            >
+                              <Icon className="h-4 w-4" aria-hidden="true" />
+                              <span className="whitespace-nowrap">{item.label}</span>
+                            </button>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ))}
               </nav>
             </aside>
 

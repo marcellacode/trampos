@@ -52,7 +52,7 @@ function MensagensContent() {
             className="flex-1"
             onClick={() => setActiveTab("pessoas")}
           >
-            Pessoas
+            Recrutadores
           </Button>
           <Button
             type="button"
@@ -63,7 +63,7 @@ function MensagensContent() {
             className="flex-1"
             onClick={() => setActiveTab("jobe")}
           >
-            Copiloto Jobe
+            Assistente Jobe
           </Button>
         </div>
 
@@ -99,74 +99,109 @@ function EntrevistasModuleContent() {
   const jobId = searchParams.get("jobId") ?? undefined;
   const roleTitle = searchParams.get("role") ?? undefined;
   const companyName = searchParams.get("company") ?? undefined;
+  const initialTab = searchParams.get("tab") === "convites" ? "convites" : "praticar";
+  const [activeTab, setActiveTab] = useState<"praticar" | "convites">(initialTab);
 
   const timelineQuery = useTimelineEvents("interview_invite");
   const invites = timelineQuery.data ?? [];
 
   return (
     <ModuleCrudShell config={ENTREVISTAS_MODULE}>
-      <InterviewSimulator
-        jobId={jobId}
-        roleTitle={roleTitle}
-        companyName={companyName}
-      />
-
-      <section
-        className="rounded-2xl border border-border bg-card/50"
-        aria-labelledby="interview-invites-heading"
+      <div
+        className="mb-6 flex gap-1 rounded-xl border border-border bg-muted/30 p-1"
+        role="tablist"
+        aria-label="Seções de entrevistas"
       >
-        <div className="border-b border-border px-4 py-4 sm:px-6">
-          <h2
-            id="interview-invites-heading"
-            className="text-base font-bold text-foreground"
-          >
-            Convites de entrevista
-          </h2>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Gerados automaticamente a partir das suas candidaturas e timeline
-          </p>
-        </div>
+        <Button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "praticar"}
+          variant={activeTab === "praticar" ? "secondary" : "ghost"}
+          size="sm"
+          className="flex-1"
+          onClick={() => setActiveTab("praticar")}
+        >
+          Simulador
+        </Button>
+        <Button
+          type="button"
+          role="tab"
+          aria-selected={activeTab === "convites"}
+          variant={activeTab === "convites" ? "secondary" : "ghost"}
+          size="sm"
+          className="flex-1"
+          onClick={() => setActiveTab("convites")}
+        >
+          Convites
+        </Button>
+      </div>
 
-        {timelineQuery.isLoading ? (
-          <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
-            Carregando convites…
-          </p>
-        ) : invites.length === 0 ? (
-          <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
-            Nenhum convite registrado ainda. Quando uma empresa avançar sua
-            candidatura, o convite aparecerá aqui.
-          </p>
-        ) : (
-          <ul className="divide-y divide-border" role="list">
-            {invites.map((item) => {
-              const row = item as {
-                id: string;
-                title: string;
-                description?: string | null;
-                href?: string;
-                created_at?: string;
-              };
-              return (
-                <li key={row.id}>
-                  <Link
-                    href={row.href ?? "/dashboard/entrevistas"}
-                    className="block px-4 py-4 transition-colors hover:bg-muted/50 sm:px-6"
-                  >
-                    <p className="text-sm font-medium text-foreground">
-                      {row.title}
-                    </p>
-                    {row.description ? (
-                      <p className="mt-1 text-sm text-muted-foreground">
-                        {row.description}
+      <div role="tabpanel" className={cn(activeTab !== "praticar" && "hidden")}>
+        <InterviewSimulator
+          jobId={jobId}
+          roleTitle={roleTitle}
+          companyName={companyName}
+        />
+      </div>
+
+      <div role="tabpanel" className={cn(activeTab !== "convites" && "hidden")}>
+        <section
+          className="rounded-2xl border border-border bg-card/50"
+          aria-labelledby="interview-invites-heading"
+        >
+          <div className="border-b border-border px-4 py-4 sm:px-6">
+            <h2
+              id="interview-invites-heading"
+              className="text-base font-bold text-foreground"
+            >
+              Convites de entrevista
+            </h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Gerados automaticamente a partir das suas candidaturas e timeline
+            </p>
+          </div>
+
+          {timelineQuery.isLoading ? (
+            <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
+              Carregando convites…
+            </p>
+          ) : invites.length === 0 ? (
+            <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
+              Nenhum convite registrado ainda. Quando uma empresa avançar sua
+              candidatura, o convite aparecerá aqui.
+            </p>
+          ) : (
+            <ul className="divide-y divide-border" role="list">
+              {invites.map((item) => {
+                const row = item as {
+                  id: string;
+                  title: string;
+                  description?: string | null;
+                  href?: string;
+                  created_at?: string;
+                };
+                return (
+                  <li key={row.id}>
+                    <Link
+                      href={row.href ?? "/dashboard/entrevistas"}
+                      className="block px-4 py-4 transition-colors hover:bg-muted/50 sm:px-6"
+                    >
+                      <p className="text-sm font-medium text-foreground">
+                        {row.title}
                       </p>
-                    ) : null}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        )}
-      </section>
+                      {row.description ? (
+                        <p className="mt-1 text-sm text-muted-foreground">
+                          {row.description}
+                        </p>
+                      ) : null}
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </section>
+      </div>
     </ModuleCrudShell>
   );
 }

@@ -101,7 +101,7 @@ function CurriculoContent() {
           className="flex-1"
           onClick={() => setActiveTab("perfil")}
         >
-          Perfil
+          Dados profissionais
         </Button>
         <Button
           type="button"

@@ -156,11 +156,36 @@ export const FAQ_ITEMS = [
 ] as const;
 
 export const DASHBOARD_NAV = [
-  { label: "Dashboard", icon: "LayoutDashboard" as const, active: true },
-  { label: "Vagas", icon: "Briefcase" as const },
-  { label: "Currículo", icon: "FileText" as const },
-  { label: "Entrevistas", icon: "Video" as const },
-  { label: "Agenda", icon: "Calendar" as const },
+  {
+    section: "Visão geral",
+    items: [
+      { label: "Início", icon: "LayoutDashboard" as const, active: true },
+    ],
+  },
+  {
+    section: "Oportunidades",
+    items: [
+      { label: "Vagas", icon: "Briefcase" as const },
+      { label: "Objetivos", icon: "Crosshair" as const },
+      { label: "Agenda", icon: "Calendar" as const },
+    ],
+  },
+  {
+    section: "Carreira",
+    items: [
+      { label: "Currículo", icon: "FileText" as const },
+      { label: "Empregabilidade", icon: "TrendingUp" as const },
+      { label: "Entrevistas", icon: "Mic" as const },
+    ],
+  },
+  {
+    section: "Comunidade",
+    items: [
+      { label: "Feed", icon: "Newspaper" as const },
+      { label: "Rede", icon: "Users" as const },
+      { label: "Mensagens", icon: "MessageSquare" as const },
+    ],
+  },
 ] as const;
 
 export const FOOTER_LINKS = {

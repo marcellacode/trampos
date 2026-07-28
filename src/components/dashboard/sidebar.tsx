@@ -5,12 +5,9 @@ import { usePathname } from "next/navigation";
 import { ChevronUp, LogOut, Settings, X } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/shared/logo";
-import {
-  COMPANY_NAV_ITEM,
-  DASHBOARD_NAV_ITEMS,
-} from "@/lib/dashboard/constants";
+import { getDashboardNavSections } from "@/lib/dashboard/constants";
 import { useCompanyMemberships } from "@/lib/crud/hooks";
-import type { DashboardUser } from "@/types/dashboard";
+import type { DashboardUser, NavItem } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
 
 interface SidebarProps {
@@ -20,18 +17,49 @@ interface SidebarProps {
   className?: string;
 }
 
+function isNavItemActive(pathname: string, href: string): boolean {
+  if (href === "/dashboard/empresa") {
+    return pathname === href;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function NavLink({
+  item,
+  pathname,
+  onClose,
+}: {
+  item: NavItem;
+  pathname: string;
+  onClose?: () => void;
+}) {
+  const Icon = item.icon;
+  const active = isNavItemActive(pathname, item.href);
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onClose}
+      className={cn(
+        "flex items-center gap-2.5 rounded px-3 py-2 text-sm font-medium transition-colors",
+        active
+          ? "bg-accent text-primary"
+          : "text-foreground hover:bg-muted"
+      )}
+      aria-current={active ? "page" : undefined}
+    >
+      <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
+      <span className="truncate">{item.label}</span>
+    </Link>
+  );
+}
+
 export function Sidebar({ user, open = false, onClose, className }: SidebarProps) {
   const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
   const membershipsQuery = useCompanyMemberships();
-  const navItems =
-    (membershipsQuery.data?.length ?? 0) > 0
-      ? [
-          ...DASHBOARD_NAV_ITEMS.slice(0, 3),
-          COMPANY_NAV_ITEM,
-          ...DASHBOARD_NAV_ITEMS.slice(3),
-        ]
-      : DASHBOARD_NAV_ITEMS;
+  const hasCompanyMembership = (membershipsQuery.data?.length ?? 0) > 0;
+  const navSections = getDashboardNavSections(hasCompanyMembership);
 
   const content = (
     <div className="flex h-full flex-col bg-card">
@@ -50,34 +78,26 @@ export function Sidebar({ user, open = false, onClose, className }: SidebarProps
       </div>
 
       <nav className="flex-1 overflow-y-auto p-3" aria-label="Menu principal">
-        <ul className="space-y-0.5" role="list">
-          {navItems.map((item) => {
-            const Icon = item.icon;
-            const active =
-              item.href === "/dashboard"
-                ? pathname === "/dashboard"
-                : pathname.startsWith(item.href);
-
-            return (
-              <li key={item.href}>
-                <Link
-                  href={item.href}
-                  onClick={onClose}
-                  className={cn(
-                    "flex items-center gap-2.5 rounded px-3 py-2 text-sm font-medium transition-colors",
-                    active
-                      ? "bg-accent text-primary"
-                      : "text-foreground hover:bg-muted"
-                  )}
-                  aria-current={active ? "page" : undefined}
-                >
-                  <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-                  <span className="truncate">{item.label}</span>
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
+        <div className="space-y-5">
+          {navSections.map((section) => (
+            <div key={section.id}>
+              <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+                {section.label}
+              </p>
+              <ul className="space-y-0.5" role="list">
+                {section.items.map((item) => (
+                  <li key={item.href}>
+                    <NavLink
+                      item={item}
+                      pathname={pathname}
+                      onClose={onClose}
+                    />
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       </nav>
 
       <div className="relative border-t border-border p-3">

@@ -18,9 +18,9 @@ import { cn } from "@/lib/utils";
 type RedeTab = "following" | "followers" | "suggestions";
 
 const TABS: { id: RedeTab; label: string }[] = [
+  { id: "suggestions", label: "Descobrir" },
   { id: "following", label: "Seguindo" },
   { id: "followers", label: "Seguidores" },
-  { id: "suggestions", label: "Descobrir" },
 ];
 
 function shellLayoutProps(shell: ReturnType<typeof useDashboardShell>["shell"]) {
@@ -291,7 +291,7 @@ function SuggestionsTab() {
 
 export function RedePage() {
   const { shell } = useDashboardShell();
-  const [activeTab, setActiveTab] = useState<RedeTab>("following");
+  const [activeTab, setActiveTab] = useState<RedeTab>("suggestions");
 
   return (
     <DashboardLayout {...shellLayoutProps(shell)}>

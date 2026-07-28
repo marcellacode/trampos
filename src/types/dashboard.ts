@@ -25,6 +25,12 @@ export interface NavItem {
   badge?: number;
 }
 
+export interface NavSection {
+  id: string;
+  label: string;
+  items: NavItem[];
+}
+
 export type TimelineActor = "ai" | "company";
 
 export type TimelineEventKind =

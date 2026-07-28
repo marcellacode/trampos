@@ -22,8 +22,8 @@ function shellLayoutProps(shell: ReturnType<typeof useDashboardShell>["shell"]) 
 }
 
 const FEED_TABS: { id: FeedMode; label: string }[] = [
-  { id: "for_you", label: "Para você" },
-  { id: "explore", label: "Explorar" },
+  { id: "for_you", label: "Seguindo" },
+  { id: "explore", label: "Descobrir" },
 ];
 
 export function FeedPage() {
