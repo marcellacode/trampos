@@ -1,8 +1,9 @@
 ﻿import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DiscoveryData, JobRecommendation } from "@/types/jobs";
-import { isAdzunaConfigured } from "@/lib/integrations/adzuna/env";
-import { searchAdzunaJobs } from "@/lib/integrations/adzuna/client";
-import { mapAdzunaJobsToRecommendations } from "@/lib/integrations/adzuna/mapper";
+import {
+  fetchAllExternalJobs,
+  mergeExternalJobLists,
+} from "@/lib/discovery/fetch-external-jobs";
 import { fetchDiscoveryData } from "@/lib/supabase/queries/discovery";
 import { checkMatchSyncRateLimit } from "@/lib/matching/match-rate-limit";
 import {
@@ -29,25 +30,11 @@ function normalizeKey(value: string): string {
     .trim();
 }
 
-function jobDedupKey(job: JobRecommendation): string {
-  return `${normalizeKey(job.company)}::${normalizeKey(job.role)}`;
-}
-
 function mergeJobLists(
   primary: JobRecommendation[],
   secondary: JobRecommendation[]
 ): JobRecommendation[] {
-  const seen = new Set(primary.map(jobDedupKey));
-  const merged = [...primary];
-
-  for (const job of secondary) {
-    const key = jobDedupKey(job);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    merged.push(job);
-  }
-
-  return merged;
+  return mergeExternalJobLists([primary, secondary]);
 }
 
 function filterJobsByQuery(
@@ -90,30 +77,6 @@ async function loadProfileSearchDefaults(
   };
 }
 
-async function fetchAdzunaJobsForDiscovery(
-  options: DiscoverySearchOptions,
-  defaults: { what?: string; where?: string }
-) {
-  if (!isAdzunaConfigured()) return [];
-
-  try {
-    const what = options.what?.trim() || defaults.what;
-    const where = options.where?.trim() || defaults.where;
-
-    const response = await searchAdzunaJobs({
-      what: what || "desenvolvedor",
-      where: where || "Brasil",
-      page: options.page ?? 1,
-      resultsPerPage: 20,
-    });
-
-    return mapAdzunaJobsToRecommendations(response.results ?? []);
-  } catch (error) {
-    console.error("[discovery] Adzuna fetch failed:", error);
-    return [];
-  }
-}
-
 export async function fetchDiscoveryWithExternalJobs(
   supabase: SupabaseClient,
   userId: string | null,
@@ -121,12 +84,12 @@ export async function fetchDiscoveryWithExternalJobs(
 ): Promise<DiscoveryData> {
   const defaults = await loadProfileSearchDefaults(supabase, userId);
 
-  const [discovery, adzunaJobs] = await Promise.all([
+  const [discovery, externalJobs] = await Promise.all([
     fetchDiscoveryData(supabase, userId),
-    fetchAdzunaJobsForDiscovery(options, defaults),
+    fetchAllExternalJobs({ ...options, perProvider: 15 }, defaults),
   ]);
 
-  let jobs = mergeJobLists(discovery.jobs, adzunaJobs);
+  let jobs = mergeJobLists(discovery.jobs, externalJobs);
 
   if (options.what?.trim()) {
     jobs = filterJobsByQuery(jobs, options.what);

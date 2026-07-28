@@ -6,6 +6,7 @@ import {
   prepareJobApplicationAction,
 } from "@/app/actions/applications";
 import type { JobRecommendation } from "@/types/jobs";
+import { isExternalJob } from "@/lib/jobs/source-utils";
 
 export type ApplicationUiState = "idle" | "preparing" | "prepared" | "completed";
 
@@ -46,7 +47,7 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
   const [coverLetterText, setCoverLetterText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const isExternal = job.source === "adzuna" || Boolean(job.externalUrl);
+  const isExternal = isExternalJob(job);
 
   const prepare = useCallback(async () => {
     setState("preparing");

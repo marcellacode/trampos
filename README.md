@@ -2,7 +2,7 @@
 
 Copiloto de carreira com IA: compatibilidade de vagas, candidatura assistida, discovery inteligente, simulador de entrevistas e currículo adaptado por vaga.
 
-Stack: **Next.js 16** · **Supabase** · **TanStack Query** · **Groq** (LLM) · **Adzuna** (vagas externas)
+Stack: **Next.js 16** · **Supabase** · **TanStack Query** · **Groq** (LLM) · **Adzuna, Remotive, Arbeitnow, RemoteOK, Jobicy** (vagas externas)
 
 ## Setup
 
@@ -30,9 +30,11 @@ Abra [http://localhost:3000](http://localhost:3000).
 | `SUPABASE_SERVICE_ROLE_KEY` | Sim* | Chave service role — **somente servidor**, nunca `NEXT_PUBLIC_` |
 | `GROQ_API_KEY` | Recomendada | IA: matching, currículo, chat, entrevistas, filtros |
 | `GROQ_MODEL` | Não | Default: `llama-3.3-70b-versatile` |
-| `ADZUNA_APP_ID` | Recomendada | Vagas externas via [Adzuna API](https://developer.adzuna.com/) |
+| `ADZUNA_APP_ID` | Recomendada | Vagas BR via [Adzuna API](https://developer.adzuna.com/) |
 | `ADZUNA_APP_KEY` | Recomendada | Par do App ID |
 | `ADZUNA_COUNTRY` | Não | Default: `br` |
+
+**Fontes gratuitas sem configuração:** Remotive, Arbeitnow, RemoteOK e Jobicy — APIs públicas, mescladas automaticamente no discovery.
 | `GITHUB_TOKEN` | Não | Aumenta rate limit da GitHub API no import de perfil |
 | `SUPABASE_STORAGE_BUCKET` | Não | Default: `resumes` (bucket criado na migration) |
 
@@ -91,11 +93,11 @@ A conta demo vem com catálogo interno, candidaturas e matches pré-populados.
 4. **Discovery:** salve/oculte vagas → recarregue → persistência confirmada.
 5. Filtro inteligente: digite algo como *"vagas remotas de React sênior"*.
 
-### 3. Vaga Adzuna (requer `ADZUNA_*`)
+### 3. Vagas externas
 
-1. Configure `ADZUNA_APP_ID` e `ADZUNA_APP_KEY`.
-2. **Vagas:** busque — vagas externas aparecem misturadas ao catálogo.
-3. Abra vaga Adzuna (`adzuna-*` na URL) → apply abre URL externa.
+1. **Sem config:** Remotive, Arbeitnow, RemoteOK e Jobicy já aparecem no discovery (remote/internacional).
+2. **Com Adzuna** (`ADZUNA_APP_ID` + `ADZUNA_APP_KEY`): vagas BR somam ao catálogo.
+3. Abra vaga externa (`adzuna-*`, `remotive-*`, etc.) → apply abre URL externa.
 4. Confirme conclusão no sidebar após candidatar no site da empresa.
 5. Teste hide/save em vaga externa.
 

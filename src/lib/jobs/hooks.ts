@@ -3,7 +3,6 @@
 import { useQuery } from "@tanstack/react-query";
 import type { DiscoveryData, JobDetail } from "@/types/jobs";
 import {
-  fetchAdzunaJobDetailAction,
   fetchDiscoveryAction,
 } from "@/app/actions/adzuna";
 import {
@@ -15,7 +14,8 @@ import {
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { fetchJobById } from "@/lib/supabase/queries/jobs";
 import { getCurrentUserId } from "@/lib/supabase/queries/profile";
-import { parseAdzunaJobId } from "@/lib/integrations/adzuna/mapper";
+import { parseExternalJobRef } from "@/lib/jobs/source-utils";
+import { fetchExternalJobDetailAction } from "@/app/actions/external-jobs";
 
 async function fetchDiscovery(searchQuery?: string): Promise<DiscoveryData> {
   const result = await fetchDiscoveryAction(
@@ -28,8 +28,8 @@ async function fetchDiscovery(searchQuery?: string): Promise<DiscoveryData> {
 }
 
 async function fetchJob(id: string): Promise<JobDetail | null> {
-  if (parseAdzunaJobId(id)) {
-    const result = await fetchAdzunaJobDetailAction(id);
+  if (parseExternalJobRef(id)) {
+    const result = await fetchExternalJobDetailAction(id);
     if (!result.success) {
       throw new Error(result.error);
     }

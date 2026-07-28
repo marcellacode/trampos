@@ -1,5 +1,9 @@
 export type ExternalJobProvider =
   | "adzuna"
+  | "remotive"
+  | "arbeitnow"
+  | "remoteok"
+  | "jobicy"
   | "greenhouse"
   | "gupy"
   | "workable"

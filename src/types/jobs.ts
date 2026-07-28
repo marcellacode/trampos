@@ -43,7 +43,13 @@ export interface BestSendTime {
   insight: string;
 }
 
-export type JobSource = "internal" | "adzuna";
+export type JobSource =
+  | "internal"
+  | "adzuna"
+  | "remotive"
+  | "arbeitnow"
+  | "remoteok"
+  | "jobicy";
 
 export interface JobRecommendation {
   id: string;

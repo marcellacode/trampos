@@ -3,6 +3,7 @@ import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { detectAtsProvider } from "@/lib/integrations/ats/detect-provider";
 import { enrichJobFromGreenhouseUrl } from "@/lib/integrations/ats/providers/greenhouse/client";
 import type { ExternalJobInput, ExternalJobRow } from "@/lib/external-jobs/types";
+import { isExternalJobSource, providerFromExternalKey } from "@/lib/jobs/source-utils";
 import type { JobRecommendation } from "@/types/jobs";
 
 function rowToExternalJob(row: ExternalJobRow): ExternalJobInput & { id: string } {
@@ -83,7 +84,7 @@ export async function upsertExternalJobFromRecommendation(
   supabase: SupabaseClient,
   job: JobRecommendation
 ): Promise<ExternalJobRow | null> {
-  if (job.source !== "adzuna" && !job.id.includes("-")) {
+  if (!isExternalJobSource(job.source)) {
     return null;
   }
 
@@ -102,25 +103,13 @@ export async function upsertExternalJobFromRecommendation(
     }
   }
 
-  if (enrichedJob.source !== "adzuna") {
-    return upsertExternalJob(supabase, {
-      externalKey: enrichedJob.id,
-      provider: "unknown",
-      title: enrichedJob.role,
-      companyName: enrichedJob.company,
-      location: enrichedJob.location,
-      description: enrichedJob.description ?? enrichedJob.aiSummary,
-      applyUrl: enrichedJob.externalUrl ?? null,
-      salaryMin: enrichedJob.salaryMin || null,
-      salaryMax: enrichedJob.salaryMax || null,
-      remote: enrichedJob.remote,
-      stack: enrichedJob.stack,
-    });
-  }
+  const provider = isExternalJobSource(enrichedJob.source)
+    ? enrichedJob.source
+    : providerFromExternalKey(enrichedJob.id);
 
   return upsertExternalJob(supabase, {
     externalKey: enrichedJob.id,
-    provider: "adzuna",
+    provider: provider === "unknown" ? "unknown" : provider,
     title: enrichedJob.role,
     companyName: enrichedJob.company,
     location: enrichedJob.location,
@@ -150,7 +139,7 @@ export async function resolveExternalJobId(
     .upsert(
       {
         external_key: externalKey,
-        provider: externalKey.startsWith("adzuna-") ? "adzuna" : "unknown",
+        provider: providerFromExternalKey(externalKey),
         title: job?.role ?? "Vaga externa",
         company_name: job?.company ?? "",
         location: job?.location ?? "",

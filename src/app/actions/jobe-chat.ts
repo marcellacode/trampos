@@ -9,9 +9,7 @@ import {
 import { prepareApplication } from "@/lib/integrations/ats/application-service";
 import { hideJobByRef, listHiddenJobRefs } from "@/lib/supabase/queries/mutations/saved-jobs";
 import { fetchJobsForUser } from "@/lib/supabase/queries/jobs";
-import { isAdzunaConfigured } from "@/lib/integrations/adzuna/env";
-import { searchAdzunaJobs } from "@/lib/integrations/adzuna/client";
-import { mapAdzunaJobsToRecommendations } from "@/lib/integrations/adzuna/mapper";
+import { fetchAllExternalJobs } from "@/lib/discovery/fetch-external-jobs";
 import type { JobRecommendation } from "@/types/jobs";
 import type { ActionResult } from "@/app/actions/ai";
 import type { ApplicationSummary, ChatJob } from "@/types/jobe-chat";
@@ -66,28 +64,29 @@ async function loadExcludedJobIds(
   return excluded;
 }
 
-async function loadJobsWithAdzuna(
+async function loadJobsWithExternal(
   supabase: Awaited<ReturnType<typeof requireAuth>>["supabase"],
   userId: string,
   goals: ProfileGoals,
   limit = 40
 ): Promise<JobRecommendation[]> {
-  const [supabaseJobs, adzunaJobs] = await Promise.all([
+  const [supabaseJobs, externalJobs] = await Promise.all([
     fetchJobsForUser(supabase, userId, limit),
-    isAdzunaConfigured()
-      ? searchAdzunaJobs({
-          what: goals.role || "desenvolvedor",
-          where: goals.location || "Brasil",
-          resultsPerPage: 20,
-        }).then((res) => mapAdzunaJobsToRecommendations(res.results ?? []))
-      : Promise.resolve([]),
+    fetchAllExternalJobs(
+      {
+        what: goals.role || "desenvolvedor",
+        where: goals.location || "Brasil",
+        perProvider: 10,
+      },
+      { what: goals.role, where: goals.location }
+    ),
   ]);
 
   const seen = new Set(
     supabaseJobs.map((j) => `${j.company.toLowerCase()}::${j.role.toLowerCase()}`)
   );
   const merged = [...supabaseJobs];
-  for (const job of adzunaJobs) {
+  for (const job of externalJobs) {
     const key = `${job.company.toLowerCase()}::${job.role.toLowerCase()}`;
     if (!seen.has(key)) merged.push(job);
   }
@@ -101,7 +100,7 @@ export async function fetchNewJobsForChatAction(
     const { supabase, user } = await requireAuth();
     const goals = await loadProfileGoals(supabase, user.id);
     const [jobs, excluded] = await Promise.all([
-      loadJobsWithAdzuna(supabase, user.id, goals, 40),
+      loadJobsWithExternal(supabase, user.id, goals, 40),
       loadExcludedJobIds(supabase, user.id, shownJobIds),
     ]);
 
@@ -214,15 +213,16 @@ export async function searchJobsForChatAction(
     }
 
     const goals = await loadProfileGoals(supabase, user.id);
-    const [baseJobs, adzunaJobs, excluded] = await Promise.all([
+    const [baseJobs, externalJobs, excluded] = await Promise.all([
       fetchJobsForUser(supabase, user.id, 40),
-      isAdzunaConfigured()
-        ? searchAdzunaJobs({
-            what: query.trim(),
-            where: goals.location || "Brasil",
-            resultsPerPage: 20,
-          }).then((res) => mapAdzunaJobsToRecommendations(res.results ?? []))
-        : Promise.resolve([]),
+      fetchAllExternalJobs(
+        {
+          what: query.trim(),
+          where: goals.location || "Brasil",
+          perProvider: 10,
+        },
+        { what: goals.role, where: goals.location }
+      ),
       loadExcludedJobIds(supabase, user.id, []),
     ]);
 
@@ -230,7 +230,7 @@ export async function searchJobsForChatAction(
       baseJobs.map((j) => `${j.company.toLowerCase()}::${j.role.toLowerCase()}`)
     );
     const jobs = [...baseJobs];
-    for (const job of adzunaJobs) {
+    for (const job of externalJobs) {
       const key = `${job.company.toLowerCase()}::${job.role.toLowerCase()}`;
       if (!seen.has(key)) jobs.push(job);
     }

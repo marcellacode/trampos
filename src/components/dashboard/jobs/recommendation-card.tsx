@@ -20,6 +20,7 @@ import { ApprovalProbabilityCard } from "@/components/dashboard/jobs/approval-pr
 import { BestSendTimeCard } from "@/components/dashboard/jobs/best-send-time-card";
 import { HIDE_REASONS } from "@/lib/jobs/constants";
 import { useJobApplication } from "@/lib/applications/hooks";
+import { isExternalJob, getJobSourceLabel } from "@/lib/jobs/source-utils";
 import type { HideReason, JobRecommendation } from "@/types/jobs";
 import { cn } from "@/lib/utils";
 
@@ -60,7 +61,8 @@ export function RecommendationCard({
     isExternal: applyIsExternal,
   } = useJobApplication({ job });
 
-  const isExternal = job.source === "adzuna";
+  const isExternal = isExternalJob(job);
+  const sourceLabel = getJobSourceLabel(job.source);
 
   function handleHide(reason: HideReason) {
     onHide(job.id, reason);
@@ -122,9 +124,9 @@ export function RecommendationCard({
             <h3 className="mt-0.5 text-base font-semibold text-white sm:text-lg">
               {job.role}
             </h3>
-            {isExternal && (
+            {isExternal && sourceLabel && (
               <span className="mt-1.5 inline-flex items-center rounded-md border border-[#6366F1]/30 bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#A5B4FC]">
-                Adzuna
+                {sourceLabel}
               </span>
             )}
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#9CA3AF]">

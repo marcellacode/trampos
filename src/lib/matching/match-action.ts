@@ -18,9 +18,8 @@ import {
 import type { ComputedMatch } from "@/lib/matching/types";
 import { fetchDiscoveryData } from "@/lib/supabase/queries/discovery";
 import { fetchJobById } from "@/lib/supabase/queries/jobs";
-import { parseAdzunaJobId } from "@/lib/integrations/adzuna/mapper";
-import { getAdzunaJobById } from "@/lib/integrations/adzuna/client";
-import { mapAdzunaJobToRecommendation } from "@/lib/integrations/adzuna/mapper";
+import { fetchExternalJobRecommendation } from "@/lib/integrations/jobs/resolve-external-job";
+import { parseExternalJobRef } from "@/lib/jobs/source-utils";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof AuthError) return error.message;
@@ -82,13 +81,11 @@ export async function computeJobMatchAction(
     ]);
 
     let job;
-    const adzunaId = parseAdzunaJobId(ref);
-    if (adzunaId) {
-      const adzunaJob = await getAdzunaJobById(adzunaId);
-      if (!adzunaJob) {
+    if (parseExternalJobRef(ref)) {
+      job = await fetchExternalJobRecommendation(ref);
+      if (!job) {
         return { success: false, error: "Vaga não encontrada." };
       }
-      job = mapAdzunaJobToRecommendation(adzunaJob);
     } else {
       const detail = await fetchJobById(supabase, ref, user.id);
       if (!detail) {

@@ -38,6 +38,7 @@ import {
   saveJobAction,
   unsaveJobAction,
 } from "@/app/actions/discovery";
+import { isExternalJob } from "@/lib/jobs/source-utils";
 import type { JobDetail } from "@/types/jobs";
 
 interface JobDetailsPageProps {
@@ -85,7 +86,7 @@ function JobDetailsContent({ job }: { job: JobDetail }) {
     }
   }
 
-  const isExternal = job.source === "adzuna";
+  const isExternal = isExternalJob(job);
 
   if (isExternal) {
     return (

@@ -1,3 +1,5 @@
+import type { JobSource } from "@/types/jobs";
+
 export interface ChatJob {
   id: string;
   companyId: string;
@@ -12,7 +14,7 @@ export interface ChatJob {
   remote: boolean;
   aiSummary: string;
   stack: string[];
-  source?: "internal" | "adzuna";
+  source?: JobSource;
   externalUrl?: string;
 }
 
