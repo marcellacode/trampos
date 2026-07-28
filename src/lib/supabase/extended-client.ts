@@ -10,6 +10,10 @@ export function fromExtendedTable(
     | "interview_sessions"
     | "posts"
     | "follows"
+    | "post_reactions"
+    | "post_comments"
+    | "post_shares"
+    | "post_counts"
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (supabase as any).from(table);

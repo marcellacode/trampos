@@ -4,159 +4,19 @@ import type {
   FeedCursor,
   FeedPage,
   FeedPost,
-  PostVisibility,
 } from "@/types/feed";
 import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { formatRelativeTime } from "@/lib/supabase/utils";
+import { fetchPostEngagementBatch } from "@/lib/supabase/queries/post-engagement";
+import {
+  applyEngagementToPost,
+  collectEngagementPostIds,
+  mapFeedPostRow,
+  POST_SELECT,
+  type DbFeedPostRow,
+} from "@/lib/supabase/queries/feed-mapper";
 
 const FEED_PAGE_SIZE = 20;
-
-const POST_SELECT = `
-  id,
-  author_user_id,
-  author_company_id,
-  content,
-  media_urls,
-  job_id,
-  visibility,
-  created_at,
-  updated_at,
-  author_profile:profiles!posts_author_user_id_fkey (
-    id,
-    full_name,
-    avatar_url,
-    avatar_initials,
-    slug,
-    headline
-  ),
-  author_company:companies!posts_author_company_id_fkey (
-    id,
-    name,
-    logo,
-    brand_color,
-    slug
-  ),
-  job:jobs!posts_job_id_fkey (
-    id,
-    slug,
-    title,
-    location,
-    salary_display,
-    remote,
-    companies!jobs_company_id_fkey (
-      name,
-      logo,
-      brand_color
-    )
-  )
-`;
-
-interface DbProfileAuthor {
-  id: string;
-  full_name: string;
-  avatar_url: string | null;
-  avatar_initials: string;
-  slug: string | null;
-  headline: string;
-}
-
-interface DbCompanyAuthor {
-  id: string;
-  name: string;
-  logo: string | null;
-  brand_color: string;
-  slug: string;
-}
-
-interface DbJobCompany {
-  name: string;
-  logo: string | null;
-  brand_color: string;
-}
-
-interface DbJobPreview {
-  id: string;
-  slug: string;
-  title: string;
-  location: string;
-  salary_display: string;
-  remote: boolean;
-  companies: DbJobCompany | DbJobCompany[] | null;
-}
-
-interface DbFeedPostRow {
-  id: string;
-  author_user_id: string | null;
-  author_company_id: string | null;
-  content: string;
-  media_urls: unknown;
-  job_id: string | null;
-  visibility: PostVisibility;
-  created_at: string;
-  updated_at: string;
-  author_profile: DbProfileAuthor | DbProfileAuthor[] | null;
-  author_company: DbCompanyAuthor | DbCompanyAuthor[] | null;
-  job: DbJobPreview | DbJobPreview[] | null;
-}
-
-function unwrapOne<T>(value: T | T[] | null | undefined): T | null {
-  if (value == null) return null;
-  return Array.isArray(value) ? (value[0] ?? null) : value;
-}
-
-function mapFeedPost(row: DbFeedPostRow): FeedPost {
-  const profile = unwrapOne(row.author_profile);
-  const company = unwrapOne(row.author_company);
-  const job = unwrapOne(row.job);
-  const jobCompany = job ? unwrapOne(job.companies) : null;
-
-  const mediaUrls = Array.isArray(row.media_urls)
-    ? row.media_urls.filter((item): item is string => typeof item === "string")
-    : [];
-
-  return {
-    id: row.id,
-    content: row.content,
-    mediaUrls,
-    visibility: row.visibility,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-    authorUser: profile
-      ? {
-          id: profile.id,
-          fullName: profile.full_name,
-          avatarUrl: profile.avatar_url,
-          avatarInitials: profile.avatar_initials,
-          slug: profile.slug,
-          headline: profile.headline,
-        }
-      : null,
-    authorCompany: company
-      ? {
-          id: company.id,
-          name: company.name,
-          logo: company.logo,
-          brandColor: company.brand_color,
-          slug: company.slug,
-        }
-      : null,
-    job: job
-      ? {
-          id: job.id,
-          slug: job.slug,
-          title: job.title,
-          location: job.location,
-          salaryDisplay: job.salary_display,
-          remote: job.remote,
-          companyName: jobCompany?.name ?? "",
-          companyLogo: jobCompany?.logo ?? null,
-          companyColor: jobCompany?.brand_color ?? "#4F7CFF",
-        }
-      : null,
-    likeCount: 0,
-    commentCount: 0,
-  };
-}
 
 export function encodeFeedCursor(cursor: FeedCursor): string {
   return Buffer.from(JSON.stringify(cursor)).toString("base64url");
@@ -175,7 +35,11 @@ export function decodeFeedCursor(value: string | null | undefined): FeedCursor |
 
 export async function fetchFeedPosts(
   supabase: SupabaseClient,
-  options: { cursor?: FeedCursor | null; limit?: number } = {}
+  options: {
+    cursor?: FeedCursor | null;
+    limit?: number;
+    viewerUserId?: string;
+  } = {}
 ): Promise<FeedPage> {
   const limit = options.limit ?? FEED_PAGE_SIZE;
 
@@ -198,7 +62,17 @@ export async function fetchFeedPosts(
   const rows = (data ?? []) as DbFeedPostRow[];
   const hasMore = rows.length > limit;
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
-  const posts = pageRows.map(mapFeedPost);
+  let posts = pageRows.map((row) => mapFeedPostRow(row));
+
+  if (options.viewerUserId && posts.length > 0) {
+    const engagementIds = collectEngagementPostIds(posts);
+    const engagementByPostId = await fetchPostEngagementBatch(
+      supabase,
+      engagementIds,
+      options.viewerUserId
+    );
+    posts = posts.map((post) => applyEngagementToPost(post, engagementByPostId));
+  }
 
   const last = pageRows.at(-1);
   const nextCursor =
@@ -232,7 +106,7 @@ export async function createFeedPost(
       .single();
 
     if (error) throw error;
-    return mapFeedPost(data as DbFeedPostRow);
+    return mapFeedPostRow(data as DbFeedPostRow);
   }
 
   const { data, error } = await fromExtendedTable(supabase, "posts")
@@ -247,7 +121,7 @@ export async function createFeedPost(
     .single();
 
   if (error) throw error;
-  return mapFeedPost(data as DbFeedPostRow);
+  return mapFeedPostRow(data as DbFeedPostRow);
 }
 
 export async function deleteFeedPost(

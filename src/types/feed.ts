@@ -29,6 +29,18 @@ export interface FeedJobPreview {
   companyColor: string;
 }
 
+export interface FeedComment {
+  id: string;
+  postId: string;
+  userId: string;
+  parentCommentId: string | null;
+  content: string;
+  createdAt: string;
+  updatedAt: string;
+  author: FeedAuthorUser;
+  replies?: FeedComment[];
+}
+
 export interface FeedPost {
   id: string;
   content: string;
@@ -39,8 +51,11 @@ export interface FeedPost {
   authorUser: FeedAuthorUser | null;
   authorCompany: FeedAuthorCompany | null;
   job: FeedJobPreview | null;
+  sharedPost: FeedPost | null;
   likeCount: number;
   commentCount: number;
+  shareCount: number;
+  likedByMe: boolean;
 }
 
 export interface FeedCursor {
@@ -59,4 +74,15 @@ export interface CreatePostInput {
   jobId?: string | null;
   authorCompanyId?: string | null;
   mediaUrls?: string[];
+}
+
+export interface CreateCommentInput {
+  postId: string;
+  content: string;
+  parentCommentId?: string | null;
+}
+
+export interface SharePostInput {
+  postId: string;
+  comment?: string | null;
 }
