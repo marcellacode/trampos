@@ -1,6 +1,8 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { JobRecommendation } from "@/types/jobs";
+import type { ExtractedProfile } from "@/types/onboarding";
 import { detectAtsProvider } from "@/lib/integrations/ats/detect-provider";
+import { enrichJobFromGreenhouseUrl } from "@/lib/integrations/ats/providers/greenhouse/enrich-job";
 import { tailorResumeForJob } from "@/lib/integrations/ats/resume/tailor-for-job";
 import { isInternalJobRef } from "@/lib/external-jobs/resolve-job-ref";
 import {
@@ -67,15 +69,83 @@ async function getOrCreateCompanyId(
   return created.id as string;
 }
 
+async function validateProfileForApplication(
+  supabase: SupabaseClient,
+  userId: string,
+  profile: ExtractedProfile | null
+): Promise<void> {
+  if (!profile?.name?.trim()) {
+    throw new Error("Complete seu perfil com nome antes de se candidatar.");
+  }
+
+  const { data: authProfile } = await supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (!authProfile?.email?.trim()) {
+    throw new Error("Adicione seu e-mail no perfil antes de se candidatar.");
+  }
+
+  const { count: resumeCount } = await supabase
+    .from("resume_uploads")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("status", "completed");
+
+  const hasResumeContent =
+    (resumeCount ?? 0) > 0 ||
+    profile.experiences.length > 0 ||
+    Boolean(profile.summary?.trim());
+
+  if (!hasResumeContent) {
+    throw new Error(
+      "Envie seu currículo ou preencha experiências no perfil antes de se candidatar."
+    );
+  }
+}
+
+async function needsExternalConsent(
+  supabase: SupabaseClient,
+  userId: string
+): Promise<boolean> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const { count } = await (supabase as any)
+    .from("job_applications")
+    .select("id", { count: "exact", head: true })
+    .eq("user_id", userId)
+    .eq("source", "external")
+    .not("user_consent_at", "is", null);
+
+  return (count ?? 0) === 0;
+}
+
+async function enrichJobDescription(
+  applyUrl: string | null,
+  job?: JobRecommendation
+): Promise<{ description?: string; roleTitle?: string }> {
+  let description = job?.description ?? job?.aiSummary;
+  let roleTitle = job?.role;
+
+  if (applyUrl && detectAtsProvider(applyUrl) === "greenhouse") {
+    const enriched = await enrichJobFromGreenhouseUrl(applyUrl);
+    if (enriched) {
+      description = enriched.description || description;
+      roleTitle = enriched.title || roleTitle;
+    }
+  }
+
+  return { description, roleTitle };
+}
+
 export async function prepareApplication(
   supabase: SupabaseClient,
   userId: string,
   input: PrepareApplicationInput
 ): Promise<PreparedApplication> {
   const profile = await loadUserProfile(supabase, userId);
-  if (!profile?.name) {
-    throw new Error("Complete seu perfil antes de se candidatar.");
-  }
+  await validateProfileForApplication(supabase, userId, profile);
 
   const isExternal = !isInternalJobRef(input.jobRef);
   let externalJobId: string | null = null;
@@ -95,23 +165,27 @@ export async function prepareApplication(
     input.companyId
   );
 
-  const tailored = await tailorResumeForJob(profile, {
-    role: input.roleTitle,
+  const enriched = await enrichJobDescription(applyUrl, input.job);
+  const roleTitle = enriched.roleTitle ?? input.roleTitle;
+
+  const tailored = await tailorResumeForJob(profile!, {
+    role: roleTitle,
     company: input.companyName,
-    description: input.job?.description ?? input.job?.aiSummary,
+    description: enriched.description,
     stack: input.job?.stack,
   });
 
   const now = new Date().toISOString();
   const atsProvider = detectAtsProvider(applyUrl);
   const submissionStatus = isExternal && applyUrl ? "pending_external" : "completed";
+  const setConsent = isExternal && (await needsExternalConsent(supabase, userId));
 
-  const payload = {
+  const payload: Record<string, unknown> = {
     user_id: userId,
     job_id: isExternal ? null : input.jobRef,
     external_job_id: externalJobId,
     company_id: companyId,
-    role_title: input.roleTitle,
+    role_title: roleTitle,
     status: "applied",
     status_label:
       submissionStatus === "pending_external"
@@ -126,6 +200,10 @@ export async function prepareApplication(
     tailored_resume_text: tailored.resumeText,
     cover_letter_text: tailored.coverLetter,
   };
+
+  if (setConsent) {
+    payload.user_consent_at = now;
+  }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const applications = () => (supabase as any).from("job_applications");
@@ -156,10 +234,22 @@ export async function prepareApplication(
   }
 
   await createTimelineEvent(supabase, userId, {
-    title: `Candidatura preparada: ${input.roleTitle}`,
+    title: `Currículo adaptado: ${roleTitle}`,
+    description: `Personalizado para ${input.companyName}.`,
+    href: "/dashboard/curriculo",
+    event_kind: "resume_tailored",
+    actor: "ai",
+    icon_name: "filetext",
+    color_token: "purple",
+    job_id: isExternal ? null : input.jobRef,
+    company_id: companyId,
+  });
+
+  await createTimelineEvent(supabase, userId, {
+    title: `Candidatura preparada: ${roleTitle}`,
     description: isExternal
-      ? `Currículo adaptado. Conclua em ${input.companyName}.`
-      : `Candidatura registrada para ${input.roleTitle}.`,
+      ? `Abra o site da empresa para concluir em ${input.companyName}.`
+      : `Candidatura registrada para ${roleTitle}.`,
     href: isExternal && applyUrl ? applyUrl : `/dashboard/vagas/${input.jobRef}`,
     event_kind: "application_sent",
     actor: "ai",

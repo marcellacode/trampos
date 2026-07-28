@@ -56,7 +56,7 @@ export async function importGitHubProfile(
   return result.data.profile;
 }
 
-export async function uploadResumeToCloudinary(
+export async function uploadResumeToStorage(
   file: File
 ): Promise<{ url: string; publicId: string }> {
   if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -72,6 +72,9 @@ export async function uploadResumeToCloudinary(
 
   return { url: result.data.url, publicId: result.data.path };
 }
+
+/** @deprecated Use uploadResumeToStorage */
+export const uploadResumeToCloudinary = uploadResumeToStorage;
 
 export async function parseResumeWithAI(
   file: File
@@ -155,7 +158,7 @@ export async function resolveImport(
       if (!file) {
         throw Object.assign(new Error("missing_file"), { code: "invalid_file" });
       }
-      await uploadResumeToCloudinary(file);
+      await uploadResumeToStorage(file);
       return parseResumeWithAI(file);
     case "scratch":
       return buildScratchProfile();

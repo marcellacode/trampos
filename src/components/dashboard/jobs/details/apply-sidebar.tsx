@@ -7,6 +7,7 @@ import {
   Check,
   ChevronUp,
   Clock,
+  Copy,
   ExternalLink,
   Sparkles,
   Star,
@@ -22,10 +23,7 @@ import type {
   ApprovalProbability,
   JobDetail,
 } from "@/types/jobs";
-import {
-  confirmExternalApplicationAction,
-  prepareJobApplicationAction,
-} from "@/app/actions/applications";
+import { copyToClipboard, useJobApplication } from "@/lib/applications/hooks";
 import { cn } from "@/lib/utils";
 
 interface ApplySidebarProps {
@@ -110,39 +108,74 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
   );
 }
 
+function PreviewBlock({
+  title,
+  text,
+}: {
+  title: string;
+  text: string;
+}) {
+  const [copied, setCopied] = useState(false);
+
+  async function handleCopy() {
+    const ok = await copyToClipboard(text);
+    if (ok) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  return (
+    <div className="rounded-lg border border-white/[0.06] bg-black/20 p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-xs font-semibold text-white">{title}</p>
+        <button
+          type="button"
+          onClick={() => void handleCopy()}
+          className="inline-flex items-center gap-1 text-[10px] text-[#9CA3AF] transition-colors hover:text-white"
+        >
+          <Copy className="h-3 w-3" aria-hidden="true" />
+          {copied ? "Copiado!" : "Copiar"}
+        </button>
+      </div>
+      <pre className="max-h-32 overflow-y-auto whitespace-pre-wrap font-sans text-xs text-[#9CA3AF]">
+        {text.slice(0, 800)}
+        {text.length > 800 ? "…" : ""}
+      </pre>
+    </div>
+  );
+}
+
 export function ApplySidebar({ job, className }: ApplySidebarProps) {
-  const [loading, setLoading] = useState(false);
-  const [prepared, setPrepared] = useState(false);
-  const [applyUrl, setApplyUrl] = useState<string | null>(job.externalUrl ?? null);
-  const [applicationId, setApplicationId] = useState<string | null>(null);
-  const [resumePreview, setResumePreview] = useState<string | null>(null);
-  const isExternal = job.source === "adzuna" || Boolean(job.externalUrl);
+  const {
+    state,
+    isExternal,
+    applyUrl,
+    tailoredResumeText,
+    coverLetterText,
+    error,
+    buttonLabel,
+    prepare,
+    confirmExternal,
+    openExternalApply,
+    isLoading,
+    isDone,
+  } = useJobApplication({ job });
 
-  async function handlePrepare() {
-    setLoading(true);
-    const result = await prepareJobApplicationAction(job);
-    setLoading(false);
-    if (!result.success) return;
+  const showPreview = Boolean(tailoredResumeText || coverLetterText);
 
-    setPrepared(true);
-    setApplyUrl(result.data.applyUrl);
-    setApplicationId(result.data.applicationId);
-    setResumePreview(result.data.tailoredResumeText);
+  async function handlePrimaryAction() {
+    if (isDone) return;
+
+    if (state === "prepared" && applyUrl) {
+      openExternalApply();
+      return;
+    }
+
+    if (state === "idle") {
+      await prepare();
+    }
   }
-
-  async function handleConfirm() {
-    if (!applicationId) return;
-    await confirmExternalApplicationAction(applicationId);
-    setPrepared(true);
-  }
-
-  const buttonLabel = loading
-    ? "Preparando..."
-    : prepared
-      ? isExternal && applyUrl
-        ? "Abrir candidatura"
-        : "Candidatura registrada"
-      : "Preparar candidatura com IA";
 
   return (
     <aside className={cn("space-y-4", className)}>
@@ -164,25 +197,29 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           <p className="text-sm font-medium text-white">{job.aiSummary}</p>
         </div>
 
-        {resumePreview && (
-          <div className="mt-4 max-h-40 overflow-y-auto rounded-lg border border-white/[0.06] bg-black/20 p-3 text-xs text-[#9CA3AF]">
-            <pre className="whitespace-pre-wrap font-sans">{resumePreview.slice(0, 600)}…</pre>
+        {showPreview && (
+          <div className="mt-4 space-y-3">
+            {tailoredResumeText && (
+              <PreviewBlock title="Currículo adaptado" text={tailoredResumeText} />
+            )}
+            {coverLetterText && (
+              <PreviewBlock title="Carta de apresentação" text={coverLetterText} />
+            )}
           </div>
+        )}
+
+        {error && (
+          <p className="mt-4 text-xs text-red-400" role="alert">
+            {error}
+          </p>
         )}
 
         <Button
           className="mt-5 h-12 w-full gap-2 text-base shadow-[0_0_32px_rgba(79,124,255,0.25)]"
-          disabled={loading}
-          onClick={() => {
-            if (prepared && applyUrl) {
-              window.open(applyUrl, "_blank", "noopener,noreferrer");
-              void handleConfirm();
-              return;
-            }
-            void handlePrepare();
-          }}
+          disabled={isLoading || isDone}
+          onClick={() => void handlePrimaryAction()}
         >
-          {prepared && applyUrl ? (
+          {state === "prepared" && applyUrl ? (
             <ExternalLink className="h-4 w-4" aria-hidden="true" />
           ) : (
             <Sparkles className="h-4 w-4" aria-hidden="true" />
@@ -190,9 +227,27 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           {buttonLabel}
         </Button>
 
-        {prepared && isExternal && (
+        {state === "prepared" && isExternal && applyUrl && (
+          <Button
+            variant="outline"
+            className="mt-2 h-10 w-full border-white/10 bg-transparent"
+            onClick={() => void confirmExternal()}
+          >
+            <Check className="mr-2 h-4 w-4" aria-hidden="true" />
+            Já concluí no site
+          </Button>
+        )}
+
+        {state === "prepared" && isExternal && (
           <p className="mt-2 text-center text-xs text-[#9CA3AF]">
-            A IA preparou currículo e carta. Conclua no site da empresa.
+            A IA preparou currículo e carta. Copie, cole no site e confirme quando
+            terminar.
+          </p>
+        )}
+
+        {isDone && (
+          <p className="mt-2 text-center text-xs text-[#22C55E]">
+            Candidatura registrada com sucesso.
           </p>
         )}
 
@@ -225,6 +280,8 @@ interface MobileApplySheetProps {
 }
 
 export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps) {
+  const { prepare, isLoading } = useJobApplication({ job });
+
   return (
     <>
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#0C0D0F]/95 p-4 backdrop-blur-xl lg:hidden">
@@ -243,9 +300,16 @@ export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps)
               <span className="text-[10px] text-[#9CA3AF]">Sem match</span>
             )}
           </button>
-          <Button className="h-11 flex-1 gap-2" onClick={onToggle}>
+          <Button
+            className="h-11 flex-1 gap-2"
+            disabled={isLoading}
+            onClick={() => {
+              onToggle();
+              void prepare();
+            }}
+          >
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            Preparar candidatura
+            {isLoading ? "Preparando..." : "Preparar candidatura"}
           </Button>
         </div>
       </div>

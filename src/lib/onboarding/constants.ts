@@ -141,7 +141,8 @@ export const ACCEPTED_RESUME_TYPES = [
 export const ERROR_MESSAGES = {
   invalid_file: "Arquivo inválido. Envie um PDF ou DOCX de até 10MB.",
   upload_failed: "Falha ao enviar o currículo. Tente novamente.",
-  linkedin_failed: "Não foi possível importar o LinkedIn. Tente outra forma.",
+  linkedin_failed:
+    "Não foi possível extrair o perfil. Cole o texto exportado do LinkedIn ou tente outra forma.",
   github_failed: "Falha ao analisar o GitHub. Verifique a conexão e tente de novo.",
   offline: "Sem conexão. Verifique sua internet e tente novamente.",
   unknown: "Algo deu errado. Tente novamente em instantes.",

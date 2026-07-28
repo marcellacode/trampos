@@ -90,13 +90,13 @@ import {
   updateProfileSummary,
   updateProject,
 } from "@/lib/supabase/queries/mutations/profile-entities";
+import { hideJobByRef } from "@/lib/supabase/queries/mutations/saved-jobs";
 import {
   addFavoriteCompany,
   createOauthConnection,
   createResumeUpload,
   deleteOauthConnection,
   deleteResumeUpload,
-  hideJob,
   listHiddenJobs,
   listOauthConnections,
   listResumeUploads,
@@ -215,8 +215,12 @@ export function useDeleteJobApplication() {
 
 export function useApplyToJob() {
   return useCrudMutation(
-    (input: { jobId: string; companyId: string; roleTitle: string }) =>
-      withUser((s, u) => applyToJob(s, u, input)),
+    (input: {
+      jobId: string;
+      companyId: string;
+      roleTitle: string;
+      companyName?: string;
+    }) => withUser((s, u) => applyToJob(s, u, input)),
     crudKeys.applications
   );
 }
@@ -497,7 +501,7 @@ export function useHiddenJobs() {
 export function useHideJob() {
   return useCrudMutation(
     ({ jobId, reason }: { jobId: string; reason?: string }) =>
-      withUser((s, u) => hideJob(s, u, jobId, reason)),
+      withUser((s, u) => hideJobByRef(s, u, jobId, reason)),
     crudKeys.hiddenJobs
   );
 }

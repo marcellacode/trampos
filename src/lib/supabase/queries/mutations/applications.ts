@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { prepareApplication } from "@/lib/integrations/ats/application-service";
 import { createCrud } from "@/lib/supabase/crud/factory";
 
 export interface JobApplicationRow {
@@ -50,30 +51,21 @@ export async function applyToJob(
     jobId: string;
     companyId: string;
     roleTitle: string;
+    companyName?: string;
   }
 ): Promise<JobApplicationRow> {
-  const { data: existing } = await supabase
-    .from("job_applications")
-    .select("id")
-    .eq("user_id", userId)
-    .eq("job_id", input.jobId)
+  const { data: company } = await supabase
+    .from("companies")
+    .select("name")
+    .eq("id", input.companyId)
     .maybeSingle();
 
-  if (existing) {
-    return updateJobApplication(supabase, userId, existing.id, {
-      status: "applied",
-      status_label: "Candidatura enviada",
-      applied_at: new Date().toISOString(),
-      last_activity_at: new Date().toISOString(),
-    });
-  }
-
-  return createJobApplication(supabase, userId, {
-    job_id: input.jobId,
-    company_id: input.companyId,
-    role_title: input.roleTitle,
-    status: "applied",
-    status_label: "Candidatura enviada",
-    applied_at: new Date().toISOString(),
+  const result = await prepareApplication(supabase, userId, {
+    jobRef: input.jobId,
+    companyId: input.companyId,
+    roleTitle: input.roleTitle,
+    companyName: input.companyName ?? company?.name ?? "Empresa",
   });
+
+  return result.application;
 }

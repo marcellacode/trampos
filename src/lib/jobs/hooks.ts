@@ -6,6 +6,12 @@ import {
   fetchAdzunaJobDetailAction,
   fetchDiscoveryAction,
 } from "@/app/actions/adzuna";
+import {
+  listHiddenJobRefsAction,
+  listSavedJobRefsAction,
+  saveJobAction,
+  unsaveJobAction,
+} from "@/app/actions/discovery";
 import { createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { fetchJobById } from "@/lib/supabase/queries/jobs";
 import { getCurrentUserId } from "@/lib/supabase/queries/profile";
@@ -49,5 +55,42 @@ export function useJob(id: string) {
     queryFn: () => fetchJob(id),
     staleTime: 60_000,
     enabled: Boolean(id),
+  });
+}
+
+export function useSavedJobs() {
+  return useQuery({
+    queryKey: ["saved-jobs"],
+    queryFn: async () => {
+      const result = await listSavedJobRefsAction();
+      if (!result.success) throw new Error(result.error);
+      return new Set(result.data);
+    },
+    staleTime: 30_000,
+  });
+}
+
+export function useSaveJob() {
+  return {
+    save: async (jobRef: string, job?: DiscoveryData["jobs"][number]) => {
+      const result = await saveJobAction(jobRef, job);
+      if (!result.success) throw new Error(result.error);
+    },
+    unsave: async (jobRef: string) => {
+      const result = await unsaveJobAction(jobRef);
+      if (!result.success) throw new Error(result.error);
+    },
+  };
+}
+
+export function useHiddenJobRefs() {
+  return useQuery({
+    queryKey: ["hidden-jobs"],
+    queryFn: async () => {
+      const result = await listHiddenJobRefsAction();
+      if (!result.success) throw new Error(result.error);
+      return new Set(result.data);
+    },
+    staleTime: 30_000,
   });
 }

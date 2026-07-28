@@ -406,6 +406,19 @@ Baseie-se apenas no perfil real. PT-BR.`,
       console.warn("[onboarding] match sync failed:", syncError);
     }
 
+    const { createTimelineEvent } = await import(
+      "@/lib/supabase/queries/mutations/timeline"
+    );
+    await createTimelineEvent(supabase, user.id, {
+      title: "Busca de vagas iniciada",
+      description: "Estamos encontrando oportunidades compatíveis com seu perfil.",
+      href: "/dashboard/vagas",
+      event_kind: "job_found",
+      actor: "ai",
+      icon_name: "search",
+      color_token: "blue",
+    });
+
     return {
       success: true,
       data: { suggestionsCount },

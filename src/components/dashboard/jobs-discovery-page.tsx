@@ -63,6 +63,17 @@ export function JobsDiscoveryPage() {
     if (!data) return [];
     let jobs = data.jobs.filter((j) => !hiddenJobs.has(j.id));
 
+    const activeFilterLabels = filters.map((f) => f.label.toLowerCase()).filter(Boolean);
+
+    if (activeFilterLabels.length > 0) {
+      jobs = jobs.filter((job) => {
+        const haystack = [job.role, job.company, job.location, ...job.stack, job.aiSummary]
+          .join(" ")
+          .toLowerCase();
+        return activeFilterLabels.every((label) => haystack.includes(label));
+      });
+    }
+
     if (aiFilterQuery.trim()) {
       const q = aiFilterQuery.toLowerCase();
       jobs = jobs.filter((job) => {
@@ -74,7 +85,7 @@ export function JobsDiscoveryPage() {
     }
 
     return sortByCompatibility(jobs, (job) => job.company);
-  }, [data, hiddenJobs, aiFilterQuery]);
+  }, [data, hiddenJobs, aiFilterQuery, filters]);
 
   const compareJobs = useMemo(() => {
     if (!data) return [];
@@ -100,14 +111,16 @@ export function JobsDiscoveryPage() {
     }
   }
 
-  async function handleHide(jobId: string, _reason: HideReason) {
+  async function handleHide(jobId: string, reason: HideReason) {
     setHiddenJobs((prev) => new Set([...prev, jobId]));
     setCompareIds((prev) => prev.filter((id) => id !== jobId));
-    await hideJobByRefAction(jobId, _reason);
+    const job = data?.jobs.find((j) => j.id === jobId);
+    await hideJobByRefAction(jobId, reason, job);
   }
 
   async function handleSave(jobId: string) {
     const isSaved = savedJobs.has(jobId);
+    const job = data?.jobs.find((j) => j.id === jobId);
     if (isSaved) {
       setSavedJobs((prev) => {
         const next = new Set(prev);
@@ -117,7 +130,7 @@ export function JobsDiscoveryPage() {
       await unsaveJobAction(jobId);
     } else {
       setSavedJobs((prev) => new Set([...prev, jobId]));
-      await saveJobAction(jobId);
+      await saveJobAction(jobId, job);
     }
   }
 

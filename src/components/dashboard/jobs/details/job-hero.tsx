@@ -23,9 +23,23 @@ interface JobHeroProps {
   onSave: () => void;
   onShare: () => void;
   isExternal?: boolean;
+  onPrepare?: () => void;
+  prepareLabel?: string;
+  prepareLoading?: boolean;
+  prepareDisabled?: boolean;
 }
 
-export function JobHero({ job, saved, onSave, onShare, isExternal }: JobHeroProps) {
+export function JobHero({
+  job,
+  saved,
+  onSave,
+  onShare,
+  isExternal,
+  onPrepare,
+  prepareLabel = "Preparar candidatura com IA",
+  prepareLoading = false,
+  prepareDisabled = false,
+}: JobHeroProps) {
   return (
     <div className="space-y-4">
       {/* Breadcrumb + Back */}
@@ -124,7 +138,15 @@ export function JobHero({ job, saved, onSave, onShare, isExternal }: JobHeroProp
         </div>
 
         <div className="relative mt-6 flex flex-wrap gap-2 border-t border-white/[0.06] pt-6">
-          {isExternal && job.externalUrl ? (
+          <Button
+            className="h-10 flex-1 gap-2 sm:flex-none sm:px-6"
+            disabled={prepareLoading || prepareDisabled}
+            onClick={onPrepare}
+          >
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+            {prepareLabel}
+          </Button>
+          {isExternal && job.externalUrl && (
             <Button
               render={
                 <a
@@ -134,14 +156,10 @@ export function JobHero({ job, saved, onSave, onShare, isExternal }: JobHeroProp
                 />
               }
               nativeButton={false}
-              className="h-10 flex-1 gap-2 sm:flex-none sm:px-6"
+              variant="outline"
+              className="h-10 border-white/10 bg-transparent sm:px-6"
             >
-              Ver vaga na Adzuna
-            </Button>
-          ) : (
-            <Button className="h-10 flex-1 gap-2 sm:flex-none sm:px-6">
-              <Sparkles className="h-4 w-4" aria-hidden="true" />
-              Candidatar com IA
+              Ver original
             </Button>
           )}
           <Button

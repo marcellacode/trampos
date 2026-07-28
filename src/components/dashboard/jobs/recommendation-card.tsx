@@ -19,6 +19,7 @@ import { CompatibilityBar } from "@/components/dashboard/jobs/compatibility-bar"
 import { ApprovalProbabilityCard } from "@/components/dashboard/jobs/approval-probability-card";
 import { BestSendTimeCard } from "@/components/dashboard/jobs/best-send-time-card";
 import { HIDE_REASONS } from "@/lib/jobs/constants";
+import { useJobApplication } from "@/lib/applications/hooks";
 import type { HideReason, JobRecommendation } from "@/types/jobs";
 import { cn } from "@/lib/utils";
 
@@ -46,12 +47,37 @@ export function RecommendationCard({
   const saved = savedProp || savedLocal;
   const [hovered, setHovered] = useState(false);
 
+  const {
+    state: applyState,
+    applyUrl,
+    buttonLabel: applyLabel,
+    prepare,
+    openExternalApply,
+    confirmExternal,
+    isLoading: applyLoading,
+    isDone: applyDone,
+    error: applyError,
+    isExternal: applyIsExternal,
+  } = useJobApplication({ job });
+
   const isExternal = job.source === "adzuna";
-  const externalUrl = job.externalUrl;
 
   function handleHide(reason: HideReason) {
     onHide(job.id, reason);
     setShowHideFeedback(false);
+  }
+
+  async function handleApply() {
+    if (applyDone) return;
+
+    if (applyState === "prepared" && applyUrl) {
+      openExternalApply();
+      return;
+    }
+
+    if (applyState === "idle") {
+      await prepare();
+    }
   }
 
   return (
@@ -241,46 +267,40 @@ export function RecommendationCard({
 
       {/* Actions */}
       <div className="relative mt-5 flex flex-wrap gap-2">
-        {isExternal && externalUrl ? (
-          <Button
-            render={
-              <a
-                href={externalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              />
-            }
-            nativeButton={false}
-            className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5"
-          >
+        <Button
+          render={<Link href={job.href} />}
+          nativeButton={false}
+          variant="outline"
+          className="h-9 flex-1 border-white/10 bg-transparent sm:flex-none sm:px-5"
+        >
+          {isExternal ? "Resumo" : "Ver detalhes"}
+        </Button>
+        <Button
+          className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5"
+          disabled={applyLoading || applyDone}
+          onClick={() => void handleApply()}
+        >
+          {applyState === "prepared" && applyUrl ? (
             <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
-            Ver vaga
-          </Button>
-        ) : (
-          <Button
-            render={<Link href={job.href} />}
-            nativeButton={false}
-            variant="outline"
-            className="h-9 flex-1 border-white/10 bg-transparent sm:flex-none sm:px-5"
-          >
-            Ver detalhes
-          </Button>
-        )}
-        {!isExternal && (
-          <Button className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5">
+          ) : (
             <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-            Candidatar com IA
+          )}
+          {applyLabel}
+        </Button>
+        {applyState === "prepared" && applyIsExternal && applyUrl && (
+          <Button
+            variant="outline"
+            className="h-9 border-white/10 bg-transparent sm:px-4"
+            onClick={() => void confirmExternal()}
+          >
+            <Check className="h-3.5 w-3.5" aria-hidden="true" />
+            Já concluí
           </Button>
         )}
-        {isExternal && externalUrl && (
-          <Button
-            render={<Link href={job.href} />}
-            nativeButton={false}
-            variant="outline"
-            className="h-9 flex-1 border-white/10 bg-transparent sm:flex-none sm:px-5"
-          >
-            Resumo
-          </Button>
+        {applyError && (
+          <p className="w-full text-xs text-red-400" role="alert">
+            {applyError}
+          </p>
         )}
         <Button
           variant="outline"
