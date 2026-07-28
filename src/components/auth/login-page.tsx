@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { LoginShowcase } from "@/components/auth/login-showcase";
 import { LoginCard } from "@/components/auth/login-card";
@@ -43,7 +43,9 @@ export function LoginPage({ activities, testimonials }: LoginPageProps) {
           </div>
 
           <div className="relative z-10 w-full max-w-[460px]">
-            <LoginCard />
+            <Suspense fallback={null}>
+              <LoginCard />
+            </Suspense>
           </div>
         </section>
       </div>

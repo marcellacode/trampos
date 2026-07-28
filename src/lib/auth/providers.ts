@@ -1,7 +1,9 @@
 import type {
   AuthProvider,
   OAuthSignInOptions,
+  ResetPasswordForEmailOptions,
   SignInWithPasswordOptions,
+  UpdatePasswordOptions,
 } from "@/types/auth";
 import {
   createBrowserSupabaseClient,
@@ -35,5 +37,24 @@ export async function signInWithOAuth({
       redirectTo: getAuthCallbackUrl(redirectTo),
     },
   });
+  return { error: error?.message ?? null };
+}
+
+export async function resetPasswordForEmail({
+  email,
+  redirectTo = "/reset-password",
+}: ResetPasswordForEmailOptions): Promise<{ error: string | null }> {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: getAuthCallbackUrl(redirectTo),
+  });
+  return { error: error?.message ?? null };
+}
+
+export async function updatePassword({
+  password,
+}: UpdatePasswordOptions): Promise<{ error: string | null }> {
+  const supabase = createBrowserSupabaseClient();
+  const { error } = await supabase.auth.updateUser({ password });
   return { error: error?.message ?? null };
 }

@@ -102,7 +102,7 @@ export default async function PublicProfileRoute({
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Logo />
           {isAuthenticated ? (
-            <Button variant="outline" size="sm" render={<Link href="/dashboard" />}>
+            <Button variant="outline" size="sm" render={<Link href="/dashboard/inicio" />}>
               Ir para o dashboard
             </Button>
           ) : (

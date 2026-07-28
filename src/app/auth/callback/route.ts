@@ -1,13 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
+import { DASHBOARD_HOME, sanitizeInternalPath } from "@/lib/auth/redirect";
 import type { Database } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/onboarding";
+  const next = sanitizeInternalPath(searchParams.get("next"), "/onboarding");
 
   if (code) {
     const cookieStore = await cookies();
@@ -39,8 +40,12 @@ export async function GET(request: Request) {
           .eq("id", user.id)
           .maybeSingle();
 
+        if (next === "/reset-password") {
+          return NextResponse.redirect(`${origin}${next}`);
+        }
+
         const destination = profile?.onboarding_completed
-          ? "/dashboard/feed"
+          ? DASHBOARD_HOME
           : next.startsWith("/onboarding")
             ? next
             : "/onboarding";

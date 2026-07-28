@@ -38,3 +38,12 @@ export interface SignInWithPasswordOptions {
   password: string;
   rememberMe?: boolean;
 }
+
+export interface ResetPasswordForEmailOptions {
+  email: string;
+  redirectTo?: string;
+}
+
+export interface UpdatePasswordOptions {
+  password: string;
+}

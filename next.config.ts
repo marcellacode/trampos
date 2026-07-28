@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
         permanent: false,
       },
       {
+        source: "/dashboard/estudos",
+        destination: "/dashboard/empregabilidade",
+        permanent: false,
+      },
+      {
         source: "/dashboard/empresas",
         destination: "/dashboard/vagas",
         permanent: false,

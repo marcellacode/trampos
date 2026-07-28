@@ -1,5 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { DASHBOARD_HOME } from "@/lib/auth/redirect";
 import type { Database } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
@@ -62,7 +63,7 @@ export async function proxy(request: NextRequest) {
 
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = profile?.onboarding_completed
-      ? "/dashboard/inicio"
+      ? DASHBOARD_HOME
       : "/onboarding";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);

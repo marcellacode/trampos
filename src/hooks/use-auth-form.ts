@@ -3,7 +3,8 @@
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { DASHBOARD_HOME, sanitizeInternalPath } from "@/lib/auth/redirect";
 import { loginSchema, type LoginSchema } from "@/lib/auth/schema";
 import { signInWithPassword } from "@/lib/auth/providers";
 import type { AuthStatus } from "@/types/auth";
@@ -21,6 +22,7 @@ function mapAuthError(message: string): string {
 
 export function useAuthForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<AuthStatus>("idle");
   const [rootError, setRootError] = useState<string | null>(null);
 
@@ -55,10 +57,10 @@ export function useAuthForm() {
 
       setStatus("success");
       await new Promise((resolve) => setTimeout(resolve, 700));
-      router.push("/dashboard/feed");
+      router.push(sanitizeInternalPath(searchParams.get("next"), DASHBOARD_HOME));
       router.refresh();
     },
-    [form, router]
+    [form, router, searchParams]
   );
 
   const clearRootError = useCallback(() => {

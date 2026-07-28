@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import type { Metadata } from "next";
 import { LoginPage } from "@/components/auth/login-page";
+import { DASHBOARD_HOME } from "@/lib/auth/redirect";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import {
   fetchAuthTestimonials,
@@ -31,7 +32,7 @@ export default async function Page() {
           .eq("id", user.id)
           .maybeSingle();
 
-        redirect(profile?.onboarding_completed ? "/dashboard/feed" : "/onboarding");
+        redirect(profile?.onboarding_completed ? DASHBOARD_HOME : "/onboarding");
       }
     } catch (error) {
       if (error instanceof Error && error.message === "NEXT_REDIRECT") {

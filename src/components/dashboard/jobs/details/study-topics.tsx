@@ -68,7 +68,7 @@ export function StudyTopics({ data }: StudyTopicsProps) {
       </div>
 
       <Button
-        render={<Link href="/dashboard/estudos" />}
+        render={<Link href="/dashboard/empregabilidade" />}
         nativeButton={false}
         variant="outline"
         className="mt-5 h-10 w-full gap-2 border-primary/30 bg-primary/5 text-primary hover:bg-primary/10"
