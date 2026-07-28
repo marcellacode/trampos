@@ -30,6 +30,7 @@ export interface CreateTimelineEventInput {
   color_token?: string;
   glow_token?: string;
   is_live?: boolean;
+  created_at?: string;
 }
 
 export interface UpdateTimelineEventInput {

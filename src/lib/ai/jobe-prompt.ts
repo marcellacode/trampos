@@ -53,7 +53,8 @@ export interface CareerGoals {
 export function buildJobeContext(
   profile: ExtractedProfile | null,
   jobs?: JobSummary[],
-  goals?: CareerGoals
+  goals?: CareerGoals,
+  careerContextAppendix?: string
 ): string {
   const sections: string[] = [];
 
@@ -121,5 +122,10 @@ export function buildJobeContext(
     return "Nenhum dado de perfil disponível ainda. Responda de forma genérica sobre carreira e vagas.";
   }
 
-  return sections.join("\n\n");
+  const base = sections.join("\n\n");
+  if (careerContextAppendix?.trim()) {
+    return `${base}\n\n${careerContextAppendix.trim()}`;
+  }
+
+  return base;
 }

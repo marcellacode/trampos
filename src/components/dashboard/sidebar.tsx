@@ -6,6 +6,7 @@ import { ChevronUp, LogOut, Settings, X } from "lucide-react";
 import { useState } from "react";
 import { Logo } from "@/components/shared/logo";
 import { getDashboardNavSections } from "@/lib/dashboard/constants";
+import { useCareerNavBadges } from "@/lib/career/hooks";
 import { useCompanyMemberships } from "@/lib/crud/hooks";
 import type { DashboardUser, NavItem } from "@/types/dashboard";
 import { cn } from "@/lib/utils";
@@ -50,6 +51,11 @@ function NavLink({
     >
       <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
       <span className="truncate">{item.label}</span>
+      {item.badge ? (
+        <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 text-[10px] font-bold text-primary-foreground">
+          {item.badge}
+        </span>
+      ) : null}
     </Link>
   );
 }
@@ -58,8 +64,9 @@ export function Sidebar({ user, open = false, onClose, className }: SidebarProps
   const pathname = usePathname();
   const [profileOpen, setProfileOpen] = useState(false);
   const membershipsQuery = useCompanyMemberships();
+  const { badges } = useCareerNavBadges();
   const hasCompanyMembership = (membershipsQuery.data?.length ?? 0) > 0;
-  const navSections = getDashboardNavSections(hasCompanyMembership);
+  const navSections = getDashboardNavSections(hasCompanyMembership, badges);
 
   const content = (
     <div className="flex h-full flex-col bg-card">

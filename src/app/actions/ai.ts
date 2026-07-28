@@ -21,7 +21,6 @@ import { parseGoalText } from "@/lib/onboarding/goal-parser";
 import { fetchProfileData } from "@/lib/supabase/queries/profile";
 import { fetchJobCardsForUser } from "@/lib/supabase/queries/jobs";
 import { searchPlatformEntities } from "@/lib/supabase/queries/universal-search";
-import { createSystemPostIfEnabled } from "@/lib/feed/system-posts";
 import {
   createChatMessage,
   listChatMessagesByContext,
@@ -408,20 +407,9 @@ Baseie-se apenas no perfil real. PT-BR.`,
       console.warn("[onboarding] match sync failed:", syncError);
     }
 
-    const { createTimelineEvent } = await import(
-      "@/lib/supabase/queries/mutations/timeline"
-    );
-    await createTimelineEvent(supabase, user.id, {
-      title: "Busca de vagas iniciada",
-      description: "Estamos encontrando oportunidades compatíveis com seu perfil.",
-      href: "/dashboard/vagas",
-      event_kind: "job_found",
-      actor: "ai",
-      icon_name: "search",
-      color_token: "blue",
-    });
-
-    await createSystemPostIfEnabled(supabase, user.id, "onboarding_completed");
+    const { emitCareerEvent } = await import("@/lib/career/event-bus");
+    await emitCareerEvent(supabase, user.id, "onboarding_completed");
+    await emitCareerEvent(supabase, user.id, "profile_updated");
 
     return {
       success: true,

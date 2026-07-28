@@ -16,6 +16,9 @@ import {
   NewUserState,
 } from "@/components/dashboard/empty-states";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { GuidedEmptyStateView } from "@/components/dashboard/guided-empty-state";
+import { useCareerContext } from "@/lib/career/hooks";
+import { getGuidedEmptyState } from "@/lib/career/guided-empty-states";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { isDashboardEmpty } from "@/lib/dashboard/empty-data";
 import type { DashboardViewState } from "@/types/dashboard";
@@ -27,6 +30,7 @@ interface DashboardPageProps {
 
 export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
   const { shell, data, isLoading, isError } = useDashboardShell();
+  const { context } = useCareerContext();
   const isEmpty = data ? isDashboardEmpty(data) : true;
 
   if (isLoading || viewState === "loading") {
@@ -61,6 +65,11 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
         unreadMessages={0}
       >
         <NewUserState firstName={data.user.firstName} />
+        {context ? (
+          <div className="mt-6">
+            <GuidedEmptyStateView {...getGuidedEmptyState(context)} />
+          </div>
+        ) : null}
       </DashboardLayout>
     );
   }

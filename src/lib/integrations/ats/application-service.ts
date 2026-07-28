@@ -12,9 +12,7 @@ import {
 import { loadUserProfile } from "@/lib/matching/compute-compatibility";
 import { applicationStatusLabel } from "@/lib/applications/status-labels";
 import type { JobApplicationRow } from "@/lib/supabase/queries/mutations/applications";
-import { createNotification } from "@/lib/supabase/queries/mutations/notifications";
-import { createTimelineEvent } from "@/lib/supabase/queries/mutations/timeline";
-import { createSystemPostIfEnabled } from "@/lib/feed/system-posts";
+import { emitCareerEvent } from "@/lib/career/event-bus";
 
 export interface PrepareApplicationInput {
   jobRef: string;
@@ -239,30 +237,13 @@ export async function prepareApplication(
     application = data as JobApplicationRow;
   }
 
-  await createTimelineEvent(supabase, userId, {
-    title: `Currículo adaptado: ${roleTitle}`,
-    description: `Personalizado para ${input.companyName}.`,
-    href: "/dashboard/curriculo",
-    event_kind: "resume_tailored",
-    actor: "ai",
-    icon_name: "filetext",
-    color_token: "purple",
-    job_id: isExternal ? null : input.jobRef,
-    company_id: companyId,
-  });
-
-  await createTimelineEvent(supabase, userId, {
-    title: `Candidatura preparada: ${roleTitle}`,
-    description: isExternal
-      ? `Abra o site da empresa para concluir em ${input.companyName}.`
-      : `Candidatura registrada para ${roleTitle}.`,
-    href: isExternal && applyUrl ? applyUrl : `/dashboard/vagas/${input.jobRef}`,
-    event_kind: "application_sent",
-    actor: "ai",
-    icon_name: "send",
-    color_token: "blue",
-    job_id: isExternal ? null : input.jobRef,
-    company_id: companyId,
+  await emitCareerEvent(supabase, userId, "application_prepared", {
+    jobRef: input.jobRef,
+    companyId,
+    companyName: input.companyName,
+    roleTitle,
+    applyUrl,
+    isExternal,
   });
 
   return {
@@ -412,31 +393,12 @@ export async function applyInternalJob(
     application = data as JobApplicationRow;
   }
 
-  await createTimelineEvent(supabase, userId, {
-    title: `Candidatura enviada: ${roleTitle}`,
-    description: `Sua candidatura para ${companyName} foi registrada na plataforma.`,
-    href: `/dashboard/vagas/${input.jobId}`,
-    event_kind: "application_sent",
-    actor: "user",
-    icon_name: "send",
-    color_token: "green",
-    job_id: input.jobId,
-    company_id: companyId,
-  });
-
-  await createNotification(supabase, userId, {
-    title: `Candidatura enviada — ${roleTitle}`,
-    description: `${companyName} recebeu sua candidatura com currículo adaptado.`,
-    href: `/dashboard/vagas/${input.jobId}`,
-    action_label: "Ver vaga",
-    icon_name: "send",
-    color_token: "green",
-    notification_group: "today",
-  });
-
-  await createSystemPostIfEnabled(supabase, userId, "internal_application_submitted", {
-    roleTitle,
+  await emitCareerEvent(supabase, userId, "application_submitted", {
+    jobRef: input.jobId,
+    companyId,
     companyName,
+    roleTitle,
+    applicationId: application.id,
   });
 
   return {

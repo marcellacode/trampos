@@ -14,14 +14,29 @@ import {
   ClipboardList,
 } from "lucide-react";
 import type { NavItem, NavSection } from "@/types/dashboard";
+import type { CareerNavBadges } from "@/types/career-context";
 
-/** Navegação principal agrupada por jornada do candidato */
+/** Navegação principal agrupada pela jornada do candidato */
 export const DASHBOARD_NAV_SECTIONS: NavSection[] = [
   {
-    id: "overview",
-    label: "Visão geral",
+    id: "journey",
+    label: "Minha jornada",
     items: [
       { label: "Início", href: "/dashboard/inicio", icon: LayoutDashboard },
+      { label: "Agenda", href: "/dashboard/agenda", icon: Calendar },
+    ],
+  },
+  {
+    id: "profile",
+    label: "Meu perfil",
+    items: [
+      { label: "Currículo", href: "/dashboard/curriculo", icon: FileText },
+      { label: "Objetivos", href: "/dashboard/objetivos", icon: Crosshair },
+      {
+        label: "Empregabilidade",
+        href: "/dashboard/empregabilidade",
+        icon: TrendingUp,
+      },
     ],
   },
   {
@@ -29,26 +44,12 @@ export const DASHBOARD_NAV_SECTIONS: NavSection[] = [
     label: "Oportunidades",
     items: [
       { label: "Vagas", href: "/dashboard/vagas", icon: Briefcase },
-      { label: "Objetivos", href: "/dashboard/objetivos", icon: Crosshair },
-      { label: "Agenda", href: "/dashboard/agenda", icon: Calendar },
-    ],
-  },
-  {
-    id: "career",
-    label: "Carreira",
-    items: [
-      { label: "Currículo", href: "/dashboard/curriculo", icon: FileText },
-      {
-        label: "Empregabilidade",
-        href: "/dashboard/empregabilidade",
-        icon: TrendingUp,
-      },
       { label: "Entrevistas", href: "/dashboard/entrevistas", icon: Mic },
     ],
   },
   {
     id: "community",
-    label: "Comunidade",
+    label: "Rede & Comunidade",
     items: [
       { label: "Feed", href: "/dashboard/feed", icon: Newspaper },
       { label: "Rede", href: "/dashboard/rede", icon: Users },
@@ -83,18 +84,48 @@ export const DASHBOARD_NAV_ITEMS: NavItem[] = DASHBOARD_NAV_SECTIONS.flatMap(
 
 export const COMPANY_NAV_ITEM: NavItem = COMPANY_NAV_SECTION.items[0];
 
-export function getDashboardNavSections(
-  hasCompanyMembership: boolean
+const BADGE_ROUTES: Record<string, keyof CareerNavBadges> = {
+  "/dashboard/vagas": "vagas",
+  "/dashboard/agenda": "agenda",
+  "/dashboard/mensagens": "mensagens",
+  "/dashboard/curriculo": "curriculo",
+};
+
+export function applyNavBadges(
+  sections: NavSection[],
+  badges: CareerNavBadges
 ): NavSection[] {
+  return sections.map((section) => ({
+    ...section,
+    items: section.items.map((item) => {
+      const badgeKey = BADGE_ROUTES[item.href];
+      const count = badgeKey ? badges[badgeKey] : 0;
+      return count > 0 ? { ...item, badge: count > 99 ? 99 : count } : item;
+    }),
+  }));
+}
+
+export function getDashboardNavSections(
+  hasCompanyMembership: boolean,
+  badges?: CareerNavBadges
+): NavSection[] {
+  let sections: NavSection[];
+
   if (!hasCompanyMembership) {
-    return DASHBOARD_NAV_SECTIONS;
+    sections = DASHBOARD_NAV_SECTIONS;
+  } else {
+    sections = [
+      ...DASHBOARD_NAV_SECTIONS.slice(0, 2),
+      COMPANY_NAV_SECTION,
+      ...DASHBOARD_NAV_SECTIONS.slice(2),
+    ];
   }
 
-  return [
-    ...DASHBOARD_NAV_SECTIONS.slice(0, 2),
-    COMPANY_NAV_SECTION,
-    ...DASHBOARD_NAV_SECTIONS.slice(2),
-  ];
+  if (badges) {
+    sections = applyNavBadges(sections, badges);
+  }
+
+  return sections;
 }
 
 export const SEARCH_EXAMPLES = [

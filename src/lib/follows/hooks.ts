@@ -8,6 +8,7 @@ import {
   toggleFollowAction,
 } from "@/app/actions/follows";
 import { feedKeys } from "@/lib/feed/hooks";
+import { invalidateCareerQueries } from "@/lib/career/invalidate";
 import type { FollowTargetType, ToggleFollowResult } from "@/types/follows";
 
 export const followKeys = {
@@ -108,6 +109,7 @@ export function useToggleFollow(options?: {
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: followKeys.all });
       void queryClient.invalidateQueries({ queryKey: feedKeys.all });
+      invalidateCareerQueries(queryClient);
     },
   });
 }

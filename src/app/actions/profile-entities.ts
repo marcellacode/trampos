@@ -2,7 +2,7 @@
 
 import type { ActionResult } from "@/app/actions/ai";
 import { AuthError, requireAuth } from "@/lib/auth/require-auth";
-import { createSystemPostIfEnabled } from "@/lib/feed/system-posts";
+import { emitCareerEvent } from "@/lib/career/event-bus";
 import { createCertificate } from "@/lib/supabase/queries/mutations/profile-entities";
 
 function getErrorMessage(error: unknown): string {
@@ -17,8 +17,8 @@ export async function createCertificateAction(
   try {
     const { supabase, user } = await requireAuth();
     const row = await createCertificate(supabase, user.id, input);
-    await createSystemPostIfEnabled(supabase, user.id, "certificate_added", {
-      name: String(input.name ?? ""),
+    await emitCareerEvent(supabase, user.id, "certificate_added", {
+      certificateName: String(input.name ?? ""),
     });
     return { success: true, data: { id: row.id as string } };
   } catch (error) {

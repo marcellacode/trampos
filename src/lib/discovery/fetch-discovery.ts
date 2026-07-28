@@ -13,6 +13,11 @@ import {
   updateDiscoverySummary,
 } from "@/lib/matching/sync-user-matches";
 import { listHiddenJobRefs } from "@/lib/supabase/queries/mutations/saved-jobs";
+import { fetchFollowingList } from "@/lib/supabase/queries/follows";
+import {
+  buildRankContext,
+  rankJobsWithContext,
+} from "@/lib/jobs/rank-with-context";
 
 export interface DiscoverySearchOptions {
   what?: string;
@@ -128,6 +133,17 @@ export async function fetchDiscoveryWithExternalJobs(
       jobs = jobs.filter((job) => !hidden.has(job.id));
     } catch (error) {
       console.error("[discovery] hidden jobs filter failed:", error);
+    }
+
+    try {
+      const following = await fetchFollowingList(supabase, userId);
+      const rankContext = buildRankContext(
+        following.companies.map((c) => c.id),
+        following.companies.map((c) => c.name)
+      );
+      jobs = rankJobsWithContext(jobs, rankContext);
+    } catch (error) {
+      console.error("[discovery] follow boost failed:", error);
     }
   }
 

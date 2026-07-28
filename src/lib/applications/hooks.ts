@@ -1,12 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   applyInternalJobAction,
   confirmExternalApplicationAction,
   getInternalApplicationAction,
   prepareJobApplicationAction,
 } from "@/app/actions/applications";
+import { invalidateCareerQueries } from "@/lib/career/invalidate";
 import type { JobRecommendation } from "@/types/jobs";
 import {
   getApplyButtonLabel,
@@ -47,6 +49,7 @@ interface UseJobApplicationOptions {
 }
 
 export function useJobApplication({ job }: UseJobApplicationOptions) {
+  const queryClient = useQueryClient();
   const [state, setState] = useState<ApplicationUiState>("idle");
   const [applyUrl, setApplyUrl] = useState<string | null>(job.externalUrl ?? null);
   const [applicationId, setApplicationId] = useState<string | null>(null);
@@ -96,8 +99,9 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
     setState(
       result.data.submissionStatus === "completed" ? "completed" : "prepared"
     );
+    invalidateCareerQueries(queryClient);
     return true;
-  }, [isInternalPlatform, job]);
+  }, [isInternalPlatform, job, queryClient]);
 
   const confirmExternal = useCallback(async () => {
     if (!applicationId) return false;
@@ -107,8 +111,9 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
       return false;
     }
     setState("completed");
+    invalidateCareerQueries(queryClient);
     return true;
-  }, [applicationId]);
+  }, [applicationId, queryClient]);
 
   const openExternalApply = useCallback(() => {
     if (!applyUrl) return;

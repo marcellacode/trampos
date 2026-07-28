@@ -6,22 +6,23 @@ import {
   EntityCrudSection,
   ModuleCrudShell,
 } from "@/components/crud/module-crud-page";
-import { Timeline } from "@/components/dashboard/timeline";
-import { EmptyTimelineState } from "@/components/dashboard/empty-states";
+import { AgendaEventCard } from "@/components/dashboard/agenda/agenda-event-card";
+import { GuidedEmptyStateView } from "@/components/dashboard/guided-empty-state";
 import { LoadingSkeletons } from "@/components/dashboard/loading-skeletons";
 import { Button } from "@/components/ui/button";
+import { useCareerContext } from "@/lib/career/hooks";
+import { getAgendaGuidedEmptyState } from "@/lib/career/guided-empty-states";
 import {
   useCreateTimelineEvent,
   useDeleteTimelineEvent,
   useTimelineEvents,
   useUpdateTimelineEvent,
 } from "@/lib/crud/hooks";
-import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { AGENDA_MODULE } from "@/lib/crud/modules";
 import { cn } from "@/lib/utils";
 
 export function AgendaModulePage() {
-  const { data, isLoading } = useDashboardShell();
+  const { context, isLoading } = useCareerContext();
   const [advancedOpen, setAdvancedOpen] = useState(false);
 
   const timelineQuery = useTimelineEvents();
@@ -30,17 +31,21 @@ export function AgendaModulePage() {
   const deleteEvent = useDeleteTimelineEvent();
   const [timeline] = AGENDA_MODULE.entities;
 
-  const timelineItems = data?.timeline ?? [];
+  const timelineItems = context?.upcomingEvents ?? [];
 
   return (
     <ModuleCrudShell config={AGENDA_MODULE}>
       {isLoading ? (
         <LoadingSkeletons />
       ) : timelineItems.length > 0 ? (
-        <Timeline items={timelineItems} />
-      ) : (
-        <EmptyTimelineState />
-      )}
+        <div className="space-y-3">
+          {timelineItems.map((item) => (
+            <AgendaEventCard key={item.id} item={item} />
+          ))}
+        </div>
+      ) : context ? (
+        <GuidedEmptyStateView {...getAgendaGuidedEmptyState(context)} />
+      ) : null}
 
       <div className="rounded-2xl border border-border bg-card/50">
         <Button

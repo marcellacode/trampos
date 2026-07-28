@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { ActionResult } from "@/app/actions/ai";
 import { AuthError, requireAuth } from "@/lib/auth/require-auth";
+import { emitCareerEvent } from "@/lib/career/event-bus";
 import {
   fetchFollowersList,
   fetchFollowingList,
@@ -57,6 +58,31 @@ export async function toggleFollowAction(input: {
       input.targetType === "user"
         ? await toggleFollowUser(supabase, user.id, input.targetId)
         : await toggleFollowCompany(supabase, user.id, input.targetId);
+
+    if (result.isFollowing) {
+      let followTargetName = "perfil";
+      if (input.targetType === "company") {
+        const { data: company } = await supabase
+          .from("companies")
+          .select("name")
+          .eq("id", input.targetId)
+          .maybeSingle();
+        followTargetName = company?.name ?? "empresa";
+      } else {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("full_name, first_name")
+          .eq("id", input.targetId)
+          .maybeSingle();
+        followTargetName = profile?.full_name ?? profile?.first_name ?? "profissional";
+      }
+
+      await emitCareerEvent(supabase, user.id, "follow_added", {
+        followTargetType: input.targetType,
+        followTargetName,
+        companyId: input.targetType === "company" ? input.targetId : undefined,
+      });
+    }
 
     if (input.revalidateSlug) {
       revalidatePath(

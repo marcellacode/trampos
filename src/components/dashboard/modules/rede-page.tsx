@@ -1,11 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { Building2, Loader2, MapPin, Users } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { FollowButton } from "@/components/follows/follow-button";
+import { GuidedEmptyStateView } from "@/components/dashboard/guided-empty-state";
 import { Button } from "@/components/ui/button";
+import { useCareerContext } from "@/lib/career/hooks";
+import { getRedeGuidedEmptyState } from "@/lib/career/guided-empty-states";
 import {
   useFollowersList,
   useFollowingList,
@@ -158,7 +161,14 @@ function LoadingState() {
   );
 }
 
-function EmptyState({ message }: { message: string }) {
+function EmptyState({
+  message,
+  guided,
+}: {
+  message: string;
+  guided?: ReactNode;
+}) {
+  if (guided) return <>{guided}</>;
   return (
     <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
       {message}
@@ -166,7 +176,7 @@ function EmptyState({ message }: { message: string }) {
   );
 }
 
-function FollowingTab() {
+function FollowingTab({ guidedEmpty }: { guidedEmpty?: ReactNode }) {
   const followingQuery = useFollowingList();
 
   if (followingQuery.isLoading) return <LoadingState />;
@@ -178,7 +188,10 @@ function FollowingTab() {
 
   if (users.length === 0 && companies.length === 0) {
     return (
-      <EmptyState message="Você ainda não segue ninguém. Explore sugestões na aba ao lado." />
+      <EmptyState
+        message="Você ainda não segue ninguém. Explore sugestões na aba ao lado."
+        guided={guidedEmpty}
+      />
     );
   }
 
@@ -240,7 +253,7 @@ function FollowersTab() {
   );
 }
 
-function SuggestionsTab() {
+function SuggestionsTab({ guidedEmpty }: { guidedEmpty?: ReactNode }) {
   const suggestionsQuery = useFollowSuggestions();
 
   if (suggestionsQuery.isLoading) return <LoadingState />;
@@ -253,7 +266,10 @@ function SuggestionsTab() {
 
   if (users.length === 0 && companies.length === 0) {
     return (
-      <EmptyState message="Nenhuma sugestão no momento. Complete seu perfil com skills e localização." />
+      <EmptyState
+        message="Nenhuma sugestão no momento. Complete seu perfil com skills e localização."
+        guided={guidedEmpty}
+      />
     );
   }
 
@@ -291,7 +307,11 @@ function SuggestionsTab() {
 
 export function RedePage() {
   const { shell } = useDashboardShell();
+  const { context } = useCareerContext();
   const [activeTab, setActiveTab] = useState<RedeTab>("suggestions");
+  const guidedEmpty = context ? (
+    <GuidedEmptyStateView {...getRedeGuidedEmptyState(context)} />
+  ) : undefined;
 
   return (
     <DashboardLayout {...shellLayoutProps(shell)}>
@@ -325,9 +345,13 @@ export function RedePage() {
         </div>
 
         <div role="tabpanel">
-          {activeTab === "following" ? <FollowingTab /> : null}
+          {activeTab === "following" ? (
+            <FollowingTab guidedEmpty={guidedEmpty} />
+          ) : null}
           {activeTab === "followers" ? <FollowersTab /> : null}
-          {activeTab === "suggestions" ? <SuggestionsTab /> : null}
+          {activeTab === "suggestions" ? (
+            <SuggestionsTab guidedEmpty={guidedEmpty} />
+          ) : null}
         </div>
       </div>
     </DashboardLayout>

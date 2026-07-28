@@ -16,6 +16,11 @@ import {
   SmartFilters,
 } from "@/components/dashboard/jobs";
 import { sortByCompatibility } from "@/lib/jobs/sort";
+import {
+  buildRankContext,
+  rankJobsWithContext,
+} from "@/lib/jobs/rank-with-context";
+import { useCareerContext } from "@/lib/career/hooks";
 import { isPlatformApply } from "@/lib/jobs/source-utils";
 import { isDiscoveryEmpty } from "@/lib/jobs/empty-data";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
@@ -32,6 +37,7 @@ import {
 
 export function JobsDiscoveryPage() {
   const { shell } = useDashboardShell();
+  const { context } = useCareerContext();
   const [searchQuery, setSearchQuery] = useState("");
   const { data, isLoading, isError, refetch } = useDiscovery(searchQuery);
   const [filters, setFilters] = useState<SmartFilter[]>([]);
@@ -88,8 +94,16 @@ export function JobsDiscoveryPage() {
       jobs = jobs.filter((job) => isPlatformApply(job));
     }
 
+    if (context) {
+      const rankContext = buildRankContext(
+        context.followedEntities.companyIds,
+        context.followedEntities.companyNames
+      );
+      return rankJobsWithContext(jobs, rankContext);
+    }
+
     return sortByCompatibility(jobs, (job) => job.company);
-  }, [data, hiddenJobs, aiFilterQuery, filters, platformOnly]);
+  }, [data, hiddenJobs, aiFilterQuery, filters, platformOnly, context]);
 
   const compareJobs = useMemo(() => {
     if (!data) return [];

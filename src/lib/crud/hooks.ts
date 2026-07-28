@@ -139,6 +139,7 @@ import {
   type UpdateTimelineEventInput,
 } from "@/lib/supabase/queries/mutations/timeline";
 import { crudKeys } from "@/lib/crud/query-keys";
+import { invalidateCareerQueries } from "@/lib/career/invalidate";
 
 function scheduleMatchResyncInBackground() {
   void import("@/lib/matching/match-action")
@@ -176,7 +177,7 @@ function useInvalidate(keys: readonly unknown[]) {
   const queryClient = useQueryClient();
   return () => {
     void queryClient.invalidateQueries({ queryKey: keys });
-    void queryClient.invalidateQueries({ queryKey: crudKeys.dashboard });
+    invalidateCareerQueries(queryClient);
   };
 }
 

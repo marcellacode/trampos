@@ -6,8 +6,10 @@ import {
   EntityCrudSection,
   ModuleCrudShell,
 } from "@/components/crud/module-crud-page";
-import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { PortfolioSection } from "@/components/dashboard/modules/portfolio-page";
+import { ProfileCompletenessBanner } from "@/components/dashboard/curriculo/profile-completeness-banner";
+import { TailoredResumeVersions } from "@/components/dashboard/curriculo/tailored-resume-versions";
+import { ProfileVisibilitySection } from "@/components/dashboard/curriculo/profile-visibility-section";
 import { Button } from "@/components/ui/button";
 import {
   useCertificates,
@@ -34,10 +36,8 @@ import {
   useUpdateExperience,
   useUpdateLanguage,
 } from "@/lib/crud/hooks";
+import { useCareerContext } from "@/lib/career/hooks";
 import { CURRICULO_MODULE } from "@/lib/crud/modules";
-import { useDashboardShell } from "@/lib/dashboard/hooks";
-import { TailoredResumeVersions } from "@/components/dashboard/curriculo/tailored-resume-versions";
-import { ProfileVisibilitySection } from "@/components/dashboard/curriculo/profile-visibility-section";
 import { cn } from "@/lib/utils";
 
 type CurriculoTab = "perfil" | "portfolio";
@@ -49,6 +49,7 @@ function parseOptionalDate(value: unknown): string | null {
 
 function CurriculoContent() {
   const searchParams = useSearchParams();
+  const { context } = useCareerContext();
   const initialTab =
     searchParams.get("tab") === "portfolio" ? "portfolio" : "perfil";
   const [activeTab, setActiveTab] = useState<CurriculoTab>(initialTab);
@@ -117,6 +118,7 @@ function CurriculoContent() {
       </div>
 
       <div role="tabpanel" className={cn(activeTab !== "perfil" && "hidden")}>
+        {context ? <ProfileCompletenessBanner profile={context.profile} /> : null}
         <ProfileVisibilitySection />
         <TailoredResumeVersions />
 

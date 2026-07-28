@@ -72,9 +72,9 @@ export function EmptyTimelineState() {
     <EmptyState
       icon={Clock}
       title="Nenhuma atividade recente"
-      description="Quando você buscar vagas, salvar oportunidades ou se candidatar, os eventos aparecerão aqui."
-      ctaLabel="Buscar vagas"
-      ctaHref="/dashboard/vagas"
+      description="Quando você buscar vagas, se candidatar ou seguir empresas, os eventos aparecerão na Agenda e aqui no Início."
+      ctaLabel="Ver agenda"
+      ctaHref="/dashboard/agenda"
     />
   );
 }
