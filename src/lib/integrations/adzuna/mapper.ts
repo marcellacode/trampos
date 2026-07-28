@@ -3,6 +3,7 @@ import { applyMatchToJob } from "@/lib/matching/sync-user-matches";
 import type { UserJobMatchRow } from "@/lib/matching/types";
 import type { JobDetail, JobRecommendation } from "@/types/jobs";
 import { companyInitials } from "@/lib/supabase/utils";
+import { truncateForDiscovery } from "@/lib/integrations/jobs/shared-mapper";
 
 const DEFAULT_COLOR = "#6366F1";
 
@@ -64,7 +65,7 @@ export function mapAdzunaJobToRecommendation(
     role: job.title,
     source: "adzuna",
     externalUrl: job.redirect_url,
-    description: stripHtml(job.description),
+    description: truncateForDiscovery(job.description),
     hasMatch: false,
     compatibility: 0,
     approvalProbability: {
@@ -95,7 +96,7 @@ export function mapAdzunaJobToRecommendation(
     },
     benefits: [],
     remote: inferRemote(job),
-    aiSummary: stripHtml(job.description).slice(0, 280),
+    aiSummary: truncateForDiscovery(job.description, 280),
   };
 
   return userMatch ? applyMatchToJob(base, userMatch) : base;

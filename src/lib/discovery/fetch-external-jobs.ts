@@ -62,7 +62,7 @@ async function fetchAdzunaJobs(
       what,
       where,
       page: options.page ?? 1,
-      resultsPerPage: options.perProvider ?? 15,
+      resultsPerPage: options.perProvider ?? 8,
     });
 
     return mapAdzunaJobsToRecommendations(response.results ?? []);

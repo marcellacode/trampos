@@ -21,7 +21,7 @@ const JOB_LIST_SELECT = `
   published_at,
   verified,
   ai_summary,
-  companies (
+  companies!jobs_company_id_fkey (
     id,
     slug,
     name,
@@ -84,7 +84,7 @@ const JOB_MATCH_SELECT = `
     jobs:compared_job_id (
       id,
       title,
-      companies (name, logo, brand_color)
+      companies!jobs_company_id_fkey (name, logo, brand_color)
     )
   )
 `;
@@ -254,7 +254,7 @@ export async function fetchJobById(
           slug,
           title,
           salary_display,
-          companies (name, logo, brand_color),
+          companies!jobs_company_id_fkey (name, logo, brand_color),
           job_matches (compatibility)
         )
       `
@@ -266,7 +266,7 @@ export async function fetchJobById(
       .select(
         `
         sort_order,
-        companies (
+        companies!job_similar_companies_company_id_fkey (
           id,
           slug,
           name,

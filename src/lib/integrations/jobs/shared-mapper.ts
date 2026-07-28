@@ -5,6 +5,9 @@ import type { JobDetail, JobRecommendation } from "@/types/jobs";
 
 export const DEFAULT_JOB_COLOR = "#6366F1";
 
+/** Keep discovery payloads small enough for server actions. */
+export const DISCOVERY_DESCRIPTION_MAX = 600;
+
 const REMOTE_KEYWORDS =
   /\b(remot[oa]|home\s*office|trabalho\s*remoto|remote|hibrid[oa]|hybrid)\b/i;
 
@@ -13,6 +16,12 @@ export function stripHtml(html: string): string {
     .replace(/<[^>]+>/g, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+export function truncateForDiscovery(text: string, max = DISCOVERY_DESCRIPTION_MAX): string {
+  const clean = stripHtml(text);
+  if (clean.length <= max) return clean;
+  return `${clean.slice(0, max).trim()}…`;
 }
 
 export function inferRemote(...parts: (string | undefined)[]): boolean {
@@ -67,7 +76,9 @@ export function buildExternalJobRecommendation(input: {
   remote?: boolean;
 }): JobRecommendation {
   const id = externalJobRef(input.source, input.externalId);
-  const description = input.description ? stripHtml(input.description) : "";
+  const description = input.description
+    ? truncateForDiscovery(input.description)
+    : "";
   const salary = formatSalaryDisplay({
     min: input.salaryMin,
     max: input.salaryMax,

@@ -192,7 +192,7 @@ export async function fetchLandingStats(supabase: SupabaseClient) {
         published_at,
         verified,
         ai_summary,
-        companies (name, logo, brand_color)
+        companies!jobs_company_id_fkey (name, logo, brand_color)
       `
       )
       .eq("is_active", true)

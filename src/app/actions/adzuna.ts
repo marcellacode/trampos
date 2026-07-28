@@ -54,6 +54,7 @@ export async function fetchDiscoveryAction(
     );
     return { success: true, data };
   } catch (error) {
+    console.error("[fetchDiscoveryAction]", error);
     return { success: false, error: getErrorMessage(error) };
   }
 }

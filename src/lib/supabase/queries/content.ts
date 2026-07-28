@@ -42,7 +42,7 @@ export async function fetchRecentJobActivity(
 ) {
   const { data, error } = await supabase
     .from("jobs")
-    .select("id, title, companies(name)")
+    .select("id, title, companies!jobs_company_id_fkey(name)")
     .eq("is_active", true)
     .order("published_at", { ascending: false })
     .limit(limit);

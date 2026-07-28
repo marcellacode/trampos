@@ -86,7 +86,7 @@ export async function fetchDiscoveryWithExternalJobs(
 
   const [discovery, externalJobs] = await Promise.all([
     fetchDiscoveryData(supabase, userId),
-    fetchAllExternalJobs({ ...options, perProvider: 15 }, defaults),
+    fetchAllExternalJobs({ ...options, perProvider: 8 }, defaults),
   ]);
 
   let jobs = mergeJobLists(discovery.jobs, externalJobs);
@@ -96,37 +96,45 @@ export async function fetchDiscoveryWithExternalJobs(
   }
 
   if (userId && jobs.length > 0) {
-    let matchMap = await loadUserMatchesForJobs(
-      supabase,
-      userId,
-      jobs.map((j) => j.id)
-    );
+    try {
+      let matchMap = await loadUserMatchesForJobs(
+        supabase,
+        userId,
+        jobs.map((j) => j.id)
+      );
 
-    const missingMatches = jobs.filter((j) => !matchMap.has(j.id));
-    const canSync =
-      !options.skipBackgroundSync &&
-      missingMatches.length > 0 &&
-      checkMatchSyncRateLimit(userId).allowed;
+      const missingMatches = jobs.filter((j) => !matchMap.has(j.id));
+      const canSync =
+        !options.skipBackgroundSync &&
+        missingMatches.length > 0 &&
+        checkMatchSyncRateLimit(userId).allowed;
 
-    if (canSync) {
-      try {
-        await syncUserMatches(supabase, userId, missingMatches, 12, {
-          skipRateLimit: true,
-        });
-        matchMap = await loadUserMatchesForJobs(
-          supabase,
-          userId,
-          jobs.map((j) => j.id)
-        );
-      } catch (error) {
-        console.error("[discovery] match sync failed:", error);
+      if (canSync) {
+        try {
+          await syncUserMatches(supabase, userId, missingMatches, 8, {
+            skipRateLimit: true,
+          });
+          matchMap = await loadUserMatchesForJobs(
+            supabase,
+            userId,
+            jobs.map((j) => j.id)
+          );
+        } catch (error) {
+          console.error("[discovery] match sync failed:", error);
+        }
       }
+
+      jobs = jobs.map((job) => applyMatchToJob(job, matchMap.get(job.id)));
+    } catch (error) {
+      console.error("[discovery] match load failed:", error);
     }
 
-    jobs = jobs.map((job) => applyMatchToJob(job, matchMap.get(job.id)));
-
-    const hidden = await listHiddenJobRefs(supabase, userId);
-    jobs = jobs.filter((job) => !hidden.has(job.id));
+    try {
+      const hidden = await listHiddenJobRefs(supabase, userId);
+      jobs = jobs.filter((job) => !hidden.has(job.id));
+    } catch (error) {
+      console.error("[discovery] hidden jobs filter failed:", error);
+    }
   }
 
   if (userId && jobs.some((j) => j.hasMatch)) {
