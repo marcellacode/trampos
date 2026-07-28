@@ -78,6 +78,10 @@ export function OnboardingFlow() {
   const { data: savedProfile } = useProfile();
   const [step, setStep] = useState<OnboardingStep>("import");
   const [showUpload, setShowUpload] = useState(false);
+  const [showGithubInput, setShowGithubInput] = useState(false);
+  const [showLinkedinInput, setShowLinkedinInput] = useState(false);
+  const [githubUsername, setGithubUsername] = useState("");
+  const [linkedinText, setLinkedinText] = useState("");
   const [error, setError] = useState<OnboardingError | null>(null);
   const [data, setData] = useState<OnboardingData>({
     importMethod: null,
@@ -105,10 +109,18 @@ export function OnboardingFlow() {
     mutationFn: async ({
       method,
       file,
+      githubUsername: ghUser,
+      linkedinText: liText,
     }: {
       method: ImportMethod;
       file?: File | null;
-    }) => resolveImport(method, file),
+      githubUsername?: string;
+      linkedinText?: string;
+    }) =>
+      resolveImport(method, file, {
+        githubUsername: ghUser,
+        linkedinText: liText,
+      }),
     onSuccess: (profile, variables) => {
       setData((prev) => ({
         ...prev,
@@ -168,11 +180,30 @@ export function OnboardingFlow() {
     setError(null);
     if (method === "resume") {
       setShowUpload(true);
+      setShowGithubInput(false);
+      setShowLinkedinInput(false);
       setData((prev) => ({ ...prev, importMethod: method }));
       return;
     }
 
     setShowUpload(false);
+
+    if (method === "github") {
+      setShowGithubInput(true);
+      setShowLinkedinInput(false);
+      setData((prev) => ({ ...prev, importMethod: method }));
+      return;
+    }
+
+    if (method === "linkedin") {
+      setShowLinkedinInput(true);
+      setShowGithubInput(false);
+      setData((prev) => ({ ...prev, importMethod: method }));
+      return;
+    }
+
+    setShowGithubInput(false);
+    setShowLinkedinInput(false);
     setData((prev) => ({ ...prev, importMethod: method }));
 
     if (method === "scratch") {
@@ -272,7 +303,7 @@ export function OnboardingFlow() {
           transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           className="flex flex-1 flex-col"
         >
-          {step === "import" && !showUpload && (
+          {step === "import" && !showUpload && !showGithubInput && !showLinkedinInput && (
             <div className="flex flex-1 flex-col justify-center gap-10 py-4">
               <div className="mx-auto max-w-2xl space-y-4 text-center">
                 <motion.h1
@@ -307,8 +338,8 @@ export function OnboardingFlow() {
                 >
                   <ImportCard
                     index={0}
-                    title="Importar LinkedIn"
-                    description="Conecte seu LinkedIn e deixe a IA analisar sua carreira."
+                    title="Colar perfil LinkedIn"
+                    description="Cole o texto exportado do seu perfil — sem API paga."
                     icon={Network}
                     onClick={() => handleMethodSelect("linkedin")}
                     disabled={importMutation.isPending}
@@ -316,7 +347,7 @@ export function OnboardingFlow() {
                   <ImportCard
                     index={1}
                     title="Importar GitHub"
-                    description="A IA analisa projetos, tecnologias, commits, README e linguagens."
+                    description="Informe seu @username — usamos a API pública do GitHub."
                     icon={GitBranch}
                     onClick={() => handleMethodSelect("github")}
                     disabled={importMutation.isPending}
@@ -352,6 +383,63 @@ export function OnboardingFlow() {
                   <span>{error.message}</span>
                 </motion.div>
               )}
+            </div>
+          )}
+
+          {step === "import" && showGithubInput && (
+            <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8">
+              <h2 className="text-center text-xl font-semibold text-white">
+                Seu username no GitHub
+              </h2>
+              <input
+                value={githubUsername}
+                onChange={(e) => setGithubUsername(e.target.value)}
+                placeholder="ex: octocat"
+                className="rounded-xl border border-white/10 bg-[#111315] px-4 py-3 text-white outline-none focus:border-[#4F7CFF]/50"
+              />
+              <button
+                type="button"
+                disabled={!githubUsername.trim() || importMutation.isPending}
+                onClick={() => {
+                  setStep("processing");
+                  importMutation.mutate(
+                    { method: "github", githubUsername },
+                    { onSuccess: () => setStep("summary") }
+                  );
+                }}
+                className="rounded-xl bg-[#4F7CFF] py-3 font-medium text-white disabled:opacity-50"
+              >
+                Analisar perfil
+              </button>
+            </div>
+          )}
+
+          {step === "import" && showLinkedinInput && (
+            <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8">
+              <h2 className="text-center text-xl font-semibold text-white">
+                Cole o texto do seu perfil
+              </h2>
+              <textarea
+                value={linkedinText}
+                onChange={(e) => setLinkedinText(e.target.value)}
+                placeholder="Cole aqui experiências, skills e resumo do LinkedIn..."
+                rows={8}
+                className="rounded-xl border border-white/10 bg-[#111315] px-4 py-3 text-sm text-white outline-none focus:border-[#4F7CFF]/50"
+              />
+              <button
+                type="button"
+                disabled={linkedinText.trim().length < 50 || importMutation.isPending}
+                onClick={() => {
+                  setStep("processing");
+                  importMutation.mutate(
+                    { method: "linkedin", linkedinText },
+                    { onSuccess: () => setStep("summary") }
+                  );
+                }}
+                className="rounded-xl bg-[#4F7CFF] py-3 font-medium text-white disabled:opacity-50"
+              >
+                Analisar perfil
+              </button>
             </div>
           )}
 

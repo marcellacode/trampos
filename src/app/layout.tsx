@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Jobera — Sua IA trabalha para conseguir seu próximo emprego",
   description:
-    "A primeira plataforma onde uma IA trabalha para conseguir um emprego para você. Procura vagas, adapta currículo, envia candidaturas e agenda entrevistas.",
+    "A primeira plataforma onde uma IA trabalha para conseguir um emprego para você. Procura vagas, adapta currículo, prepara candidaturas assistidas e treina entrevistas.",
   keywords: [
     "emprego",
     "IA",

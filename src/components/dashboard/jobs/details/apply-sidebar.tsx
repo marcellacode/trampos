@@ -1,11 +1,13 @@
 "use client";
 
+import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bot,
   Check,
   ChevronUp,
   Clock,
+  ExternalLink,
   Sparkles,
   Star,
 } from "lucide-react";
@@ -20,7 +22,10 @@ import type {
   ApprovalProbability,
   JobDetail,
 } from "@/types/jobs";
-import { useApplyToJob } from "@/lib/crud/hooks";
+import {
+  confirmExternalApplicationAction,
+  prepareJobApplicationAction,
+} from "@/app/actions/applications";
 import { cn } from "@/lib/utils";
 
 interface ApplySidebarProps {
@@ -78,24 +83,16 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
       <p className="text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
         Chance estimada
       </p>
-      <p
-        className="mt-1 text-lg font-bold"
-        style={{ color: levelColor }}
-      >
+      <p className="mt-1 text-lg font-bold" style={{ color: levelColor }}>
         {LEVEL_LABELS[data.level]}
       </p>
-      <div
-        className="mt-1 flex gap-0.5"
-        aria-label={`${data.stars} de 5 estrelas`}
-      >
+      <div className="mt-1 flex gap-0.5" aria-label={`${data.stars} de 5 estrelas`}>
         {Array.from({ length: 5 }).map((_, i) => (
           <Star
             key={i}
             className={cn(
               "h-3.5 w-3.5",
-              i < data.stars
-                ? "fill-[#F59E0B] text-[#F59E0B]"
-                : "text-white/10"
+              i < data.stars ? "fill-[#F59E0B] text-[#F59E0B]" : "text-white/10"
             )}
             aria-hidden="true"
           />
@@ -103,14 +100,8 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
       </div>
       <ul className="mt-3 space-y-1" role="list">
         {data.reasons.slice(0, 2).map((reason, i) => (
-          <li
-            key={i}
-            className="flex items-start gap-2 text-xs text-[#9CA3AF]"
-          >
-            <span
-              className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4F7CFF]"
-              aria-hidden="true"
-            />
+          <li key={i} className="flex items-start gap-2 text-xs text-[#9CA3AF]">
+            <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#4F7CFF]" />
             {reason}
           </li>
         ))}
@@ -120,16 +111,38 @@ function ApprovalSection({ data }: { data: ApprovalProbability }) {
 }
 
 export function ApplySidebar({ job, className }: ApplySidebarProps) {
-  const applyMutation = useApplyToJob();
+  const [loading, setLoading] = useState(false);
+  const [prepared, setPrepared] = useState(false);
+  const [applyUrl, setApplyUrl] = useState<string | null>(job.externalUrl ?? null);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
+  const [resumePreview, setResumePreview] = useState<string | null>(null);
+  const isExternal = job.source === "adzuna" || Boolean(job.externalUrl);
 
-  async function handleApply() {
-    if (!job.companyId) return;
-    await applyMutation.mutateAsync({
-      jobId: job.id,
-      companyId: job.companyId,
-      roleTitle: job.role,
-    });
+  async function handlePrepare() {
+    setLoading(true);
+    const result = await prepareJobApplicationAction(job);
+    setLoading(false);
+    if (!result.success) return;
+
+    setPrepared(true);
+    setApplyUrl(result.data.applyUrl);
+    setApplicationId(result.data.applicationId);
+    setResumePreview(result.data.tailoredResumeText);
   }
+
+  async function handleConfirm() {
+    if (!applicationId) return;
+    await confirmExternalApplicationAction(applicationId);
+    setPrepared(true);
+  }
+
+  const buttonLabel = loading
+    ? "Preparando..."
+    : prepared
+      ? isExternal && applyUrl
+        ? "Abrir candidatura"
+        : "Candidatura registrada"
+      : "Preparar candidatura com IA";
 
   return (
     <aside className={cn("space-y-4", className)}>
@@ -149,48 +162,57 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
             <AIBadge />
           </div>
           <p className="text-sm font-medium text-white">{job.aiSummary}</p>
-          <p className="mt-2 text-xs text-[#9CA3AF]">Porque:</p>
-          <ul className="mt-1.5 space-y-1" role="list">
-            {job.aiSummaryReasons.map((reason, i) => (
-              <li
-                key={i}
-                className="flex items-start gap-2 text-xs text-white/80"
-              >
-                <Check
-                  className="mt-0.5 h-3 w-3 shrink-0 text-[#22C55E]"
-                  aria-hidden="true"
-                />
-                {reason}
-              </li>
-            ))}
-          </ul>
         </div>
+
+        {resumePreview && (
+          <div className="mt-4 max-h-40 overflow-y-auto rounded-lg border border-white/[0.06] bg-black/20 p-3 text-xs text-[#9CA3AF]">
+            <pre className="whitespace-pre-wrap font-sans">{resumePreview.slice(0, 600)}…</pre>
+          </div>
+        )}
 
         <Button
           className="mt-5 h-12 w-full gap-2 text-base shadow-[0_0_32px_rgba(79,124,255,0.25)]"
-          disabled={applyMutation.isPending || !job.companyId}
-          onClick={() => void handleApply()}
+          disabled={loading}
+          onClick={() => {
+            if (prepared && applyUrl) {
+              window.open(applyUrl, "_blank", "noopener,noreferrer");
+              void handleConfirm();
+              return;
+            }
+            void handlePrepare();
+          }}
         >
-          <Sparkles className="h-4 w-4" aria-hidden="true" />
-          {applyMutation.isSuccess ? "Candidatura registrada" : "Candidatar com IA"}
+          {prepared && applyUrl ? (
+            <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          ) : (
+            <Sparkles className="h-4 w-4" aria-hidden="true" />
+          )}
+          {buttonLabel}
         </Button>
+
+        {prepared && isExternal && (
+          <p className="mt-2 text-center text-xs text-[#9CA3AF]">
+            A IA preparou currículo e carta. Conclua no site da empresa.
+          </p>
+        )}
 
         <div className="mt-4 flex items-center gap-1.5 text-xs text-[#9CA3AF]">
           <Clock className="h-3.5 w-3.5" aria-hidden="true" />
-          Melhor horário: {job.bestSendTime.dayLabel},{" "}
-          {job.bestSendTime.timeRange}
+          Melhor horário: {job.bestSendTime.dayLabel}, {job.bestSendTime.timeRange}
         </div>
 
-        <div className="mt-5 border-t border-white/[0.06] pt-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
-            Checklist
-          </p>
-          <ul className="space-y-2.5" role="list">
-            {job.applyChecklist.map((item) => (
-              <ChecklistItem key={item.id} item={item} />
-            ))}
-          </ul>
-        </div>
+        {job.applyChecklist.length > 0 && (
+          <div className="mt-5 border-t border-white/[0.06] pt-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+              Checklist
+            </p>
+            <ul className="space-y-2.5" role="list">
+              {job.applyChecklist.map((item) => (
+                <ChecklistItem key={item.id} item={item} />
+              ))}
+            </ul>
+          </div>
+        )}
       </ReportCard>
     </aside>
   );
@@ -202,25 +224,9 @@ interface MobileApplySheetProps {
   onToggle: () => void;
 }
 
-export function MobileApplySheet({
-  job,
-  open,
-  onToggle,
-}: MobileApplySheetProps) {
-  const applyMutation = useApplyToJob();
-
-  async function handleApply() {
-    if (!job.companyId) return;
-    await applyMutation.mutateAsync({
-      jobId: job.id,
-      companyId: job.companyId,
-      roleTitle: job.role,
-    });
-  }
-
+export function MobileApplySheet({ job, open, onToggle }: MobileApplySheetProps) {
   return (
     <>
-      {/* Fixed bottom bar */}
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-white/[0.08] bg-[#0C0D0F]/95 p-4 backdrop-blur-xl lg:hidden">
         <div className="mx-auto flex max-w-lg items-center gap-3">
           <button
@@ -230,27 +236,20 @@ export function MobileApplySheet({
           >
             {job.hasMatch ? (
               <>
-                <span className="text-lg font-bold text-[#22C55E]">
-                  {job.compatibility}%
-                </span>
+                <span className="text-lg font-bold text-[#22C55E]">{job.compatibility}%</span>
                 <span className="text-[10px]">Compat.</span>
               </>
             ) : (
               <span className="text-[10px] text-[#9CA3AF]">Sem match</span>
             )}
           </button>
-          <Button
-            className="h-11 flex-1 gap-2"
-            disabled={applyMutation.isPending || !job.companyId}
-            onClick={() => void handleApply()}
-          >
+          <Button className="h-11 flex-1 gap-2" onClick={onToggle}>
             <Sparkles className="h-4 w-4" aria-hidden="true" />
-            {applyMutation.isSuccess ? "Enviado" : "Candidatar com IA"}
+            Preparar candidatura
           </Button>
         </div>
       </div>
 
-      {/* Bottom sheet */}
       <AnimatePresence>
         {open && (
           <>

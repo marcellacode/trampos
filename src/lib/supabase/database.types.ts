@@ -574,6 +574,63 @@ export type Database = {
           },
         ]
       }
+      external_jobs: {
+        Row: {
+          apply_url: string | null
+          company_name: string
+          created_at: string
+          description: string
+          external_key: string
+          fetched_at: string
+          id: string
+          location: string
+          provider: string
+          raw_payload: Json | null
+          remote: boolean
+          salary_max: number | null
+          salary_min: number | null
+          stack: Json
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          apply_url?: string | null
+          company_name?: string
+          created_at?: string
+          description?: string
+          external_key: string
+          fetched_at?: string
+          id?: string
+          location?: string
+          provider?: string
+          raw_payload?: Json | null
+          remote?: boolean
+          salary_max?: number | null
+          salary_min?: number | null
+          stack?: Json
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          apply_url?: string | null
+          company_name?: string
+          created_at?: string
+          description?: string
+          external_key?: string
+          fetched_at?: string
+          id?: string
+          location?: string
+          provider?: string
+          raw_payload?: Json | null
+          remote?: boolean
+          salary_max?: number | null
+          salary_min?: number | null
+          stack?: Json
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       goal_chips: {
         Row: {
           category: Database["public"]["Enums"]["goal_chip_category"]
@@ -602,6 +659,76 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "goal_chips_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      interview_sessions: {
+        Row: {
+          company_name: string
+          created_at: string
+          external_job_id: string | null
+          feedback_summary: string
+          id: string
+          job_id: string | null
+          messages: Json
+          questions: Json
+          role_title: string
+          score: number | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          company_name?: string
+          created_at?: string
+          external_job_id?: string | null
+          feedback_summary?: string
+          id?: string
+          job_id?: string | null
+          messages?: Json
+          questions?: Json
+          role_title?: string
+          score?: number | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          company_name?: string
+          created_at?: string
+          external_job_id?: string | null
+          feedback_summary?: string
+          id?: string
+          job_id?: string | null
+          messages?: Json
+          questions?: Json
+          role_title?: string
+          score?: number | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_sessions_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_sessions_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "interview_sessions_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"
@@ -638,41 +765,71 @@ export type Database = {
       job_applications: {
         Row: {
           applied_at: string | null
+          ats_provider: string | null
           company_id: string
+          cover_letter_text: string | null
           created_at: string
+          external_apply_url: string | null
+          external_job_id: string | null
           id: string
           job_id: string | null
           last_activity_at: string
           role_title: string
+          source: string
           status: Database["public"]["Enums"]["application_status"]
           status_label: string
+          submission_error: string | null
+          submission_status: string
+          tailored_resume_text: string | null
           updated_at: string
+          user_confirmed_at: string | null
+          user_consent_at: string | null
           user_id: string
         }
         Insert: {
           applied_at?: string | null
+          ats_provider?: string | null
           company_id: string
+          cover_letter_text?: string | null
           created_at?: string
+          external_apply_url?: string | null
+          external_job_id?: string | null
           id?: string
           job_id?: string | null
           last_activity_at?: string
           role_title: string
+          source?: string
           status?: Database["public"]["Enums"]["application_status"]
           status_label?: string
+          submission_error?: string | null
+          submission_status?: string
+          tailored_resume_text?: string | null
           updated_at?: string
+          user_confirmed_at?: string | null
+          user_consent_at?: string | null
           user_id: string
         }
         Update: {
           applied_at?: string | null
+          ats_provider?: string | null
           company_id?: string
+          cover_letter_text?: string | null
           created_at?: string
+          external_apply_url?: string | null
+          external_job_id?: string | null
           id?: string
           job_id?: string | null
           last_activity_at?: string
           role_title?: string
+          source?: string
           status?: Database["public"]["Enums"]["application_status"]
           status_label?: string
+          submission_error?: string | null
+          submission_status?: string
+          tailored_resume_text?: string | null
           updated_at?: string
+          user_confirmed_at?: string | null
+          user_consent_at?: string | null
           user_id?: string
         }
         Relationships: [
@@ -681,6 +838,13 @@ export type Database = {
             columns: ["company_id"]
             isOneToOne: false
             referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_applications_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
             referencedColumns: ["id"]
           },
           {
@@ -2426,6 +2590,52 @@ export type Database = {
         }
         Relationships: []
       }
+      saved_jobs: {
+        Row: {
+          external_job_id: string | null
+          id: string
+          job_id: string | null
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_jobs_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_jobs_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_jobs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       smart_filters: {
         Row: {
           created_at: string
@@ -2611,24 +2821,37 @@ export type Database = {
       }
       user_hidden_jobs: {
         Row: {
+          external_job_id: string | null
           hidden_at: string
-          job_id: string
+          id: string
+          job_id: string | null
           reason: Database["public"]["Enums"]["hide_reason"]
           user_id: string
         }
         Insert: {
+          external_job_id?: string | null
           hidden_at?: string
-          job_id: string
+          id?: string
+          job_id?: string | null
           reason?: Database["public"]["Enums"]["hide_reason"]
           user_id: string
         }
         Update: {
+          external_job_id?: string | null
           hidden_at?: string
-          job_id?: string
+          id?: string
+          job_id?: string | null
           reason?: Database["public"]["Enums"]["hide_reason"]
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "user_hidden_jobs_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "user_hidden_jobs_job_id_fkey"
             columns: ["job_id"]
@@ -2638,6 +2861,79 @@ export type Database = {
           },
           {
             foreignKeyName: "user_hidden_jobs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_job_matches: {
+        Row: {
+          ai_summary: string
+          approval_level: Database["public"]["Enums"]["approval_level"]
+          approval_stars: number
+          best_send_day_label: string
+          best_send_time_range: string
+          compatibility: number
+          computed_at: string
+          created_at: string
+          external_job_id: string | null
+          id: string
+          job_id: string | null
+          match_reasons: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          ai_summary?: string
+          approval_level?: Database["public"]["Enums"]["approval_level"]
+          approval_stars?: number
+          best_send_day_label?: string
+          best_send_time_range?: string
+          compatibility?: number
+          computed_at?: string
+          created_at?: string
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          match_reasons?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          ai_summary?: string
+          approval_level?: Database["public"]["Enums"]["approval_level"]
+          approval_stars?: number
+          best_send_day_label?: string
+          best_send_time_range?: string
+          compatibility?: number
+          computed_at?: string
+          created_at?: string
+          external_job_id?: string | null
+          id?: string
+          job_id?: string | null
+          match_reasons?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_job_matches_external_job_id_fkey"
+            columns: ["external_job_id"]
+            isOneToOne: false
+            referencedRelation: "external_jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_job_matches_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "jobs"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_job_matches_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
             referencedRelation: "profiles"

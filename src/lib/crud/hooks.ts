@@ -123,6 +123,29 @@ import {
 } from "@/lib/supabase/queries/mutations/timeline";
 import { crudKeys } from "@/lib/crud/query-keys";
 
+function scheduleMatchResyncInBackground() {
+  void import("@/lib/matching/match-action")
+    .then(({ scheduleMatchResyncAction }) => scheduleMatchResyncAction())
+    .catch(() => {});
+}
+
+const MATCH_RESYNC_KEYS: readonly (readonly unknown[])[] = [
+  crudKeys.profile,
+  crudKeys.experiences,
+  crudKeys.skills,
+  crudKeys.languages,
+  crudKeys.certificates,
+  crudKeys.goalChips,
+];
+
+function queryKeysEqual(a: readonly unknown[], b: readonly unknown[]): boolean {
+  return a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
+function shouldResyncMatchesForKeys(keys: readonly unknown[]): boolean {
+  return MATCH_RESYNC_KEYS.some((resyncKey) => queryKeysEqual(keys, resyncKey));
+}
+
 async function withUser<T>(
   fn: (supabase: ReturnType<typeof createBrowserSupabaseClient>, userId: string) => Promise<T>
 ): Promise<T> {
@@ -146,10 +169,15 @@ function useCrudMutation<TData, TVariables>(
   options?: UseMutationOptions<TData, Error, TVariables>
 ) {
   const invalidate = useInvalidate(invalidateKeys);
+  const shouldResyncMatches = shouldResyncMatchesForKeys(invalidateKeys);
+
   return useMutation({
     mutationFn,
     onSuccess: (...args) => {
       invalidate();
+      if (shouldResyncMatches) {
+        scheduleMatchResyncInBackground();
+      }
       options?.onSuccess?.(...args);
     },
     ...options,

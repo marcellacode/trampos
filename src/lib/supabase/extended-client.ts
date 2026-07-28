@@ -1,0 +1,14 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+/** Access tables added before `database.types.ts` is regenerated. */
+export function fromExtendedTable(
+  supabase: SupabaseClient,
+  table:
+    | "external_jobs"
+    | "user_job_matches"
+    | "saved_jobs"
+    | "interview_sessions"
+) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return (supabase as any).from(table);
+}

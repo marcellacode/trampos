@@ -1,4 +1,6 @@
 import type { AdzunaJobResult, AdzunaJobView } from "@/lib/integrations/adzuna/types";
+import { applyMatchToJob } from "@/lib/matching/sync-user-matches";
+import type { UserJobMatchRow } from "@/lib/matching/types";
 import type { JobDetail, JobRecommendation } from "@/types/jobs";
 import { companyInitials } from "@/lib/supabase/utils";
 
@@ -49,12 +51,13 @@ export function parseAdzunaJobId(id: string): string | null {
 }
 
 export function mapAdzunaJobToRecommendation(
-  job: AdzunaJobResult
+  job: AdzunaJobResult,
+  userMatch?: UserJobMatchRow
 ): JobRecommendation {
   const company = job.company.display_name || "Empresa";
   const id = adzunaJobId(job.id);
 
-  return {
+  const base: JobRecommendation = {
     id,
     companyId: "",
     company,
@@ -94,6 +97,8 @@ export function mapAdzunaJobToRecommendation(
     remote: inferRemote(job),
     aiSummary: stripHtml(job.description).slice(0, 280),
   };
+
+  return userMatch ? applyMatchToJob(base, userMatch) : base;
 }
 
 export function mapAdzunaJobToDetail(job: AdzunaJobView): JobDetail {
@@ -162,7 +167,10 @@ export function mapAdzunaJobToDetail(job: AdzunaJobView): JobDetail {
 }
 
 export function mapAdzunaJobsToRecommendations(
-  jobs: AdzunaJobResult[]
+  jobs: AdzunaJobResult[],
+  matchMap?: Map<string, UserJobMatchRow>
 ): JobRecommendation[] {
-  return jobs.map(mapAdzunaJobToRecommendation);
+  return jobs.map((job) =>
+    mapAdzunaJobToRecommendation(job, matchMap?.get(adzunaJobId(job.id)))
+  );
 }

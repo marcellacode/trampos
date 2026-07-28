@@ -308,101 +308,107 @@ export async function processOnboardingCompleteAction(
     const rateError = enforceRateLimit(user.id);
     if (rateError) return rateError;
 
-    if (!isGroqConfigured()) {
-      return { success: true, data: { suggestionsCount: 0 } };
-    }
+    let suggestionsCount = 0;
 
-    const profile = await fetchProfileData(supabase, user.id);
-    if (!profile) {
-      return { success: true, data: { suggestionsCount: 0 } };
-    }
+    if (isGroqConfigured()) {
+      const profile = await fetchProfileData(supabase, user.id);
+      if (profile) {
+        const goalContext = data.goalText ? `\nMetas: ${data.goalText}` : "";
 
-    const goalContext = data.goalText ? `\nMetas: ${data.goalText}` : "";
-
-    const raw = await chatCompletion(
-      [
-        {
-          role: "system",
-          content: `Você enriquece perfis profissionais para a Jobera.
+        const raw = await chatCompletion(
+          [
+            {
+              role: "system",
+              content: `Você enriquece perfis profissionais para a Jobera.
 Retorne JSON: {
   "predominantProfile": string,
   "strengths": string[] (3-5 pontos fortes),
   "suggestions": [{ "title", "description", "actionLabel", "type": "github"|"linkedin"|"skill"|"project"|"experience" }] (2-4 sugestões)
 }
 Baseie-se apenas no perfil real. PT-BR.`,
-        },
-        {
-          role: "user",
-          content: `${buildJobeContext(profile)}${goalContext}\nMétodo de importação: ${data.importMethod ?? "desconhecido"}`,
-        },
-      ],
-      { jsonMode: true, temperature: 0.4 }
-    );
+            },
+            {
+              role: "user",
+              content: `${buildJobeContext(profile)}${goalContext}\nMétodo de importação: ${data.importMethod ?? "desconhecido"}`,
+            },
+          ],
+          { jsonMode: true, temperature: 0.4 }
+        );
 
-    const parsed = onboardingCompleteResponseSchema.parse(JSON.parse(raw));
+        const parsed = onboardingCompleteResponseSchema.parse(JSON.parse(raw));
+        suggestionsCount = parsed.suggestions.length;
 
-    await supabase.from("profile_ai_suggestions").delete().eq("user_id", user.id);
+        await supabase.from("profile_ai_suggestions").delete().eq("user_id", user.id);
 
-    if (parsed.suggestions.length > 0) {
-      const { error } = await supabase.from("profile_ai_suggestions").insert(
-        parsed.suggestions.map((suggestion) => ({
-          user_id: user.id,
-          title: suggestion.title,
-          description: suggestion.description,
-          action_label: suggestion.actionLabel,
-          suggestion_type: suggestion.type,
-        }))
-      );
-      if (error) throw error;
-    }
-
-    if (parsed.predominantProfile || parsed.strengths.length > 0) {
-      const { data: existingDna } = await supabase
-        .from("professional_dna")
-        .select("id")
-        .eq("user_id", user.id)
-        .maybeSingle();
-
-      if (existingDna?.id) {
-        await supabase
-          .from("dna_strengths")
-          .delete()
-          .eq("dna_id", existingDna.id);
-      }
-
-      const { data: dnaRow, error: dnaError } = await supabase
-        .from("professional_dna")
-        .upsert(
-          {
-            user_id: user.id,
-            predominant_profile:
-              parsed.predominantProfile ?? profile.currentRole ?? "Perfil em construção",
-            with_skills_label: "novas competências",
-          },
-          { onConflict: "user_id" }
-        )
-        .select("id")
-        .single();
-
-      if (dnaError) throw dnaError;
-
-      if (parsed.strengths.length > 0) {
-        const { error: strengthsError } = await supabase
-          .from("dna_strengths")
-          .insert(
-            parsed.strengths.map((strength, index) => ({
-              dna_id: dnaRow.id,
-              strength,
-              sort_order: index,
+        if (parsed.suggestions.length > 0) {
+          const { error } = await supabase.from("profile_ai_suggestions").insert(
+            parsed.suggestions.map((suggestion) => ({
+              user_id: user.id,
+              title: suggestion.title,
+              description: suggestion.description,
+              action_label: suggestion.actionLabel,
+              suggestion_type: suggestion.type,
             }))
           );
-        if (strengthsError) throw strengthsError;
+          if (error) throw error;
+        }
+
+        if (parsed.predominantProfile || parsed.strengths.length > 0) {
+          const { data: existingDna } = await supabase
+            .from("professional_dna")
+            .select("id")
+            .eq("user_id", user.id)
+            .maybeSingle();
+
+          if (existingDna?.id) {
+            await supabase
+              .from("dna_strengths")
+              .delete()
+              .eq("dna_id", existingDna.id);
+          }
+
+          const { data: dnaRow, error: dnaError } = await supabase
+            .from("professional_dna")
+            .upsert(
+              {
+                user_id: user.id,
+                predominant_profile:
+                  parsed.predominantProfile ?? profile.currentRole ?? "Perfil em construção",
+                with_skills_label: "novas competências",
+              },
+              { onConflict: "user_id" }
+            )
+            .select("id")
+            .single();
+
+          if (dnaError) throw dnaError;
+
+          if (parsed.strengths.length > 0) {
+            const { error: strengthsError } = await supabase
+              .from("dna_strengths")
+              .insert(
+                parsed.strengths.map((strength, index) => ({
+                  dna_id: dnaRow.id,
+                  strength,
+                  sort_order: index,
+                }))
+              );
+            if (strengthsError) throw strengthsError;
+          }
+        }
       }
+    }
+
+    try {
+      const { syncUserMatchesAction } = await import("@/lib/matching/match-action");
+      await syncUserMatchesAction();
+    } catch (syncError) {
+      console.warn("[onboarding] match sync failed:", syncError);
     }
 
     return {
       success: true,
-      data: { suggestionsCount: parsed.suggestions.length },
+      data: { suggestionsCount },
     };
   } catch (error) {
     return toActionError(error);
@@ -456,6 +462,99 @@ Para vagas remotas/React/etc, use /dashboard/vagas com query params se fizer sen
 
     const parsed = universalSearchResponseSchema.parse(JSON.parse(raw));
     return { success: true, data: parsed };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function importGitHubProfileAction(
+  username: string
+): Promise<ActionResult<{ profile: ExtractedProfile }>> {
+  try {
+    const { user } = await requireAuth();
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    const { fetchGitHubProfile } = await import("@/lib/integrations/github/profile");
+    const profile = await fetchGitHubProfile(username);
+    return { success: true, data: { profile } };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function importProfileTextAction(
+  text: string
+): Promise<ActionResult<{ profile: ExtractedProfile }>> {
+  try {
+    const trimmed = text.trim();
+    if (trimmed.length < 50) {
+      return { success: false, error: "Cole mais informações do perfil." };
+    }
+
+    const { user } = await requireAuth();
+    const rateError = enforceRateLimit(user.id);
+    if (rateError) return rateError;
+
+    if (!isGroqConfigured()) {
+      return { success: false, error: "IA indisponível. Configure GROQ_API_KEY." };
+    }
+
+    const raw = await chatCompletion(
+      [
+        {
+          role: "system",
+          content: `Extraia perfil profissional de texto colado (LinkedIn/export).
+Retorne JSON com: name, currentRole, summary, avatarInitials, seniority, skills, experiences, languages, projects, certificates.`,
+        },
+        { role: "user", content: trimmed },
+      ],
+      { jsonMode: true, temperature: 0.1, maxTokens: 2048 }
+    );
+
+    const parsed = extractedProfileAiSchema.parse(JSON.parse(raw));
+    return {
+      success: true,
+      data: { profile: mapAiProfileToExtracted(parsed) },
+    };
+  } catch (error) {
+    return toActionError(error);
+  }
+}
+
+export async function uploadResumeStorageAction(
+  formData: FormData
+): Promise<ActionResult<{ url: string; path: string }>> {
+  try {
+    const { supabase, user } = await requireAuth();
+    const file = formData.get("file");
+    if (!(file instanceof File)) {
+      return { success: false, error: "Arquivo obrigatório." };
+    }
+
+    const ext = file.name.split(".").pop() ?? "pdf";
+    const path = `${user.id}/${Date.now()}.${ext}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("resumes")
+      .upload(path, file, { upsert: true, contentType: file.type });
+
+    if (uploadError) {
+      console.warn("[uploadResumeStorage]", uploadError.message);
+    }
+
+    const { data: urlData } = supabase.storage.from("resumes").getPublicUrl(path);
+
+    await supabase.from("resume_uploads").insert({
+      user_id: user.id,
+      original_filename: file.name,
+      storage_url: urlData.publicUrl,
+      mime_type: file.type,
+      file_size_bytes: file.size,
+      status: "completed",
+    });
+
+    return { success: true, data: { url: urlData.publicUrl, path } };
   } catch (error) {
     return toActionError(error);
   }

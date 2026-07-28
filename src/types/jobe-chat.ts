@@ -12,6 +12,8 @@ export interface ChatJob {
   remote: boolean;
   aiSummary: string;
   stack: string[];
+  source?: "internal" | "adzuna";
+  externalUrl?: string;
 }
 
 export interface QuickReply {

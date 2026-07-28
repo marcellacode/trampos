@@ -11,9 +11,20 @@ import {
 import { AdzunaApiError, getAdzunaJobById, searchAdzunaJobs } from "@/lib/integrations/adzuna/client";
 import {
   mapAdzunaJobToDetail,
+  mapAdzunaJobToRecommendation,
   mapAdzunaJobsToRecommendations,
   parseAdzunaJobId,
 } from "@/lib/integrations/adzuna/mapper";
+import {
+  applyMatchToJob,
+  loadUserMatchesForJobs,
+  upsertUserJobMatch,
+} from "@/lib/matching/sync-user-matches";
+import {
+  computeJobMatch,
+  loadProfileGoals,
+  loadUserProfile,
+} from "@/lib/matching/compute-compatibility";
 import type { DiscoveryData, JobDetail } from "@/types/jobs";
 
 const searchSchema = z.object({
@@ -96,7 +107,27 @@ export async function fetchAdzunaJobDetailAction(
       return { success: true, data: null };
     }
 
-    return { success: true, data: mapAdzunaJobToDetail(job) };
+    const { supabase, user } = await getOptionalAuth();
+    let detail = mapAdzunaJobToDetail(job);
+
+    if (user) {
+      const matchMap = await loadUserMatchesForJobs(supabase, user.id, [id]);
+      let match = matchMap.get(id);
+
+      if (!match) {
+        const [profile, goals] = await Promise.all([
+          loadUserProfile(supabase, user.id),
+          loadProfileGoals(supabase, user.id),
+        ]);
+        const recommendation = mapAdzunaJobToRecommendation(job);
+        const computed = await computeJobMatch(recommendation, profile, goals);
+        match = await upsertUserJobMatch(supabase, user.id, recommendation, computed);
+      }
+
+      detail = applyMatchToJob(detail, match) as JobDetail;
+    }
+
+    return { success: true, data: detail };
   } catch (error) {
     return { success: false, error: getErrorMessage(error) };
   }

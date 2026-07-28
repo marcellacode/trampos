@@ -6,8 +6,8 @@ import {
   toChatJob,
   type ProfileGoals,
 } from "@/lib/jobe/filter-jobs";
-import { applyToJob } from "@/lib/supabase/queries/mutations/applications";
-import { hideJob, listHiddenJobs } from "@/lib/supabase/queries/mutations/settings";
+import { prepareApplication } from "@/lib/integrations/ats/application-service";
+import { hideJobByRef, listHiddenJobRefs } from "@/lib/supabase/queries/mutations/saved-jobs";
 import { fetchJobsForUser } from "@/lib/supabase/queries/jobs";
 import { isAdzunaConfigured } from "@/lib/integrations/adzuna/env";
 import { searchAdzunaJobs } from "@/lib/integrations/adzuna/client";
@@ -47,18 +47,20 @@ async function loadExcludedJobIds(
 ): Promise<Set<string>> {
   const excluded = new Set(clientExcluded);
 
-  const [hiddenJobs, applicationsResult] = await Promise.all([
-    listHiddenJobs(supabase, userId),
-    supabase
+  const [hiddenRefs, applicationsResult] = await Promise.all([
+    listHiddenJobRefs(supabase, userId),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (supabase as any)
       .from("job_applications")
-      .select("job_id")
-      .eq("user_id", userId)
-      .not("job_id", "is", null),
+      .select("job_id, external_jobs(external_key)")
+      .eq("user_id", userId),
   ]);
 
-  for (const row of hiddenJobs) excluded.add(row.job_id);
+  for (const ref of hiddenRefs) excluded.add(ref);
   for (const row of applicationsResult.data ?? []) {
-    if (row.job_id) excluded.add(row.job_id);
+    if (row.job_id) excluded.add(row.job_id as string);
+    const external = row.external_jobs as { external_key: string } | null;
+    if (external?.external_key) excluded.add(external.external_key);
   }
 
   return excluded;
@@ -111,7 +113,7 @@ export async function fetchNewJobsForChatAction(
 }
 
 export async function bulkApplyJobsAction(
-  jobs: { jobId: string; companyId: string; roleTitle: string }[]
+  jobs: { jobId: string; companyId: string; roleTitle: string; companyName?: string }[]
 ): Promise<ActionResult<{ count: number }>> {
   try {
     if (jobs.length === 0) {
@@ -122,10 +124,11 @@ export async function bulkApplyJobsAction(
 
     await Promise.all(
       jobs.map((job) =>
-        applyToJob(supabase, user.id, {
-          jobId: job.jobId,
+        prepareApplication(supabase, user.id, {
+          jobRef: job.jobId,
           companyId: job.companyId,
           roleTitle: job.roleTitle,
+          companyName: job.companyName ?? "Empresa",
         })
       )
     );
@@ -147,7 +150,7 @@ export async function bulkDismissJobsAction(
     const { supabase, user } = await requireAuth();
 
     await Promise.all(
-      jobIds.map((jobId) => hideJob(supabase, user.id, jobId, "other"))
+      jobIds.map((jobId) => hideJobByRef(supabase, user.id, jobId, "other"))
     );
 
     return { success: true, data: { count: jobIds.length } };

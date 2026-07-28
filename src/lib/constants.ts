@@ -34,13 +34,13 @@ export const HOW_IT_WORKS_STEPS = [
   {
     step: 5,
     title: "Se candidata",
-    description: "Aplicação automática com sua aprovação.",
+    description: "A IA prepara a candidatura; você conclui no site da empresa.",
     icon: "Send" as const,
   },
   {
     step: 6,
     title: "Agenda entrevistas",
-    description: "Coordena horários e envia lembretes.",
+    description: "Organiza sua agenda e prepara entrevistas com simulador IA.",
     icon: "Calendar" as const,
   },
   {
@@ -77,9 +77,9 @@ export const FEATURES = [
     icon: "TrendingUp" as const,
   },
   {
-    title: "Aplicação automática",
+    title: "Candidatura assistida",
     description:
-      "Envia candidaturas personalizadas enquanto você foca no que importa.",
+      "Prepara candidaturas personalizadas com currículo adaptado; você aprova cada envio.",
     icon: "Zap" as const,
   },
   {
@@ -92,7 +92,7 @@ export const FEATURES = [
 
 export const COMPARISON_FEATURES = [
   { label: "IA adapta currículo", indeed: false, linkedin: false, jobera: true },
-  { label: "Aplicação automática", indeed: false, linkedin: false, jobera: true },
+  { label: "Candidatura assistida por IA", indeed: false, linkedin: false, jobera: true },
   { label: "Feedback inteligente", indeed: false, linkedin: false, jobera: true },
   { label: "Compatibilidade %", indeed: false, linkedin: false, jobera: true },
   { label: "Treino para entrevista", indeed: false, linkedin: false, jobera: true },
@@ -118,7 +118,7 @@ export const FAQ_ITEMS = [
   {
     question: "A IA realmente envia candidaturas por mim?",
     answer:
-      "Sim, mas sempre com sua aprovação. A IA prepara candidaturas personalizadas e você decide quais enviar. Você mantém controle total sobre cada aplicação.",
+      "A IA prepara currículo adaptado e carta de apresentação para cada vaga. Você revisa, abre o site da empresa e conclui a candidatura — mantendo controle total.",
   },
   {
     question: "Meu currículo é adaptado para cada vaga?",

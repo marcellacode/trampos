@@ -22,6 +22,14 @@ import { isDiscoveryEmpty } from "@/lib/jobs/empty-data";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { useDiscovery } from "@/lib/jobs/hooks";
 import type { HideReason, SmartFilter } from "@/types/jobs";
+import {
+  hideJobByRefAction,
+  interpretSmartFilterAction,
+  listHiddenJobRefsAction,
+  listSavedJobRefsAction,
+  saveJobAction,
+  unsaveJobAction,
+} from "@/app/actions/discovery";
 
 export function JobsDiscoveryPage() {
   const { shell } = useDashboardShell();
@@ -30,8 +38,10 @@ export function JobsDiscoveryPage() {
   const [filters, setFilters] = useState<SmartFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [hiddenJobs, setHiddenJobs] = useState<Set<string>>(new Set());
+  const [savedJobs, setSavedJobs] = useState<Set<string>>(new Set());
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
+  const [aiFilterQuery, setAiFilterQuery] = useState("");
 
   useEffect(() => {
     if (data && !filtersInitialized) {
@@ -40,13 +50,31 @@ export function JobsDiscoveryPage() {
     }
   }, [data, filtersInitialized]);
 
+  useEffect(() => {
+    void listHiddenJobRefsAction().then((result) => {
+      if (result.success) setHiddenJobs(new Set(result.data));
+    });
+    void listSavedJobRefsAction().then((result) => {
+      if (result.success) setSavedJobs(new Set(result.data));
+    });
+  }, []);
+
   const visibleJobs = useMemo(() => {
     if (!data) return [];
-    return sortByCompatibility(
-      data.jobs.filter((j) => !hiddenJobs.has(j.id)),
-      (job) => job.company
-    );
-  }, [data, hiddenJobs]);
+    let jobs = data.jobs.filter((j) => !hiddenJobs.has(j.id));
+
+    if (aiFilterQuery.trim()) {
+      const q = aiFilterQuery.toLowerCase();
+      jobs = jobs.filter((job) => {
+        const haystack = [job.role, job.company, job.location, ...job.stack, job.aiSummary]
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(q);
+      });
+    }
+
+    return sortByCompatibility(jobs, (job) => job.company);
+  }, [data, hiddenJobs, aiFilterQuery]);
 
   const compareJobs = useMemo(() => {
     if (!data) return [];
@@ -72,9 +100,39 @@ export function JobsDiscoveryPage() {
     }
   }
 
-  function handleHide(jobId: string, _reason: HideReason) {
+  async function handleHide(jobId: string, _reason: HideReason) {
     setHiddenJobs((prev) => new Set([...prev, jobId]));
     setCompareIds((prev) => prev.filter((id) => id !== jobId));
+    await hideJobByRefAction(jobId, _reason);
+  }
+
+  async function handleSave(jobId: string) {
+    const isSaved = savedJobs.has(jobId);
+    if (isSaved) {
+      setSavedJobs((prev) => {
+        const next = new Set(prev);
+        next.delete(jobId);
+        return next;
+      });
+      await unsaveJobAction(jobId);
+    } else {
+      setSavedJobs((prev) => new Set([...prev, jobId]));
+      await saveJobAction(jobId);
+    }
+  }
+
+  async function handleAiFilter(query: string) {
+    const result = await interpretSmartFilterAction(query);
+    if (result.success) {
+      setAiFilterQuery(result.data.searchQuery ?? query);
+      for (const label of result.data.labels) {
+        if (!filters.some((f) => f.label.toLowerCase() === label.toLowerCase())) {
+          setFilters((prev) => [...prev, { id: `ai-${Date.now()}-${label}`, label }]);
+        }
+      }
+    } else {
+      setAiFilterQuery(query);
+    }
   }
 
   function handleCompare(jobId: string) {
@@ -137,7 +195,11 @@ export function JobsDiscoveryPage() {
         <div className="space-y-8">
           <SearchHero onSearch={handleSearch} />
           <DiscoverySummaryBar summary={data.summary} />
-          <SmartFilters filters={filters} onChange={setFilters} />
+          <SmartFilters
+            filters={filters}
+            onChange={setFilters}
+            onAiQuery={(q) => void handleAiFilter(q)}
+          />
           <JobsRanking jobs={visibleJobs.slice(0, 3)} />
 
           {compareIds.length > 0 && (
@@ -181,6 +243,7 @@ export function JobsDiscoveryPage() {
                   setFilters(data.filters);
                   setSearchQuery("");
                   setHiddenJobs(new Set());
+                  setAiFilterQuery("");
                 }}
               />
             ) : (
@@ -190,7 +253,8 @@ export function JobsDiscoveryPage() {
                     key={job.id}
                     job={job}
                     onHide={handleHide}
-                    onSave={() => {}}
+                    onSave={handleSave}
+                    saved={savedJobs.has(job.id)}
                     onCompare={handleCompare}
                     selected={compareIds.includes(job.id)}
                   />

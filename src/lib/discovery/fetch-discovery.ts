@@ -4,11 +4,21 @@ import { isAdzunaConfigured } from "@/lib/integrations/adzuna/env";
 import { searchAdzunaJobs } from "@/lib/integrations/adzuna/client";
 import { mapAdzunaJobsToRecommendations } from "@/lib/integrations/adzuna/mapper";
 import { fetchDiscoveryData } from "@/lib/supabase/queries/discovery";
+import { checkMatchSyncRateLimit } from "@/lib/matching/match-rate-limit";
+import {
+  applyMatchToJob,
+  loadUserMatchesForJobs,
+  syncUserMatches,
+  updateDiscoverySummary,
+} from "@/lib/matching/sync-user-matches";
+import { listHiddenJobRefs } from "@/lib/supabase/queries/mutations/saved-jobs";
 
 export interface DiscoverySearchOptions {
   what?: string;
   where?: string;
   page?: number;
+  /** Skip lazy background match sync (used by explicit sync actions). */
+  skipBackgroundSync?: boolean;
 }
 
 function normalizeKey(value: string): string {
@@ -122,13 +132,58 @@ export async function fetchDiscoveryWithExternalJobs(
     jobs = filterJobsByQuery(jobs, options.what);
   }
 
-  const analyzed = Math.max(discovery.summary.analyzed, jobs.length);
+  if (userId && jobs.length > 0) {
+    let matchMap = await loadUserMatchesForJobs(
+      supabase,
+      userId,
+      jobs.map((j) => j.id)
+    );
+
+    const missingMatches = jobs.filter((j) => !matchMap.has(j.id));
+    const canSync =
+      !options.skipBackgroundSync &&
+      missingMatches.length > 0 &&
+      checkMatchSyncRateLimit(userId).allowed;
+
+    if (canSync) {
+      try {
+        await syncUserMatches(supabase, userId, missingMatches, 12, {
+          skipRateLimit: true,
+        });
+        matchMap = await loadUserMatchesForJobs(
+          supabase,
+          userId,
+          jobs.map((j) => j.id)
+        );
+      } catch (error) {
+        console.error("[discovery] match sync failed:", error);
+      }
+    }
+
+    jobs = jobs.map((job) => applyMatchToJob(job, matchMap.get(job.id)));
+
+    const hidden = await listHiddenJobRefs(supabase, userId);
+    jobs = jobs.filter((job) => !hidden.has(job.id));
+  }
+
+  if (userId && jobs.some((j) => j.hasMatch)) {
+    try {
+      await updateDiscoverySummary(supabase, userId);
+    } catch (error) {
+      console.error("[discovery] summary update failed:", error);
+    }
+  }
+
+  const matchedJobs = jobs.filter((j) => j.hasMatch);
+  const analyzed = Math.max(discovery.summary.analyzed, matchedJobs.length);
 
   return {
     ...discovery,
     summary: {
-      ...discovery.summary,
       analyzed,
+      compatible: matchedJobs.filter((j) => j.compatibility >= 60).length,
+      veryCompatible: matchedJobs.filter((j) => j.compatibility >= 80).length,
+      perfect: matchedJobs.filter((j) => j.compatibility >= 95).length,
     },
     jobs,
   };

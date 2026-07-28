@@ -9,13 +9,11 @@ import { PortfolioModulePage } from "@/components/dashboard/modules/portfolio-pa
 import { ObjetivosModulePage } from "@/components/dashboard/modules/objetivos-page";
 import {
   AssistenteModulePage,
+  EntrevistasModulePage,
   MensagensModulePage,
 } from "@/components/dashboard/modules/mensagens-page";
 import { EmpresasModulePage } from "@/components/dashboard/modules/empresas-page";
-import {
-  AgendaModulePage,
-  EntrevistasModulePage,
-} from "@/components/dashboard/modules/agenda-page";
+import { AgendaModulePage } from "@/components/dashboard/modules/agenda-page";
 import {
   ConfiguracoesModulePage,
   MercadoModulePage,

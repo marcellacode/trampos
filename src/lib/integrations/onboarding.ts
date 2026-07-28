@@ -9,9 +9,12 @@ import type {
   OnboardingData,
 } from "@/types/onboarding";
 import {
+  importGitHubProfileAction,
+  importProfileTextAction,
   interpretGoalsAction,
   parseResumeAction,
   processOnboardingCompleteAction,
+  uploadResumeStorageAction,
 } from "@/app/actions/ai";
 import { buildScratchProfile } from "@/lib/integrations/onboarding-scratch";
 import { parseGoalText } from "@/lib/onboarding/goal-parser";
@@ -21,33 +24,53 @@ import {
   persistOnboardingProfileToSupabase,
 } from "@/lib/supabase/queries/profile";
 
-export async function importLinkedInProfile(): Promise<ExtractedProfile> {
-  await delay(800);
-  if (typeof navigator !== "undefined" && !navigator.onLine) {
-    throw Object.assign(new Error("offline"), { code: "offline" });
+export async function importLinkedInProfile(
+  pastedText?: string
+): Promise<ExtractedProfile> {
+  if (!pastedText?.trim()) {
+    throw Object.assign(new Error("linkedin_text_required"), {
+      code: "linkedin_failed",
+    });
   }
-  throw Object.assign(new Error("linkedin_failed"), { code: "linkedin_failed" });
+
+  const result = await importProfileTextAction(pastedText);
+  if (!result.success) {
+    throw Object.assign(new Error("linkedin_failed"), { code: "linkedin_failed" });
+  }
+  return result.data.profile;
 }
 
 export async function importGitHubProfile(
-  _username?: string
+  username?: string
 ): Promise<ExtractedProfile> {
-  await delay(800);
-  if (typeof navigator !== "undefined" && !navigator.onLine) {
-    throw Object.assign(new Error("offline"), { code: "offline" });
+  if (!username?.trim()) {
+    throw Object.assign(new Error("github_username_required"), {
+      code: "github_failed",
+    });
   }
-  throw Object.assign(new Error("github_failed"), { code: "github_failed" });
+
+  const result = await importGitHubProfileAction(username.trim());
+  if (!result.success) {
+    throw Object.assign(new Error("github_failed"), { code: "github_failed" });
+  }
+  return result.data.profile;
 }
 
 export async function uploadResumeToCloudinary(
   file: File
 ): Promise<{ url: string; publicId: string }> {
-  await delay(300);
   if (typeof navigator !== "undefined" && !navigator.onLine) {
     throw Object.assign(new Error("offline"), { code: "offline" });
   }
-  void file;
-  return { url: "", publicId: "" };
+
+  const formData = new FormData();
+  formData.set("file", file);
+  const result = await uploadResumeStorageAction(formData);
+  if (!result.success) {
+    throw Object.assign(new Error("upload_failed"), { code: "upload_failed" });
+  }
+
+  return { url: result.data.url, publicId: result.data.path };
 }
 
 export async function parseResumeWithAI(
@@ -116,25 +139,18 @@ export async function processOnboardingComplete(
 /** @deprecated Use processOnboardingComplete */
 export const triggerN8nOnboardingWebhook = processOnboardingComplete;
 
-export async function fetchGoogleDriveDocument(
-  _fileId: string
-): Promise<Blob> {
-  throw new Error("Google Drive integration not configured yet.");
-}
-
 export { buildScratchProfile } from "@/lib/integrations/onboarding-scratch";
-
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function resolveImport(
   method: ImportMethod,
-  file?: File | null
+  file?: File | null,
+  extra?: { githubUsername?: string; linkedinText?: string }
 ): Promise<ExtractedProfile> {
   switch (method) {
     case "linkedin":
-      return importLinkedInProfile();
+      return importLinkedInProfile(extra?.linkedinText);
     case "github":
-      return importGitHubProfile();
+      return importGitHubProfile(extra?.githubUsername);
     case "resume":
       if (!file) {
         throw Object.assign(new Error("missing_file"), { code: "invalid_file" });

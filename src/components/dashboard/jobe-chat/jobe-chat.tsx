@@ -5,12 +5,12 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Send, Sparkles, X } from "lucide-react";
 import { jobeChatAction, type ChatContext } from "@/app/actions/ai";
 import {
-  bulkApplyJobsAction,
   bulkDismissJobsAction,
   fetchApplicationsSummaryAction,
   fetchNewJobsForChatAction,
   searchJobsForChatAction,
 } from "@/app/actions/jobe-chat";
+import { bulkPrepareApplicationsAction } from "@/app/actions/applications";
 import { JobeChatMessage } from "@/components/dashboard/jobe-chat/jobe-chat-message";
 import { AUTH_BRAND } from "@/lib/auth/constants";
 import {
@@ -52,6 +52,46 @@ function createMessage(
     timestamp: nowTimestamp(),
     ...partial,
   };
+}
+
+function chatJobToRecommendation(job: ChatJob) {
+  return {
+    id: job.id,
+    companyId: job.companyId,
+    company: job.company,
+    role: job.role,
+    location: job.location,
+    salary: job.salary,
+    salaryMin: 0,
+    salaryMax: 0,
+    compatibility: job.compatibility,
+    hasMatch: job.compatibility > 0,
+    approvalProbability: {
+      level: "media" as const,
+      stars: 3,
+      reasons: [],
+      simulation: { stages: [], suggestion: "" },
+    },
+    bestSendTime: { dayLabel: "", timeRange: "", insight: "" },
+    logo: job.logo,
+    color: job.color,
+    href: job.href,
+    stack: job.stack,
+    reasons: [],
+    stats: { responseDays: 0, processDays: 0, steps: 0, candidates: 0 },
+    benefits: [],
+    remote: job.remote,
+    aiSummary: job.aiSummary,
+    source: job.source,
+    externalUrl: job.externalUrl,
+  };
+}
+
+function formatPrepareSuccess(count: number, externalCount: number): string {
+  if (externalCount > 0) {
+    return `Preparei ${count} candidaturas com currículo adaptado 🎉 ${externalCount} precisam ser concluídas no site da empresa.`;
+  }
+  return `Preparei ${count} candidaturas com currículo adaptado 🎉`;
 }
 
 function createWelcomeMessage(userName: string): JobeMessage {
@@ -361,12 +401,9 @@ export function JobeChat({
     setLoading(true);
 
     if (action === "apply-all") {
-      const payload = activeJobs.map((job) => ({
-        jobId: job.id,
-        companyId: job.companyId,
-        roleTitle: job.role,
-      }));
-      const result = await bulkApplyJobsAction(payload);
+      const result = await bulkPrepareApplicationsAction(
+        activeJobs.map(chatJobToRecommendation)
+      );
       setLoading(false);
 
       if (!result.success) {
@@ -381,10 +418,11 @@ export function JobeChat({
         return;
       }
 
+      const externalCount = result.data.results.filter((r) => r.isExternal).length;
       appendMessage(
         createMessage({
           role: "assistant",
-          content: `Você se candidatou a ${result.data.count} vagas 🎉`,
+          content: formatPrepareSuccess(result.data.results.length, externalCount),
           status: "success",
           quickReplies: MAIN_MENU_REPLIES,
         })
@@ -396,12 +434,8 @@ export function JobeChat({
 
     if (action === "apply-selected") {
       const selected = activeJobs.filter((job) => selectedJobIds.has(job.id));
-      const result = await bulkApplyJobsAction(
-        selected.map((job) => ({
-          jobId: job.id,
-          companyId: job.companyId,
-          roleTitle: job.role,
-        }))
+      const result = await bulkPrepareApplicationsAction(
+        selected.map(chatJobToRecommendation)
       );
       setLoading(false);
 
@@ -417,10 +451,11 @@ export function JobeChat({
         return;
       }
 
+      const externalCount = result.data.results.filter((r) => r.isExternal).length;
       appendMessage(
         createMessage({
           role: "assistant",
-          content: `Você se candidatou a ${result.data.count} vagas 🎉`,
+          content: formatPrepareSuccess(result.data.results.length, externalCount),
           status: "success",
           quickReplies: MAIN_MENU_REPLIES,
         })

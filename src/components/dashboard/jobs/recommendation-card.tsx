@@ -26,6 +26,7 @@ interface RecommendationCardProps {
   job: JobRecommendation;
   onHide: (jobId: string, reason: HideReason) => void;
   onSave: (jobId: string) => void;
+  saved?: boolean;
   onCompare?: (jobId: string) => void;
   selected?: boolean;
   className?: string;
@@ -35,12 +36,14 @@ export function RecommendationCard({
   job,
   onHide,
   onSave,
+  saved: savedProp = false,
   onCompare,
   selected,
   className,
 }: RecommendationCardProps) {
   const [showHideFeedback, setShowHideFeedback] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [savedLocal, setSavedLocal] = useState(false);
+  const saved = savedProp || savedLocal;
   const [hovered, setHovered] = useState(false);
 
   const isExternal = job.source === "adzuna";
@@ -282,8 +285,8 @@ export function RecommendationCard({
         <Button
           variant="outline"
           onClick={() => {
-            setSaved((s) => !s);
             onSave(job.id);
+            setSavedLocal((s) => !s);
           }}
           className={cn(
             "h-9 border-white/10 bg-transparent",
