@@ -8,6 +8,17 @@ import { loginSchema, type LoginSchema } from "@/lib/auth/schema";
 import { signInWithPassword } from "@/lib/auth/providers";
 import type { AuthStatus } from "@/types/auth";
 
+function mapAuthError(message: string): string {
+  const lower = message.toLowerCase();
+  if (lower.includes("invalid login credentials")) {
+    return "E-mail ou senha incorretos. Use demo@jobera.app / demo123456.";
+  }
+  if (lower.includes("email not confirmed")) {
+    return "Confirme seu e-mail antes de entrar.";
+  }
+  return message;
+}
+
 export function useAuthForm() {
   const router = useRouter();
   const [status, setStatus] = useState<AuthStatus>("idle");
@@ -35,15 +46,17 @@ export function useAuthForm() {
       });
 
       if (error) {
+        const friendly = mapAuthError(error);
         setStatus("error");
-        setRootError(error);
-        form.setError("password", { message: error });
+        setRootError(friendly);
+        form.setError("password", { message: friendly });
         return;
       }
 
       setStatus("success");
       await new Promise((resolve) => setTimeout(resolve, 700));
-      router.push("/");
+      router.push("/dashboard");
+      router.refresh();
     },
     [form, router]
   );

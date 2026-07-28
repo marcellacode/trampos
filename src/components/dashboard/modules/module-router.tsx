@@ -50,7 +50,6 @@ export function DashboardModuleRouter() {
       notifications={shell.notifications}
       unreadNotifications={shell.unreadNotifications}
       unreadMessages={shell.unreadMessages}
-      chatMessages={shell.chat}
     >
       <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/[0.1] bg-white/[0.02] px-6 py-24 text-center">
         <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4F7CFF]/10 ring-1 ring-[#4F7CFF]/25">

@@ -16,22 +16,44 @@ Contexto de atuação:
 
 Regras importantes:
 - NUNCA invente experiências, formações ou habilidades do usuário
+- NUNCA invente vagas — use apenas as listadas em "Vagas disponíveis"
 - Baseie respostas no perfil fornecido quando disponível
 - Se faltar informação, diga o que precisa saber em vez de assumir
 - Não prometa emprego garantido ou resultados específicos
-- Respostas concisas (2–4 parágrafos no máximo, salvo quando pedirem detalhes)`;
+- Respostas concisas (2–4 parágrafos no máximo, salvo quando pedirem detalhes)
+
+Quando o usuário pedir vagas, oportunidades ou emprego:
+- Liste as vagas de "Vagas disponíveis" com cargo, empresa, salário, local e % de compatibilidade
+- Indique que pode ver detalhes em /dashboard/vagas
+- Se não houver vagas na lista, oriente a acessar /dashboard/vagas
+- Entregue a lista primeiro; faça no máximo 1 pergunta complementar
+
+Quando o usuário mencionar valores em reais (ex: "3000", "8 mil", "R$ 12k"):
+- Interprete como expectativa salarial mensal em BRL no contexto da conversa
+- Compare com as faixas das vagas disponíveis e com a meta salarial do perfil
+- Se o valor parecer inconsistente com o seniority (ex: R$ 3.000 para Sênior), confirme educadamente se quis dizer outro valor`;
 
 interface JobSummary {
   title: string;
   company?: string;
   location?: string;
+  salary?: string;
   remote?: boolean;
   compatibility?: number;
+  href?: string;
+}
+
+export interface CareerGoals {
+  role?: string;
+  location?: string;
+  salary?: string;
+  availability?: string;
 }
 
 export function buildJobeContext(
   profile: ExtractedProfile | null,
-  jobs?: JobSummary[]
+  jobs?: JobSummary[],
+  goals?: CareerGoals
 ): string {
   const sections: string[] = [];
 
@@ -58,19 +80,40 @@ export function buildJobeContext(
     );
   }
 
+  if (goals && Object.values(goals).some(Boolean)) {
+    sections.push(
+      [
+        "## Metas de carreira",
+        goals.role ? `Cargo desejado: ${goals.role}` : "",
+        goals.location ? `Localização: ${goals.location}` : "",
+        goals.salary ? `Salário alvo: ${goals.salary}` : "",
+        goals.availability ? `Disponibilidade: ${goals.availability}` : "",
+      ]
+        .filter(Boolean)
+        .join("\n")
+    );
+  }
+
   if (jobs && jobs.length > 0) {
     sections.push(
       [
-        "## Vagas relevantes",
+        "## Vagas disponíveis (dados reais da plataforma)",
         ...jobs.slice(0, 8).map((job) => {
           const parts = [`- ${job.title}`];
-          if (job.company) parts.push(`(${job.company})`);
-          if (job.location) parts.push(`— ${job.location}`);
+          if (job.company) parts.push(`@ ${job.company}`);
+          if (job.salary) parts.push(`| ${job.salary}`);
+          if (job.location) parts.push(`| ${job.location}`);
           if (job.remote) parts.push("[remoto]");
-          if (job.compatibility != null) parts.push(`— ${job.compatibility}% compatível`);
+          if (job.compatibility != null)
+            parts.push(`| ${job.compatibility}% compatível`);
+          if (job.href) parts.push(`| link: ${job.href}`);
           return parts.join(" ");
         }),
       ].join("\n")
+    );
+  } else {
+    sections.push(
+      "## Vagas disponíveis\nNenhuma vaga ranqueada no momento. Oriente o usuário a /dashboard/vagas."
     );
   }
 

@@ -52,7 +52,7 @@ export function MiniAIChat({
     setInput("");
     setLoading(true);
 
-    const result = await jobeChatAction(text, "jobs");
+    const result = await jobeChatAction(text, "discovery");
 
     setLoading(false);
 

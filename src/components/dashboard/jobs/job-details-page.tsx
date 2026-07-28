@@ -28,7 +28,7 @@ import {
   WhyMatch,
 } from "@/components/dashboard/jobs/details";
 import { JobDetailsSkeleton } from "@/components/dashboard/jobs/details/job-details-skeleton";
-import { MiniAIChat } from "@/components/dashboard/jobs/mini-ai-chat";
+import { JobeChat } from "@/components/dashboard/jobe-chat";
 import { Button } from "@/components/ui/button";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { useJob } from "@/lib/jobs/hooks";
@@ -60,14 +60,15 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
       notifications={shell.notifications}
       unreadNotifications={shell.unreadNotifications}
       unreadMessages={shell.unreadMessages}
-      chatMessages={shell.chat}
       contentClassName="max-w-[1400px]"
+      chatContext="job_detail"
       chatPanel={({ open, onClose }) => (
-        <MiniAIChat
+        <JobeChat
           open={open}
           onClose={onClose}
-          messages={shell.chat}
+          userId={shell.user.id}
           userName={shell.user.firstName}
+          context="job_detail"
           className="xl:fixed xl:inset-y-0 xl:right-0 xl:w-[340px]"
         />
       )}
@@ -111,7 +112,42 @@ export function JobDetailsPage({ jobId }: JobDetailsPageProps) {
         </div>
       )}
 
-      {job && (
+      {job && job.source === "adzuna" ? (
+        <>
+          <div className="space-y-6 pb-24 lg:pb-8">
+            <JobHero
+              job={job}
+              saved={saved}
+              onSave={() => setSaved((s) => !s)}
+              onShare={handleShare}
+              isExternal
+            />
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111315] p-6">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+                Descrição
+              </p>
+              <p className="whitespace-pre-line text-sm leading-relaxed text-white/90">
+                {job.description || job.aiSummary || "Descrição não disponível."}
+              </p>
+              {job.externalUrl && (
+                <Button
+                  render={
+                    <a
+                      href={job.externalUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    />
+                  }
+                  nativeButton={false}
+                  className="mt-6 gap-2"
+                >
+                  Ver vaga na Adzuna
+                </Button>
+              )}
+            </div>
+          </div>
+        </>
+      ) : job && (
         <>
           <div className="space-y-6 pb-24 lg:pb-8">
             <JobHero

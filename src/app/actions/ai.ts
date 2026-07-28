@@ -4,6 +4,7 @@ import { z } from "zod";
 import { chatCompletion } from "@/lib/ai/groq";
 import { isGroqConfigured } from "@/lib/ai/env";
 import { buildJobeContext, JOBE_SYSTEM_PROMPT } from "@/lib/ai/jobe-prompt";
+import type { ChatMessage } from "@/lib/ai/groq";
 import { checkRateLimit } from "@/lib/ai/rate-limit";
 import { extractResumeText } from "@/lib/ai/resume-text";
 import {
@@ -18,23 +19,77 @@ import {
 import { AuthError, requireAuth } from "@/lib/auth/require-auth";
 import { parseGoalText } from "@/lib/onboarding/goal-parser";
 import { fetchProfileData } from "@/lib/supabase/queries/profile";
-import { createChatMessage } from "@/lib/supabase/queries/mutations/chat";
+import { fetchJobCardsForUser } from "@/lib/supabase/queries/jobs";
+import {
+  createChatMessage,
+  listChatMessagesByContext,
+} from "@/lib/supabase/queries/mutations/chat";
+import type { Database } from "@/lib/supabase/database.types";
 import type { ExtractedProfile, GoalChip } from "@/types/onboarding";
+
+export type ChatContext = Database["public"]["Enums"]["chat_context"];
 
 export type ActionResult<T> =
   | { success: true; data: T }
   | { success: false; error: string };
 
-function toActionError(error: unknown): ActionResult<never> {
+function getErrorMessage(error: unknown): string {
   if (error instanceof AuthError) {
-    return { success: false, error: error.message };
+    return error.message;
   }
 
   if (error instanceof Error) {
-    return { success: false, error: error.message };
+    return error.message;
   }
 
-  return { success: false, error: "Ocorreu um erro inesperado. Tente novamente." };
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof (error as { message: unknown }).message === "string"
+  ) {
+    return (error as { message: string }).message;
+  }
+
+  return "Ocorreu um erro inesperado. Tente novamente.";
+}
+
+function toActionError(error: unknown): ActionResult<never> {
+  return { success: false, error: getErrorMessage(error) };
+}
+
+async function loadChatJobSummaries(
+  supabase: Awaited<ReturnType<typeof requireAuth>>["supabase"],
+  userId: string
+) {
+  try {
+    const jobCards = await fetchJobCardsForUser(supabase, userId, 8);
+    return jobCards.map((job) => ({
+      title: job.role,
+      company: job.company,
+      location: job.location,
+      salary: job.salary,
+      remote: /remot/i.test(job.location),
+      compatibility: job.compatibility,
+      href: job.href,
+    }));
+  } catch (error) {
+    console.error("[jobeChatAction] jobs fetch failed:", error);
+    return [];
+  }
+}
+
+async function loadChatHistory(
+  supabase: Awaited<ReturnType<typeof requireAuth>>["supabase"],
+  userId: string,
+  context: ChatContext
+) {
+  try {
+    return await listChatMessagesByContext(supabase, userId, context);
+  } catch (error) {
+    console.error("[jobeChatAction] history fetch failed:", error);
+    return [];
+  }
 }
 
 function enforceRateLimit(userId: string): ActionResult<never> | null {
@@ -51,7 +106,7 @@ function enforceRateLimit(userId: string): ActionResult<never> | null {
 
 export async function jobeChatAction(
   message: string,
-  context = "copilot"
+  context: ChatContext = "dashboard"
 ): Promise<ActionResult<{ content: string }>> {
   try {
     const trimmed = message.trim();
@@ -71,24 +126,64 @@ export async function jobeChatAction(
       };
     }
 
-    const profile = await fetchProfileData(supabase, user.id);
-    const systemContent = `${JOBE_SYSTEM_PROMPT}\n\n${buildJobeContext(profile)}`;
+    let profile: ExtractedProfile | null = null;
+    try {
+      profile = await fetchProfileData(supabase, user.id);
+    } catch (error) {
+      console.error("[jobeChatAction] profile fetch failed:", error);
+    }
 
-    const content = await chatCompletion([
-      { role: "system", content: systemContent },
-      { role: "user", content: trimmed },
+    const [{ data: profileGoals }, jobSummaries, history] = await Promise.all([
+      supabase
+        .from("profiles")
+        .select("goal_role, goal_location, goal_salary, goal_availability_label")
+        .eq("id", user.id)
+        .maybeSingle(),
+      loadChatJobSummaries(supabase, user.id),
+      loadChatHistory(supabase, user.id, context),
     ]);
 
-    await createChatMessage(supabase, user.id, {
-      context,
-      role: "user",
-      content: trimmed,
-    });
-    await createChatMessage(supabase, user.id, {
-      context,
-      role: "assistant",
-      content,
-    });
+    const systemContent = `${JOBE_SYSTEM_PROMPT}\n\n${buildJobeContext(
+      profile,
+      jobSummaries,
+      profileGoals
+        ? {
+            role: profileGoals.goal_role || undefined,
+            location: profileGoals.goal_location || undefined,
+            salary: profileGoals.goal_salary || undefined,
+            availability: profileGoals.goal_availability_label || undefined,
+          }
+        : undefined
+    )}`;
+
+    const chatMessages: ChatMessage[] = [
+      { role: "system", content: systemContent },
+      ...history
+        .slice(-10)
+        .filter((msg) => msg.role === "user" || msg.role === "assistant")
+        .map((msg) => ({
+          role: msg.role as "user" | "assistant",
+          content: msg.content,
+        })),
+      { role: "user", content: trimmed },
+    ];
+
+    const content = await chatCompletion(chatMessages);
+
+    try {
+      await createChatMessage(supabase, user.id, {
+        context,
+        role: "user",
+        content: trimmed,
+      });
+      await createChatMessage(supabase, user.id, {
+        context,
+        role: "assistant",
+        content,
+      });
+    } catch (persistError) {
+      console.error("[jobeChatAction] persist failed:", persistError);
+    }
 
     return { success: true, data: { content } };
   } catch (error) {

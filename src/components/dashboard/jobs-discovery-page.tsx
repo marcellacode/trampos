@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
+import { JobeChat } from "@/components/dashboard/jobe-chat";
 import { JobsRanking } from "@/components/dashboard/jobs-ranking";
 import {
   CompanyCarousel,
@@ -10,7 +11,6 @@ import {
   DiscoveryState,
   DiscoverySummaryBar,
   MarketInsights,
-  MiniAIChat,
   OpportunityMap,
   RecommendationCard,
   SalaryRadar,
@@ -25,13 +25,13 @@ import type { HideReason, SmartFilter } from "@/types/jobs";
 
 export function JobsDiscoveryPage() {
   const { shell } = useDashboardShell();
-  const { data, isLoading, isError, refetch } = useDiscovery();
+  const [searchQuery, setSearchQuery] = useState("");
+  const { data, isLoading, isError, refetch } = useDiscovery(searchQuery);
   const [filters, setFilters] = useState<SmartFilter[]>([]);
   const [filtersInitialized, setFiltersInitialized] = useState(false);
   const [hiddenJobs, setHiddenJobs] = useState<Set<string>>(new Set());
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     if (data && !filtersInitialized) {
@@ -89,7 +89,6 @@ export function JobsDiscoveryPage() {
     });
   }
 
-  const chatMessages = data?.chat ?? shell.chat;
   const isEmpty = data ? isDiscoveryEmpty(data) : false;
 
   return (
@@ -98,16 +97,14 @@ export function JobsDiscoveryPage() {
       notifications={shell.notifications}
       unreadNotifications={shell.unreadNotifications}
       unreadMessages={shell.unreadMessages}
-      chatMessages={chatMessages}
+      chatContext="discovery"
       chatPanel={({ open, onClose }) => (
-        <MiniAIChat
+        <JobeChat
           open={open}
           onClose={onClose}
-          messages={chatMessages}
+          userId={shell.user.id}
           userName={shell.user.firstName}
-          onCompare={
-            compareIds.length === 2 ? handleCompareOpen : undefined
-          }
+          context="discovery"
           className="xl:fixed xl:inset-y-0 xl:right-0 xl:w-[340px]"
         />
       )}
@@ -129,54 +126,25 @@ export function JobsDiscoveryPage() {
               pesquisas.
             </p>
           </div>
-          <DiscoveryState state="empty" />
+          <DiscoveryState
+            state="empty"
+            onAction={() => refetch()}
+          />
         </div>
       )}
 
       {data && !isLoading && !isError && !isEmpty && (
         <div className="space-y-8">
-          <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-            <div className="max-w-lg shrink-0">
-              <h1 className="text-2xl font-semibold tracking-tight text-white">
-                Descobrir oportunidades
-              </h1>
-              <p className="mt-1.5 text-sm leading-relaxed text-[#9CA3AF]">
-                Encontramos vagas baseadas no seu perfil, não apenas nas suas
-                pesquisas.
-              </p>
-            </div>
-            <SearchHero
-              onSearch={handleSearch}
-              className="w-full lg:max-w-xl"
-            />
-          </div>
-
-          <SmartFilters
-            filters={filters}
-            onChange={setFilters}
-            onAiQuery={handleSearch}
-          />
-
+          <SearchHero onSearch={handleSearch} />
           <DiscoverySummaryBar summary={data.summary} />
-
-          {visibleJobs.length > 0 && (
-            <JobsRanking
-              jobs={visibleJobs.map((job) => ({
-                id: job.id,
-                company: job.company,
-                compatibility: job.compatibility,
-                logo: job.logo,
-                color: job.color,
-                href: job.href,
-              }))}
-            />
-          )}
+          <SmartFilters filters={filters} onChange={setFilters} />
+          <JobsRanking jobs={visibleJobs.slice(0, 3)} />
 
           {compareIds.length > 0 && (
-            <div className="flex items-center justify-between rounded-xl border border-[#4F7CFF]/30 bg-[#4F7CFF]/8 px-4 py-3">
-              <p className="text-sm text-white">
+            <div className="flex items-center justify-between rounded-xl border border-[#4F7CFF]/20 bg-[#4F7CFF]/5 px-4 py-3">
+              <p className="text-xs text-[#9CA3AF]">
                 {compareIds.length === 1
-                  ? "Selecione mais uma vaga para comparar"
+                  ? "1 vaga selecionada para comparação"
                   : "2 vagas selecionadas para comparação"}
               </p>
               {compareIds.length === 2 && (

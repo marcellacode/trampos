@@ -33,7 +33,6 @@ export function ModuleCrudShell({ config, children }: ModuleCrudShellProps) {
       notifications={shell.notifications}
       unreadNotifications={shell.unreadNotifications}
       unreadMessages={shell.unreadMessages}
-      chatMessages={shell.chat}
     >
       <div className="space-y-6">
         <div>

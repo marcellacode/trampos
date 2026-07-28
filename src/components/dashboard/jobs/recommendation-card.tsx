@@ -8,6 +8,7 @@ import {
   Bookmark,
   Check,
   Clock,
+  ExternalLink,
   EyeOff,
   MapPin,
   Sparkles,
@@ -41,6 +42,9 @@ export function RecommendationCard({
   const [showHideFeedback, setShowHideFeedback] = useState(false);
   const [saved, setSaved] = useState(false);
   const [hovered, setHovered] = useState(false);
+
+  const isExternal = job.source === "adzuna";
+  const externalUrl = job.externalUrl;
 
   function handleHide(reason: HideReason) {
     onHide(job.id, reason);
@@ -89,6 +93,11 @@ export function RecommendationCard({
             <h3 className="mt-0.5 text-base font-semibold text-white sm:text-lg">
               {job.role}
             </h3>
+            {isExternal && (
+              <span className="mt-1.5 inline-flex items-center rounded-md border border-[#6366F1]/30 bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#A5B4FC]">
+                Adzuna
+              </span>
+            )}
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#9CA3AF]">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" aria-hidden="true" />
@@ -122,58 +131,75 @@ export function RecommendationCard({
         />
       </div>
 
-      <div className="relative mt-4">
-        <ApprovalProbabilityCard data={job.approvalProbability} />
-      </div>
+      {!isExternal && (
+        <>
+          <div className="relative mt-4">
+            <ApprovalProbabilityCard data={job.approvalProbability} />
+          </div>
 
-      <div className="relative mt-4">
-        <BestSendTimeCard data={job.bestSendTime} />
-      </div>
+          <div className="relative mt-4">
+            <BestSendTimeCard data={job.bestSendTime} />
+          </div>
+        </>
+      )}
 
-      {/* Por que essa vaga? */}
-      <div className="relative mt-5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
-          Por que essa vaga?
+      {isExternal && job.aiSummary && (
+        <p className="relative mt-4 text-sm leading-relaxed text-[#9CA3AF]">
+          {job.aiSummary}
         </p>
-        <ul className="space-y-2" role="list">
-          {job.reasons.map((reason) => (
-            <li
-              key={reason.id}
-              className="flex items-start gap-2 text-sm text-white/90"
-            >
-              {reason.type === "match" ? (
-                <Check
-                  className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]"
-                  aria-hidden="true"
-                />
-              ) : (
-                <AlertTriangle
-                  className="mt-0.5 h-4 w-4 shrink-0 text-[#F59E0B]"
-                  aria-hidden="true"
-                />
-              )}
-              {reason.text}
-            </li>
-          ))}
-        </ul>
-      </div>
+      )}
+
+      {!isExternal && (
+        <>
+          {/* Por que essa vaga? */}
+          <div className="relative mt-5 rounded-xl border border-white/[0.06] bg-white/[0.02] p-4">
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-[#9CA3AF]">
+              Por que essa vaga?
+            </p>
+            <ul className="space-y-2" role="list">
+              {job.reasons.map((reason) => (
+                <li
+                  key={reason.id}
+                  className="flex items-start gap-2 text-sm text-white/90"
+                >
+                  {reason.type === "match" ? (
+                    <Check
+                      className="mt-0.5 h-4 w-4 shrink-0 text-[#22C55E]"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <AlertTriangle
+                      className="mt-0.5 h-4 w-4 shrink-0 text-[#F59E0B]"
+                      aria-hidden="true"
+                    />
+                  )}
+                  {reason.text}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </>
+      )}
 
       {/* Stack */}
-      <div className="relative mt-4">
-        <p className="mb-2 text-xs font-medium text-[#9CA3AF]">Stack</p>
-        <div className="flex flex-wrap gap-1.5">
-          {job.stack.map((tech) => (
-            <span
-              key={tech}
-              className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-xs font-medium text-white/80"
-            >
-              {tech}
-            </span>
-          ))}
+      {job.stack.length > 0 && (
+        <div className="relative mt-4">
+          <p className="mb-2 text-xs font-medium text-[#9CA3AF]">Stack</p>
+          <div className="flex flex-wrap gap-1.5">
+            {job.stack.map((tech) => (
+              <span
+                key={tech}
+                className="rounded-lg border border-white/[0.06] bg-white/[0.03] px-2.5 py-1 text-xs font-medium text-white/80"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Stats */}
+      {!isExternal && (
       <div className="relative mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           {
@@ -208,21 +234,51 @@ export function RecommendationCard({
           </div>
         ))}
       </div>
+      )}
 
       {/* Actions */}
       <div className="relative mt-5 flex flex-wrap gap-2">
-        <Button
-          render={<Link href={job.href} />}
-          nativeButton={false}
-          variant="outline"
-          className="h-9 flex-1 border-white/10 bg-transparent sm:flex-none sm:px-5"
-        >
-          Ver detalhes
-        </Button>
-        <Button className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5">
-          <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-          Candidatar com IA
-        </Button>
+        {isExternal && externalUrl ? (
+          <Button
+            render={
+              <a
+                href={externalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+              />
+            }
+            nativeButton={false}
+            className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5"
+          >
+            <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+            Ver vaga
+          </Button>
+        ) : (
+          <Button
+            render={<Link href={job.href} />}
+            nativeButton={false}
+            variant="outline"
+            className="h-9 flex-1 border-white/10 bg-transparent sm:flex-none sm:px-5"
+          >
+            Ver detalhes
+          </Button>
+        )}
+        {!isExternal && (
+          <Button className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5">
+            <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+            Candidatar com IA
+          </Button>
+        )}
+        {isExternal && externalUrl && (
+          <Button
+            render={<Link href={job.href} />}
+            nativeButton={false}
+            variant="outline"
+            className="h-9 flex-1 border-white/10 bg-transparent sm:flex-none sm:px-5"
+          >
+            Resumo
+          </Button>
+        )}
         <Button
           variant="outline"
           onClick={() => {

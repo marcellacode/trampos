@@ -3,9 +3,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 import { Sidebar } from "@/components/dashboard/sidebar";
 import { Header } from "@/components/dashboard/header";
-import { MiniChat } from "@/components/dashboard/mini-chat";
+import { JobeChat } from "@/components/dashboard/jobe-chat";
+import type { ChatContext } from "@/app/actions/ai";
 import type {
-  ChatMessage,
   DashboardUser,
   NotificationItem,
 } from "@/types/dashboard";
@@ -16,10 +16,10 @@ interface DashboardLayoutProps {
   notifications: NotificationItem[];
   unreadNotifications: number;
   unreadMessages: number;
-  chatMessages: ChatMessage[];
   children: ReactNode;
   className?: string;
   contentClassName?: string;
+  chatContext?: ChatContext;
   chatPanel?: (props: { open: boolean; onClose: () => void }) => ReactNode;
 }
 
@@ -28,10 +28,10 @@ export function DashboardLayout({
   notifications,
   unreadNotifications,
   unreadMessages,
-  chatMessages,
   children,
   className,
   contentClassName,
+  chatContext = "dashboard",
   chatPanel,
 }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -84,11 +84,12 @@ export function DashboardLayout({
           onClose: () => setChatOpen(false),
         })
       ) : (
-        <MiniChat
+        <JobeChat
           open={chatOpen}
           onClose={() => setChatOpen(false)}
-          messages={chatMessages}
+          userId={user.id}
           userName={user.firstName}
+          context={chatContext}
           className="xl:fixed xl:inset-y-0 xl:right-0 xl:w-[340px]"
         />
       )}

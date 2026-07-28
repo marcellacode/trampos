@@ -43,11 +43,19 @@ export interface BestSendTime {
   insight: string;
 }
 
+export type JobSource = "internal" | "adzuna";
+
 export interface JobRecommendation {
   id: string;
   companyId: string;
   company: string;
   role: string;
+  /** Data source — internal Supabase jobs vs external Adzuna listings */
+  source?: JobSource;
+  /** External apply URL (Adzuna redirect_url) */
+  externalUrl?: string;
+  /** Plain-text description for external jobs */
+  description?: string;
   /** Present only when the user has a personalized match in Supabase */
   hasMatch: boolean;
   compatibility: number;

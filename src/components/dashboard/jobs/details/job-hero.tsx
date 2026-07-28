@@ -22,9 +22,10 @@ interface JobHeroProps {
   saved: boolean;
   onSave: () => void;
   onShare: () => void;
+  isExternal?: boolean;
 }
 
-export function JobHero({ job, saved, onSave, onShare }: JobHeroProps) {
+export function JobHero({ job, saved, onSave, onShare, isExternal }: JobHeroProps) {
   return (
     <div className="space-y-4">
       {/* Breadcrumb + Back */}
@@ -82,6 +83,11 @@ export function JobHero({ job, saved, onSave, onShare }: JobHeroProps) {
               <h1 className="mt-1 text-xl font-bold text-white sm:text-2xl lg:text-3xl">
                 {job.role}
               </h1>
+              {isExternal && (
+                <span className="mt-2 inline-flex items-center rounded-md border border-[#6366F1]/30 bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#A5B4FC]">
+                  Fonte externa · Adzuna
+                </span>
+              )}
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-[#9CA3AF]">
                 <span className="inline-flex items-center gap-1.5">
                   <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
@@ -118,10 +124,26 @@ export function JobHero({ job, saved, onSave, onShare }: JobHeroProps) {
         </div>
 
         <div className="relative mt-6 flex flex-wrap gap-2 border-t border-white/[0.06] pt-6">
-          <Button className="h-10 flex-1 gap-2 sm:flex-none sm:px-6">
-            <Sparkles className="h-4 w-4" aria-hidden="true" />
-            Candidatar com IA
-          </Button>
+          {isExternal && job.externalUrl ? (
+            <Button
+              render={
+                <a
+                  href={job.externalUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                />
+              }
+              nativeButton={false}
+              className="h-10 flex-1 gap-2 sm:flex-none sm:px-6"
+            >
+              Ver vaga na Adzuna
+            </Button>
+          ) : (
+            <Button className="h-10 flex-1 gap-2 sm:flex-none sm:px-6">
+              <Sparkles className="h-4 w-4" aria-hidden="true" />
+              Candidatar com IA
+            </Button>
+          )}
           <Button
             variant="outline"
             onClick={onSave}

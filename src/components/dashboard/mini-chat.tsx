@@ -46,7 +46,7 @@ export function MiniChat({
     setInput("");
     setLoading(true);
 
-    const result = await jobeChatAction(text, "copilot");
+    const result = await jobeChatAction(text, "dashboard");
 
     setLoading(false);
 

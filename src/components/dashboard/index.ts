@@ -15,6 +15,7 @@ export { EmployabilityMap } from "./employability-map";
 export { EmployabilityPage } from "./employability-page";
 export { JobsDiscoveryPage } from "./jobs-discovery-page";
 export { AISuggestions } from "./ai-suggestions";
+export { JobeChat } from "./jobe-chat";
 export { MiniChat } from "./mini-chat";
 export { NotificationCenter } from "./notification-center";
 export { AnimatedCounter } from "./animated-counters";

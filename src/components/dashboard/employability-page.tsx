@@ -73,7 +73,6 @@ export function EmployabilityPage() {
       notifications={shell.notifications}
       unreadNotifications={shell.unreadNotifications}
       unreadMessages={shell.unreadMessages}
-      chatMessages={shell.chat}
     >
       <Suspense
         fallback={

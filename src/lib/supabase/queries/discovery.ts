@@ -1,6 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { DiscoveryData } from "@/types/jobs";
-import { EMPTY_DISCOVERY } from "@/lib/jobs/empty-data";
 import { mapCompanyMatch, mapJobRecommendation } from "@/lib/supabase/mappers/jobs";
 import { mapChatMessages } from "@/lib/supabase/mappers/dashboard";
 import type { DbCompany, DbJob } from "@/lib/supabase/types";
@@ -12,10 +11,6 @@ export async function fetchDiscoveryData(
   userId: string | null
 ): Promise<DiscoveryData> {
   const jobs = await fetchJobsForUser(supabase, userId, 24);
-
-  if (jobs.length === 0) {
-    return EMPTY_DISCOVERY;
-  }
 
   const [
     summaryResult,

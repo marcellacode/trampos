@@ -36,7 +36,6 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
         notifications={[]}
         unreadNotifications={0}
         unreadMessages={0}
-        chatMessages={[]}
       >
         <LoadingSkeletons />
       </DashboardLayout>
@@ -60,7 +59,6 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
         notifications={[]}
         unreadNotifications={0}
         unreadMessages={0}
-        chatMessages={data.chat}
       >
         <NewUserState firstName={data.user.firstName} />
       </DashboardLayout>
@@ -73,7 +71,6 @@ export function DashboardPage({ viewState = "default" }: DashboardPageProps) {
       notifications={data.notifications}
       unreadNotifications={data.unreadNotifications}
       unreadMessages={data.unreadMessages}
-      chatMessages={data.chat}
     >
       <div className="space-y-8">
         <Timeline items={data.timeline} />
