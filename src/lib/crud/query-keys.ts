@@ -18,5 +18,6 @@ export const crudKeys = {
   certificates: ["crud", "certificates"] as const,
   projects: ["crud", "projects"] as const,
   profile: ["profile"] as const,
+  profileVisibility: ["profile", "visibility"] as const,
   dashboard: ["dashboard"] as const,
 };

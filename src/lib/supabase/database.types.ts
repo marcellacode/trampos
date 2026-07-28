@@ -2437,16 +2437,21 @@ export type Database = {
           goal_role: string
           goal_salary: string
           goal_text: string
+          headline: string
           id: string
           import_method: Database["public"]["Enums"]["import_method"] | null
           initials: string
+          is_public: boolean
+          location: string
           onboarding_completed: boolean
           onboarding_step: Database["public"]["Enums"]["onboarding_step"] | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           seniority: string
+          slug: string | null
           summary: string
           updated_at: string
           uploaded_resume_filename: string | null
+          website_url: string | null
         }
         Insert: {
           availability?:
@@ -2465,18 +2470,23 @@ export type Database = {
           goal_role?: string
           goal_salary?: string
           goal_text?: string
+          headline?: string
           id: string
           import_method?: Database["public"]["Enums"]["import_method"] | null
           initials?: string
+          is_public?: boolean
+          location?: string
           onboarding_completed?: boolean
           onboarding_step?:
             | Database["public"]["Enums"]["onboarding_step"]
             | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           seniority?: string
+          slug?: string | null
           summary?: string
           updated_at?: string
           uploaded_resume_filename?: string | null
+          website_url?: string | null
         }
         Update: {
           availability?:
@@ -2495,18 +2505,23 @@ export type Database = {
           goal_role?: string
           goal_salary?: string
           goal_text?: string
+          headline?: string
           id?: string
           import_method?: Database["public"]["Enums"]["import_method"] | null
           initials?: string
+          is_public?: boolean
+          location?: string
           onboarding_completed?: boolean
           onboarding_step?:
             | Database["public"]["Enums"]["onboarding_step"]
             | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           seniority?: string
+          slug?: string | null
           summary?: string
           updated_at?: string
           uploaded_resume_filename?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }

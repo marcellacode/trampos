@@ -113,6 +113,11 @@ import {
   type UpdateResumeUploadInput,
 } from "@/lib/supabase/queries/mutations/settings";
 import {
+  updateProfileVisibility,
+  type UpdateProfileVisibilityInput,
+} from "@/lib/supabase/queries/mutations/public-profile";
+import { fetchProfileVisibilitySettings } from "@/lib/supabase/queries/public-profile";
+import {
   createTimelineEvent,
   deleteTimelineEvent,
   listTimelineEvents,
@@ -765,5 +770,20 @@ export function useUpdateProfileSummary() {
     (input: Parameters<typeof updateProfileSummary>[2]) =>
       withUser((s, u) => updateProfileSummary(s, u, input)),
     crudKeys.profile
+  );
+}
+
+export function useProfileVisibility() {
+  return useQuery({
+    queryKey: crudKeys.profileVisibility,
+    queryFn: () => withUser(fetchProfileVisibilitySettings),
+  });
+}
+
+export function useUpdateProfileVisibility() {
+  return useCrudMutation(
+    (input: UpdateProfileVisibilityInput) =>
+      withUser((s, u) => updateProfileVisibility(s, u, input)),
+    crudKeys.profileVisibility
   );
 }

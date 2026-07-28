@@ -6,3 +6,4 @@ export * from "./goals";
 export * from "./employability";
 export * from "./settings";
 export * from "./profile-entities";
+export * from "./public-profile";
