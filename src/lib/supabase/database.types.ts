@@ -126,76 +126,6 @@ export type Database = {
           },
         ]
       }
-      companies: {
-        Row: {
-          bio: string
-          brand_color: string
-          claimed_at: string | null
-          cover_url: string | null
-          created_at: string
-          employees_label: string
-          environment: Database["public"]["Enums"]["company_environment"] | null
-          href: string | null
-          id: string
-          is_claimed: boolean
-          logo: string
-          market_years: number | null
-          name: string
-          rating: number | null
-          remote_friendly: boolean
-          segment: string
-          slug: string
-          updated_at: string
-          verified: boolean
-        }
-        Insert: {
-          bio?: string
-          brand_color?: string
-          claimed_at?: string | null
-          cover_url?: string | null
-          created_at?: string
-          employees_label?: string
-          environment?:
-            | Database["public"]["Enums"]["company_environment"]
-            | null
-          href?: string | null
-          id?: string
-          is_claimed?: boolean
-          logo?: string
-          market_years?: number | null
-          name: string
-          rating?: number | null
-          remote_friendly?: boolean
-          segment?: string
-          slug: string
-          updated_at?: string
-          verified?: boolean
-        }
-        Update: {
-          bio?: string
-          brand_color?: string
-          claimed_at?: string | null
-          cover_url?: string | null
-          created_at?: string
-          employees_label?: string
-          environment?:
-            | Database["public"]["Enums"]["company_environment"]
-            | null
-          href?: string | null
-          id?: string
-          is_claimed?: boolean
-          logo?: string
-          market_years?: number | null
-          name?: string
-          rating?: number | null
-          remote_friendly?: boolean
-          segment?: string
-          slug?: string
-          updated_at?: string
-          verified?: boolean
-        }
-        Relationships: []
-      }
       company_members: {
         Row: {
           company_id: string
@@ -218,22 +148,65 @@ export type Database = {
           role?: Database["public"]["Enums"]["company_member_role"]
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "company_members_company_id_fkey"
-            columns: ["company_id"]
-            isOneToOne: false
-            referencedRelation: "companies"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "company_members_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      companies: {
+        Row: {
+          brand_color: string
+          created_at: string
+          employees_label: string
+          environment: Database["public"]["Enums"]["company_environment"] | null
+          href: string | null
+          id: string
+          logo: string
+          market_years: number | null
+          name: string
+          rating: number | null
+          remote_friendly: boolean
+          segment: string
+          slug: string
+          updated_at: string
+          verified: boolean
+        }
+        Insert: {
+          brand_color?: string
+          created_at?: string
+          employees_label?: string
+          environment?:
+            | Database["public"]["Enums"]["company_environment"]
+            | null
+          href?: string | null
+          id?: string
+          logo?: string
+          market_years?: number | null
+          name: string
+          rating?: number | null
+          remote_friendly?: boolean
+          segment?: string
+          slug: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Update: {
+          brand_color?: string
+          created_at?: string
+          employees_label?: string
+          environment?:
+            | Database["public"]["Enums"]["company_environment"]
+            | null
+          href?: string | null
+          id?: string
+          logo?: string
+          market_years?: number | null
+          name?: string
+          rating?: number | null
+          remote_friendly?: boolean
+          segment?: string
+          slug?: string
+          updated_at?: string
+          verified?: boolean
+        }
+        Relationships: []
       }
       company_benefits: {
         Row: {
@@ -826,7 +799,7 @@ export type Database = {
           job_id: string | null
           last_activity_at: string
           role_title: string
-          application_source: Database["public"]["Enums"]["application_source"]
+          source: string
           status: Database["public"]["Enums"]["application_status"]
           status_label: string
           submission_error: string | null
@@ -849,7 +822,7 @@ export type Database = {
           job_id?: string | null
           last_activity_at?: string
           role_title: string
-          application_source?: Database["public"]["Enums"]["application_source"]
+          source?: string
           status?: Database["public"]["Enums"]["application_status"]
           status_label?: string
           submission_error?: string | null
@@ -872,7 +845,7 @@ export type Database = {
           job_id?: string | null
           last_activity_at?: string
           role_title?: string
-          application_source?: Database["public"]["Enums"]["application_source"]
+          source?: string
           status?: Database["public"]["Enums"]["application_status"]
           status_label?: string
           submission_error?: string | null
@@ -2297,15 +2270,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profile_courses_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profile_education: {
         Row: {
@@ -2350,15 +2315,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "profile_education_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profile_experiences: {
         Row: {
@@ -2597,21 +2554,16 @@ export type Database = {
           goal_role: string
           goal_salary: string
           goal_text: string
-          headline: string
           id: string
           import_method: Database["public"]["Enums"]["import_method"] | null
           initials: string
-          is_public: boolean
-          location: string
           onboarding_completed: boolean
           onboarding_step: Database["public"]["Enums"]["onboarding_step"] | null
           plan: Database["public"]["Enums"]["subscription_plan"]
           seniority: string
-          slug: string | null
           summary: string
           updated_at: string
           uploaded_resume_filename: string | null
-          website_url: string | null
         }
         Insert: {
           availability?:
@@ -2630,23 +2582,18 @@ export type Database = {
           goal_role?: string
           goal_salary?: string
           goal_text?: string
-          headline?: string
           id: string
           import_method?: Database["public"]["Enums"]["import_method"] | null
           initials?: string
-          is_public?: boolean
-          location?: string
           onboarding_completed?: boolean
           onboarding_step?:
             | Database["public"]["Enums"]["onboarding_step"]
             | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           seniority?: string
-          slug?: string | null
           summary?: string
           updated_at?: string
           uploaded_resume_filename?: string | null
-          website_url?: string | null
         }
         Update: {
           availability?:
@@ -2665,23 +2612,18 @@ export type Database = {
           goal_role?: string
           goal_salary?: string
           goal_text?: string
-          headline?: string
           id?: string
           import_method?: Database["public"]["Enums"]["import_method"] | null
           initials?: string
-          is_public?: boolean
-          location?: string
           onboarding_completed?: boolean
           onboarding_step?:
             | Database["public"]["Enums"]["onboarding_step"]
             | null
           plan?: Database["public"]["Enums"]["subscription_plan"]
           seniority?: string
-          slug?: string | null
           summary?: string
           updated_at?: string
           uploaded_resume_filename?: string | null
-          website_url?: string | null
         }
         Relationships: []
       }
@@ -3152,15 +3094,280 @@ export type Database = {
           },
         ]
       }
+      blocked_users: {
+        Row: {
+          blocked_id: string
+          blocker_id: string
+          created_at: string
+        }
+        Insert: {
+          blocked_id: string
+          blocker_id: string
+          created_at?: string
+        }
+        Update: {
+          blocked_id?: string
+          blocker_id?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
+      conversation_participants: {
+        Row: {
+          conversation_id: string
+          created_at: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          conversation_id: string
+          created_at?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          conversation_id?: string
+          created_at?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      conversations: {
+        Row: {
+          company_id: string
+          created_at: string
+          id: string
+          job_application_id: string | null
+          last_message_at: string
+        }
+        Insert: {
+          company_id: string
+          created_at?: string
+          id?: string
+          job_application_id?: string | null
+          last_message_at?: string
+        }
+        Update: {
+          company_id?: string
+          created_at?: string
+          id?: string
+          job_application_id?: string | null
+          last_message_at?: string
+        }
+        Relationships: []
+      }
+      direct_messages: {
+        Row: {
+          content: string
+          conversation_id: string
+          created_at: string
+          id: string
+          read_at: string | null
+          sender_user_id: string
+        }
+        Insert: {
+          content: string
+          conversation_id: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id: string
+        }
+        Update: {
+          content?: string
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          read_at?: string | null
+          sender_user_id?: string
+        }
+        Relationships: []
+      }
+      follows: {
+        Row: {
+          created_at: string
+          followed_company_id: string | null
+          followed_user_id: string | null
+          follower_user_id: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          followed_company_id?: string | null
+          followed_user_id?: string | null
+          follower_user_id: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          followed_company_id?: string | null
+          followed_user_id?: string | null
+          follower_user_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      post_comments: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          parent_comment_id: string | null
+          post_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          parent_comment_id?: string | null
+          post_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          parent_comment_id?: string | null
+          post_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      post_reactions: {
+        Row: {
+          created_at: string
+          post_id: string
+          reaction_type: Database["public"]["Enums"]["post_reaction_type"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          post_id: string
+          reaction_type?: Database["public"]["Enums"]["post_reaction_type"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          post_id?: string
+          reaction_type?: Database["public"]["Enums"]["post_reaction_type"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      post_reports: {
+        Row: {
+          created_at: string
+          id: string
+          post_id: string
+          reason: string
+          reporter_user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          post_id: string
+          reason?: string
+          reporter_user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          post_id?: string
+          reason?: string
+          reporter_user_id?: string
+        }
+        Relationships: []
+      }
+      post_shares: {
+        Row: {
+          comment: string | null
+          created_at: string
+          feed_post_id: string | null
+          id: string
+          post_id: string
+          user_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          feed_post_id?: string | null
+          id?: string
+          post_id: string
+          user_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          feed_post_id?: string | null
+          id?: string
+          post_id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      posts: {
+        Row: {
+          author_company_id: string | null
+          author_user_id: string | null
+          content: string
+          created_at: string
+          id: string
+          job_id: string | null
+          media_urls: Json
+          post_source: Database["public"]["Enums"]["post_source"]
+          shared_post_id: string | null
+          source_event_kind: string | null
+          updated_at: string
+          visibility: Database["public"]["Enums"]["post_visibility"]
+        }
+        Insert: {
+          author_company_id?: string | null
+          author_user_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          media_urls?: Json
+          post_source?: Database["public"]["Enums"]["post_source"]
+          shared_post_id?: string | null
+          source_event_kind?: string | null
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["post_visibility"]
+        }
+        Update: {
+          author_company_id?: string | null
+          author_user_id?: string | null
+          content?: string
+          created_at?: string
+          id?: string
+          job_id?: string | null
+          media_urls?: Json
+          post_source?: Database["public"]["Enums"]["post_source"]
+          shared_post_id?: string | null
+          source_event_kind?: string | null
+          updated_at?: string
+          visibility?: Database["public"]["Enums"]["post_visibility"]
+        }
+        Relationships: []
+      }
     }
     Views: {
-      [_ in never]: never
+      post_counts: {
+        Row: {
+          comment_count: number
+          like_count: number
+          post_id: string
+          share_count: number
+        }
+        Relationships: []
+      }
     }
     Functions: {
-      claim_company: {
-        Args: { p_company_id: string }
-        Returns: Database["public"]["Tables"]["company_members"]["Row"]
-      }
       is_owner: { Args: { target_user_id: string }; Returns: boolean }
     }
     Enums: {
@@ -3170,7 +3377,6 @@ export type Database = {
         | "skill"
         | "project"
         | "experience"
-      application_source: "internal" | "external"
       application_status:
         | "interested"
         | "applied"
@@ -3221,6 +3427,9 @@ export type Database = {
         | "profile"
         | "dna"
         | "success"
+      post_reaction_type: "like"
+      post_source: "manual" | "system"
+      post_visibility: "public" | "followers"
       resume_suggestion_type: "add" | "move" | "highlight"
       resume_upload_status: "pending" | "processing" | "completed" | "failed"
       salary_range_kind:
@@ -3374,7 +3583,6 @@ export const Constants = {
         "project",
         "experience",
       ],
-      application_source: ["internal", "external"],
       application_status: [
         "interested",
         "applied",
@@ -3390,7 +3598,6 @@ export const Constants = {
       chat_context: ["dashboard", "discovery", "job_detail", "assistant"],
       chat_role: ["assistant", "user"],
       company_environment: ["startup", "scale_up", "corporativa"],
-      company_member_role: ["admin", "recruiter", "viewer"],
       contract_type: ["clt", "pj", "freelancer", "international"],
       copilot_status: ["active", "paused"],
       currency_code: ["BRL", "USD"],

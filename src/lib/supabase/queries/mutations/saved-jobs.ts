@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { isInternalJobRef } from "@/lib/external-jobs/resolve-job-ref";
 import { resolveExternalJobId } from "@/lib/external-jobs/upsert-external-job";
 import type { JobRecommendation } from "@/types/jobs";
@@ -8,7 +7,7 @@ export async function listSavedJobRefs(
   supabase: SupabaseClient,
   userId: string
 ): Promise<Set<string>> {
-  const { data, error } = await fromExtendedTable(supabase, "saved_jobs")
+  const { data, error } = await supabase.from("saved_jobs")
     .select("job_id, external_jobs(external_key)")
     .eq("user_id", userId);
 
@@ -17,7 +16,7 @@ export async function listSavedJobRefs(
   const refs = new Set<string>();
   for (const row of data ?? []) {
     if (row.job_id) refs.add(row.job_id as string);
-    const external = row.external_jobs as { external_key: string } | null;
+    const external = row.external_jobs as unknown as { external_key: string } | null;
     if (external?.external_key) refs.add(external.external_key);
   }
   return refs;
@@ -34,7 +33,7 @@ export async function saveJob(
     ? null
     : await resolveExternalJobId(supabase, jobRef, job);
 
-  const { data: existing } = await fromExtendedTable(supabase, "saved_jobs")
+  const { data: existing } = await supabase.from("saved_jobs")
     .select("id")
     .eq("user_id", userId)
     .match(isInternal ? { job_id: jobRef } : { external_job_id: externalJobId })
@@ -42,7 +41,7 @@ export async function saveJob(
 
   if (existing?.id) return;
 
-  const { error } = await fromExtendedTable(supabase, "saved_jobs").insert({
+  const { error } = await supabase.from("saved_jobs").insert({
     user_id: userId,
     job_id: isInternal ? jobRef : null,
     external_job_id: externalJobId,
@@ -58,7 +57,7 @@ export async function unsaveJob(
   const isInternal = isInternalJobRef(jobRef);
 
   if (isInternal) {
-    const { error } = await fromExtendedTable(supabase, "saved_jobs")
+    const { error } = await supabase.from("saved_jobs")
       .delete()
       .eq("user_id", userId)
       .eq("job_id", jobRef);
@@ -67,7 +66,7 @@ export async function unsaveJob(
   }
 
   const externalJobId = await resolveExternalJobId(supabase, jobRef);
-  const { error } = await fromExtendedTable(supabase, "saved_jobs")
+  const { error } = await supabase.from("saved_jobs")
     .delete()
     .eq("user_id", userId)
     .eq("external_job_id", externalJobId);
@@ -89,7 +88,7 @@ export async function listHiddenJobRefs(
   const refs = new Set<string>();
   for (const row of data ?? []) {
     if (row.job_id) refs.add(row.job_id as string);
-    const external = row.external_jobs as { external_key: string } | null;
+    const external = row.external_jobs as unknown as { external_key: string } | null;
     if (external?.external_key) refs.add(external.external_key);
   }
   return refs;

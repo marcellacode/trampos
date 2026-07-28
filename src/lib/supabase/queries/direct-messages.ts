@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { createNotification } from "@/lib/supabase/queries/mutations/notifications";
 import { fetchEditableCompany } from "@/lib/supabase/queries/company";
 
@@ -82,7 +81,7 @@ export async function startConversationFromApplication(
     throw new Error("Sem permissão para contatar este candidato.");
   }
 
-  const { data: existingConv } = await fromExtendedTable(supabase, "conversations")
+  const { data: existingConv } = await supabase.from("conversations")
     .select("id")
     .eq("job_application_id", applicationId)
     .maybeSingle();
@@ -90,10 +89,7 @@ export async function startConversationFromApplication(
   if (existingConv?.id) return existingConv.id as string;
 
   const now = new Date().toISOString();
-  const { data: conversation, error: convError } = await fromExtendedTable(
-    supabase,
-    "conversations"
-  )
+  const { data: conversation, error: convError } = await supabase.from("conversations")
     .insert({
       job_application_id: applicationId,
       company_id: application.company_id,
@@ -106,10 +102,7 @@ export async function startConversationFromApplication(
 
   const conversationId = conversation.id as string;
 
-  const { error: participantsError } = await fromExtendedTable(
-    supabase,
-    "conversation_participants"
-  ).insert([
+  const { error: participantsError } = await supabase.from("conversation_participants").insert([
     {
       conversation_id: conversationId,
       user_id: application.user_id,
@@ -137,7 +130,7 @@ export async function sendDirectMessage(
 
   const now = new Date().toISOString();
 
-  const { data, error } = await fromExtendedTable(supabase, "direct_messages")
+  const { data, error } = await supabase.from("direct_messages")
     .insert({
       conversation_id: conversationId,
       sender_user_id: senderId,
@@ -148,14 +141,11 @@ export async function sendDirectMessage(
 
   if (error) throw error;
 
-  await fromExtendedTable(supabase, "conversations")
+  await supabase.from("conversations")
     .update({ last_message_at: now })
     .eq("id", conversationId);
 
-  const { data: participants, error: partError } = await fromExtendedTable(
-    supabase,
-    "conversation_participants"
-  )
+  const { data: participants, error: partError } = await supabase.from("conversation_participants")
     .select("user_id")
     .eq("conversation_id", conversationId)
     .neq("user_id", senderId);
@@ -191,10 +181,7 @@ export async function listConversations(
   supabase: SupabaseClient,
   userId: string
 ): Promise<ConversationSummary[]> {
-  const { data: memberships, error: memberError } = await fromExtendedTable(
-    supabase,
-    "conversation_participants"
-  )
+  const { data: memberships, error: memberError } = await supabase.from("conversation_participants")
     .select("conversation_id, role")
     .eq("user_id", userId);
 
@@ -205,10 +192,7 @@ export async function listConversations(
     (m: { conversation_id: string }) => m.conversation_id
   );
 
-  const { data: conversations, error: convError } = await fromExtendedTable(
-    supabase,
-    "conversations"
-  )
+  const { data: conversations, error: convError } = await supabase.from("conversations")
     .select(
       `
       id,
@@ -232,10 +216,7 @@ export async function listConversations(
       ? conv.job_applications[0]
       : conv.job_applications;
 
-    const { data: participants, error: partError } = await fromExtendedTable(
-      supabase,
-      "conversation_participants"
-    )
+    const { data: participants, error: partError } = await supabase.from("conversation_participants")
       .select("user_id, role")
       .eq("conversation_id", conv.id)
       .neq("user_id", userId);
@@ -247,14 +228,14 @@ export async function listConversations(
 
     const otherProfile = await getParticipantProfile(supabase, other.user_id as string);
 
-    const { data: lastMsg } = await fromExtendedTable(supabase, "direct_messages")
+    const { data: lastMsg } = await supabase.from("direct_messages")
       .select("content, created_at, sender_user_id, read_at")
       .eq("conversation_id", conv.id)
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
 
-    const { count: unreadCount } = await fromExtendedTable(supabase, "direct_messages")
+    const { count: unreadCount } = await supabase.from("direct_messages")
       .select("id", { count: "exact", head: true })
       .eq("conversation_id", conv.id)
       .neq("sender_user_id", userId)
@@ -290,10 +271,7 @@ export async function listMessages(
   userId: string,
   conversationId: string
 ): Promise<DirectMessageRow[]> {
-  const { data: membership, error: memberError } = await fromExtendedTable(
-    supabase,
-    "conversation_participants"
-  )
+  const { data: membership, error: memberError } = await supabase.from("conversation_participants")
     .select("conversation_id")
     .eq("conversation_id", conversationId)
     .eq("user_id", userId)
@@ -302,7 +280,7 @@ export async function listMessages(
   if (memberError) throw memberError;
   if (!membership) throw new Error("Conversa não encontrada.");
 
-  const { data, error } = await fromExtendedTable(supabase, "direct_messages")
+  const { data, error } = await supabase.from("direct_messages")
     .select("id, conversation_id, sender_user_id, content, created_at, read_at")
     .eq("conversation_id", conversationId)
     .order("created_at", { ascending: true });
@@ -326,7 +304,7 @@ export async function markConversationRead(
   conversationId: string
 ): Promise<void> {
   const now = new Date().toISOString();
-  const { error } = await fromExtendedTable(supabase, "direct_messages")
+  const { error } = await supabase.from("direct_messages")
     .update({ read_at: now })
     .eq("conversation_id", conversationId)
     .neq("sender_user_id", userId)
@@ -344,7 +322,7 @@ export async function countUnreadDirectMessages(
   });
 
   if (error) {
-    const { count } = await fromExtendedTable(supabase, "direct_messages")
+    const { count } = await supabase.from("direct_messages")
       .select("id", { count: "exact", head: true });
 
     void count;

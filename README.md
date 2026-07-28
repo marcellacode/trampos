@@ -66,7 +66,25 @@ A conta demo vem com catálogo interno, candidaturas e matches pré-populados.
 | **Jobe Chat** | Assistente IA + bulk prepare (interno vs externo) |
 | **Privacidade (LGPD)** | Perfil público opt-in, exportação JSON, denunciar/bloquear no feed |
 
-> **Home do dashboard:** `/dashboard` redireciona para `/dashboard/feed` após login/onboarding.
+> **Home do dashboard:** `/dashboard` redireciona para `/dashboard/inicio` (overview com timeline, KPIs e matches). Rotas legadas redirecionam: `/dashboard/assistente` → Mensagens (Jobe), `/dashboard/mercado` e `/dashboard/empresas` → Vagas, `/dashboard/portfolio` → Currículo (aba Portfólio).
+
+## Mapa de seções (sidebar)
+
+| Rota | Função |
+|------|--------|
+| `/dashboard/inicio` | Overview: timeline, KPIs, metas, vagas com match, empregabilidade compacta |
+| `/dashboard/feed` | Rede social: publicações, composer, Para você / Explorar |
+| `/dashboard/vagas` | Discovery de vagas, filtros inteligentes, insights de mercado |
+| `/dashboard/rede` | Seguir perfis e empresas |
+| `/dashboard/curriculo` | Perfil profissional + aba Portfólio |
+| `/dashboard/empregabilidade` | Mapa de competências, missões diárias, radar de mercado |
+| `/dashboard/mensagens` | Pessoas (DM recrutador) + Copiloto Jobe |
+| `/dashboard/entrevistas` | Simulador IA + convites da timeline |
+| `/dashboard/agenda` | Timeline visual da jornada (+ CRUD avançado) |
+| `/dashboard/configuracoes` | Privacidade LGPD (+ uploads/OAuth em Avançado) |
+| `/dashboard/empresa` | Recrutador: vagas, candidatos, publicação (se membro) |
+
+**Páginas públicas:** `/empresa/[slug]` (empresa), `/perfil/[slug]` (profissional).
 
 ## Degradação graceful (sem `GROQ_API_KEY`)
 
@@ -86,7 +104,7 @@ A conta demo vem com catálogo interno, candidaturas e matches pré-populados.
 1. Login com `demo@jobera.app` / `demo123456`.
 2. **Dashboard → Vagas:** veja compatibilidade % nos cards.
 3. Abra uma vaga → **Preparar candidatura com IA** → confira currículo/carta.
-4. **Mensagens / Assistente:** converse com Jobe; teste bulk prepare.
+4. **Mensagens:** aba Copiloto Jobe (ex-Assistente); teste bulk prepare.
 5. **Currículo:** veja versões adaptadas por vaga.
 
 ### 2. Conta nova (não-demo)

@@ -2,21 +2,14 @@
 
 import { Suspense, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import {
-  EntityCrudSection,
-  ModuleCrudShell,
-} from "@/components/crud/module-crud-page";
+import Link from "next/link";
+import { ModuleCrudShell } from "@/components/crud/module-crud-page";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { InterviewSimulator } from "@/components/dashboard/interview/interview-simulator";
 import { HumanInbox } from "@/components/dashboard/messages/human-inbox";
 import { MessagesInbox } from "@/components/dashboard/messages-inbox";
 import { Button } from "@/components/ui/button";
-import {
-  useCreateTimelineEvent,
-  useDeleteTimelineEvent,
-  useTimelineEvents,
-  useUpdateTimelineEvent,
-} from "@/lib/crud/hooks";
+import { useTimelineEvents } from "@/lib/crud/hooks";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { ENTREVISTAS_MODULE } from "@/lib/crud/modules";
 import { cn } from "@/lib/utils";
@@ -93,35 +86,6 @@ export function MensagensModulePage() {
   );
 }
 
-export function AssistenteModulePage() {
-  const { shell } = useDashboardShell();
-
-  return (
-    <DashboardLayout
-      user={shell.user}
-      notifications={shell.notifications}
-      unreadNotifications={shell.unreadNotifications}
-      unreadMessages={shell.unreadMessages}
-    >
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-            Assistente de carreira
-          </h1>
-          <p className="mt-1.5 max-w-2xl text-sm text-muted-foreground">
-            Copiloto full-screen para planejar sua carreira, revisar currículo e preparar entrevistas.
-          </p>
-        </div>
-        <MessagesInbox
-          context="assistant"
-          userName={shell.user.firstName}
-          className="lg:grid-cols-[300px_1fr]"
-        />
-      </div>
-    </DashboardLayout>
-  );
-}
-
 export function EntrevistasModulePage() {
   return (
     <Suspense fallback={null}>
@@ -137,10 +101,7 @@ function EntrevistasModuleContent() {
   const companyName = searchParams.get("company") ?? undefined;
 
   const timelineQuery = useTimelineEvents("interview_invite");
-  const createEvent = useCreateTimelineEvent();
-  const updateEvent = useUpdateTimelineEvent();
-  const deleteEvent = useDeleteTimelineEvent();
-  const [interviews] = ENTREVISTAS_MODULE.entities;
+  const invites = timelineQuery.data ?? [];
 
   return (
     <ModuleCrudShell config={ENTREVISTAS_MODULE}>
@@ -150,31 +111,62 @@ function EntrevistasModuleContent() {
         companyName={companyName}
       />
 
-      <div className="rounded-2xl border border-border bg-card/50 p-1">
-        <p className="px-4 pt-4 text-xs font-medium uppercase tracking-wider text-[#6B7280]">
-          Convites reais
-        </p>
-        <EntityCrudSection
-          config={interviews}
-          items={timelineQuery.data ?? []}
-          isLoading={timelineQuery.isLoading}
-          isMutating={createEvent.isPending || updateEvent.isPending}
-          onCreate={async (payload) => {
-            await createEvent.mutateAsync({
-              title: String(payload.title ?? ""),
-              description: String(payload.description ?? ""),
-              href: String(payload.href ?? "/dashboard/entrevistas"),
-              event_kind: "interview_invite",
-            });
-          }}
-          onUpdate={async (id, payload) => {
-            await updateEvent.mutateAsync({ id, input: payload });
-          }}
-          onDelete={async (id) => {
-            await deleteEvent.mutateAsync(id);
-          }}
-        />
-      </div>
+      <section
+        className="rounded-2xl border border-border bg-card/50"
+        aria-labelledby="interview-invites-heading"
+      >
+        <div className="border-b border-border px-4 py-4 sm:px-6">
+          <h2
+            id="interview-invites-heading"
+            className="text-base font-bold text-foreground"
+          >
+            Convites de entrevista
+          </h2>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Gerados automaticamente a partir das suas candidaturas e timeline
+          </p>
+        </div>
+
+        {timelineQuery.isLoading ? (
+          <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
+            Carregando convites…
+          </p>
+        ) : invites.length === 0 ? (
+          <p className="px-4 py-6 text-sm text-muted-foreground sm:px-6">
+            Nenhum convite registrado ainda. Quando uma empresa avançar sua
+            candidatura, o convite aparecerá aqui.
+          </p>
+        ) : (
+          <ul className="divide-y divide-border" role="list">
+            {invites.map((item) => {
+              const row = item as {
+                id: string;
+                title: string;
+                description?: string | null;
+                href?: string;
+                created_at?: string;
+              };
+              return (
+                <li key={row.id}>
+                  <Link
+                    href={row.href ?? "/dashboard/entrevistas"}
+                    className="block px-4 py-4 transition-colors hover:bg-muted/50 sm:px-6"
+                  >
+                    <p className="text-sm font-medium text-foreground">
+                      {row.title}
+                    </p>
+                    {row.description ? (
+                      <p className="mt-1 text-sm text-muted-foreground">
+                        {row.description}
+                      </p>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </section>
     </ModuleCrudShell>
   );
 }

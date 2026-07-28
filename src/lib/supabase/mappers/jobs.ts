@@ -177,7 +177,7 @@ export function mapCompanyMatch(
     environment: mapCompanyEnvironment(company.environment),
     remote: company.remote_friendly,
     benefits,
-    href: company.href ?? `/dashboard/empresas/${company.slug}`,
+    href: company.href ?? `/empresa/${company.slug}`,
   };
 }
 

@@ -1,6 +1,5 @@
 import {
   Briefcase,
-  Building2,
   CheckCircle2,
   Eye,
   FileText,
@@ -49,7 +48,7 @@ const KIND_META: Record<
     icon: Eye,
     color: "#820AD1",
     glow: "rgba(130,10,209,0.35)",
-    href: "/dashboard/empresas",
+    href: "/dashboard/vagas",
   },
   interview_invite: {
     actor: "company",

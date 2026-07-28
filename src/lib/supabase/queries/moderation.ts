@@ -1,11 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 
 export async function fetchBlockedUserIds(
   supabase: SupabaseClient,
   userId: string
 ): Promise<string[]> {
-  const { data, error } = await fromExtendedTable(supabase, "blocked_users")
+  const { data, error } = await supabase.from("blocked_users")
     .select("blocked_id")
     .eq("blocker_id", userId);
 
@@ -19,7 +18,7 @@ export async function reportPost(
   postId: string,
   reason: string
 ): Promise<void> {
-  const { error } = await fromExtendedTable(supabase, "post_reports").insert({
+  const { error } = await supabase.from("post_reports").insert({
     post_id: postId,
     reporter_user_id: reporterId,
     reason: reason.trim() || "Denúncia",
@@ -37,7 +36,7 @@ export async function blockUser(
     throw new Error("Você não pode bloquear a si mesmo.");
   }
 
-  const { error } = await fromExtendedTable(supabase, "blocked_users").insert({
+  const { error } = await supabase.from("blocked_users").insert({
     blocker_id: blockerId,
     blocked_id: blockedId,
   });
@@ -50,7 +49,7 @@ export async function unblockUser(
   blockerId: string,
   blockedId: string
 ): Promise<void> {
-  const { error } = await fromExtendedTable(supabase, "blocked_users")
+  const { error } = await supabase.from("blocked_users")
     .delete()
     .eq("blocker_id", blockerId)
     .eq("blocked_id", blockedId);

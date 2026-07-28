@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import type { JobRecommendation } from "@/types/jobs";
 import { isInternalJobRef } from "@/lib/external-jobs/resolve-job-ref";
 import { resolveExternalJobId } from "@/lib/external-jobs/upsert-external-job";
@@ -69,7 +68,7 @@ export async function upsertUserJobMatch(
 
   const conflictColumn = isInternal ? "user_id,job_id" : "user_id,external_job_id";
 
-  const { data, error } = await fromExtendedTable(supabase, "user_job_matches")
+  const { data, error } = await supabase.from("user_job_matches")
     .upsert(payload, {
       onConflict: conflictColumn,
       ignoreDuplicates: false,
@@ -82,16 +81,13 @@ export async function upsertUserJobMatch(
       ? { user_id: userId, job_id: job.id }
       : { user_id: userId, external_job_id: externalJobId };
 
-    const { data: existing } = await fromExtendedTable(supabase, "user_job_matches")
+    const { data: existing } = await supabase.from("user_job_matches")
       .select("id")
       .match(filter)
       .maybeSingle();
 
     if (existing?.id) {
-      const { data: updated, error: updateError } = await fromExtendedTable(
-        supabase,
-        "user_job_matches"
-      )
+      const { data: updated, error: updateError } = await supabase.from("user_job_matches")
         .update(payload)
         .eq("id", existing.id)
         .select("*")
@@ -100,10 +96,7 @@ export async function upsertUserJobMatch(
       return updated as UserJobMatchRow;
     }
 
-    const { data: inserted, error: insertError } = await fromExtendedTable(
-      supabase,
-      "user_job_matches"
-    )
+    const { data: inserted, error: insertError } = await supabase.from("user_job_matches")
       .insert(payload)
       .select("*")
       .single();
@@ -118,7 +111,7 @@ export async function updateDiscoverySummary(
   supabase: SupabaseClient,
   userId: string
 ): Promise<void> {
-  const { data } = await fromExtendedTable(supabase, "user_job_matches")
+  const { data } = await supabase.from("user_job_matches")
     .select("compatibility")
     .eq("user_id", userId);
 
@@ -186,7 +179,7 @@ export async function loadUserMatchesForJobs(
   const map = new Map<string, UserJobMatchRow>();
 
   if (internalIds.length > 0) {
-    const { data } = await fromExtendedTable(supabase, "user_job_matches")
+    const { data } = await supabase.from("user_job_matches")
       .select("*")
       .eq("user_id", userId)
       .in("job_id", internalIds);
@@ -197,7 +190,7 @@ export async function loadUserMatchesForJobs(
   }
 
   if (externalKeys.length > 0) {
-    const { data: externalJobs } = await fromExtendedTable(supabase, "external_jobs")
+    const { data: externalJobs } = await supabase.from("external_jobs")
       .select("id, external_key")
       .in("external_key", externalKeys);
 
@@ -210,7 +203,7 @@ export async function loadUserMatchesForJobs(
     const externalIds = [...keyById.keys()];
 
     if (externalIds.length > 0) {
-      const { data } = await fromExtendedTable(supabase, "user_job_matches")
+      const { data } = await supabase.from("user_job_matches")
         .select("*")
         .eq("user_id", userId)
         .in("external_job_id", externalIds);

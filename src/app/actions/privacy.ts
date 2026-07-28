@@ -2,7 +2,6 @@
 
 import type { ActionResult } from "@/app/actions/ai";
 import { AuthError, requireAuth } from "@/lib/auth/require-auth";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof AuthError) return error.message;
@@ -37,10 +36,10 @@ export async function exportUserDataAction(): Promise<
       supabase
         .from("job_applications")
         .select(
-          "id, role_title, status, status_label, applied_at, application_source, submission_status"
+          "id, role_title, status, status_label, applied_at, source, submission_status"
         )
         .eq("user_id", user.id),
-      fromExtendedTable(supabase, "posts")
+      supabase.from("posts")
         .select("id, content, visibility, post_source, source_event_kind, created_at")
         .eq("author_user_id", user.id),
     ]);

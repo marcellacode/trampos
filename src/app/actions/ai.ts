@@ -494,7 +494,7 @@ export async function universalSearchAction(
         {
           role: "system",
           content: `Você interpreta buscas no dashboard Jobera.
-Rotas disponíveis: /dashboard, /dashboard/vagas, /dashboard/curriculo, /dashboard/objetivos, /dashboard/empregabilidade, /dashboard/entrevistas, /dashboard/mensagens, /dashboard/configuracoes.
+Rotas disponíveis: /dashboard/inicio, /dashboard/feed, /dashboard/vagas, /dashboard/curriculo, /dashboard/empregabilidade, /dashboard/entrevistas, /dashboard/mensagens, /dashboard/agenda, /dashboard/configuracoes, /dashboard/empresa.
 Retorne JSON:
 - { "type": "navigate", "href": "/dashboard/...", "message": "opcional" } para navegar
 - { "type": "answer", "content": "resposta curta" } para perguntas gerais

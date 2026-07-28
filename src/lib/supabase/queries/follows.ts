@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { fetchBlockedUserIds } from "@/lib/supabase/queries/moderation";
 import type {
   FollowCompanySummary,
@@ -70,10 +69,7 @@ export async function fetchFollowStatusForUser(
 
   let isFollowing = false;
   if (viewerId && viewerId !== targetUserId) {
-    const { data: follow, error: followError } = await fromExtendedTable(
-      supabase,
-      "follows"
-    )
+    const { data: follow, error: followError } = await supabase.from("follows")
       .select("id")
       .eq("follower_user_id", viewerId)
       .eq("followed_user_id", targetUserId)
@@ -104,10 +100,7 @@ export async function fetchFollowStatusForCompany(
 
   let isFollowing = false;
   if (viewerId) {
-    const { data: follow, error: followError } = await fromExtendedTable(
-      supabase,
-      "follows"
-    )
+    const { data: follow, error: followError } = await supabase.from("follows")
       .select("id")
       .eq("follower_user_id", viewerId)
       .eq("followed_company_id", companyId)
@@ -132,10 +125,7 @@ export async function toggleFollowUser(
     throw new Error("Você não pode seguir a si mesmo.");
   }
 
-  const { data: existing, error: existingError } = await fromExtendedTable(
-    supabase,
-    "follows"
-  )
+  const { data: existing, error: existingError } = await supabase.from("follows")
     .select("id")
     .eq("follower_user_id", followerId)
     .eq("followed_user_id", followedUserId)
@@ -144,12 +134,12 @@ export async function toggleFollowUser(
   if (existingError) throw existingError;
 
   if (existing) {
-    const { error } = await fromExtendedTable(supabase, "follows")
+    const { error } = await supabase.from("follows")
       .delete()
       .eq("id", existing.id);
     if (error) throw error;
   } else {
-    const { error } = await fromExtendedTable(supabase, "follows").insert({
+    const { error } = await supabase.from("follows").insert({
       follower_user_id: followerId,
       followed_user_id: followedUserId,
     });
@@ -168,10 +158,7 @@ export async function toggleFollowCompany(
   followerId: string,
   companyId: string
 ): Promise<ToggleFollowResult> {
-  const { data: existing, error: existingError } = await fromExtendedTable(
-    supabase,
-    "follows"
-  )
+  const { data: existing, error: existingError } = await supabase.from("follows")
     .select("id")
     .eq("follower_user_id", followerId)
     .eq("followed_company_id", companyId)
@@ -180,12 +167,12 @@ export async function toggleFollowCompany(
   if (existingError) throw existingError;
 
   if (existing) {
-    const { error } = await fromExtendedTable(supabase, "follows")
+    const { error } = await supabase.from("follows")
       .delete()
       .eq("id", existing.id);
     if (error) throw error;
   } else {
-    const { error } = await fromExtendedTable(supabase, "follows").insert({
+    const { error } = await supabase.from("follows").insert({
       follower_user_id: followerId,
       followed_company_id: companyId,
     });
@@ -203,7 +190,7 @@ export async function fetchFollowedAuthorIds(
   supabase: SupabaseClient,
   userId: string
 ): Promise<{ userIds: string[]; companyIds: string[] }> {
-  const { data, error } = await fromExtendedTable(supabase, "follows")
+  const { data, error } = await supabase.from("follows")
     .select("followed_user_id, followed_company_id")
     .eq("follower_user_id", userId);
 
@@ -224,7 +211,7 @@ export async function fetchFollowingList(
   supabase: SupabaseClient,
   userId: string
 ): Promise<FollowingList> {
-  const { data: follows, error } = await fromExtendedTable(supabase, "follows")
+  const { data: follows, error } = await supabase.from("follows")
     .select("followed_user_id, followed_company_id, created_at")
     .eq("follower_user_id", userId)
     .order("created_at", { ascending: false });
@@ -306,7 +293,7 @@ export async function fetchFollowersList(
   userId: string,
   viewerId: string
 ): Promise<FollowersList> {
-  const { data: follows, error } = await fromExtendedTable(supabase, "follows")
+  const { data: follows, error } = await supabase.from("follows")
     .select("follower_user_id, created_at")
     .eq("followed_user_id", userId)
     .order("created_at", { ascending: false });
@@ -327,10 +314,7 @@ export async function fetchFollowersList(
 
   if (profilesError) throw profilesError;
 
-  const { data: myFollows, error: myFollowsError } = await fromExtendedTable(
-    supabase,
-    "follows"
-  )
+  const { data: myFollows, error: myFollowsError } = await supabase.from("follows")
     .select("followed_user_id")
     .eq("follower_user_id", viewerId)
     .in("followed_user_id", followerIds);
@@ -378,10 +362,7 @@ export async function fetchFollowSuggestions(
   const skillNames = (mySkills ?? []).map((skill) => skill.skill_name);
   const myLocation = myProfile?.location?.trim() ?? "";
 
-  const { data: myFollows, error: followsError } = await fromExtendedTable(
-    supabase,
-    "follows"
-  )
+  const { data: myFollows, error: followsError } = await supabase.from("follows")
     .select("followed_user_id")
     .eq("follower_user_id", userId);
 
@@ -389,10 +370,7 @@ export async function fetchFollowSuggestions(
 
   const blockedIds = new Set(await fetchBlockedUserIds(supabase, userId));
 
-  const { data: myCompanyFollows, error: companyFollowsError } = await fromExtendedTable(
-    supabase,
-    "follows"
-  )
+  const { data: myCompanyFollows, error: companyFollowsError } = await supabase.from("follows")
     .select("followed_company_id")
     .eq("follower_user_id", userId);
 

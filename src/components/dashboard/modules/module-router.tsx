@@ -5,31 +5,21 @@ import { Construction } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { CurriculoModulePage } from "@/components/dashboard/modules/curriculo-page";
-import { PortfolioModulePage } from "@/components/dashboard/modules/portfolio-page";
 import { ObjetivosModulePage } from "@/components/dashboard/modules/objetivos-page";
 import {
-  AssistenteModulePage,
   EntrevistasModulePage,
   MensagensModulePage,
 } from "@/components/dashboard/modules/mensagens-page";
-import { EmpresasModulePage } from "@/components/dashboard/modules/empresas-page";
 import { AgendaModulePage } from "@/components/dashboard/modules/agenda-page";
-import {
-  ConfiguracoesModulePage,
-  MercadoModulePage,
-} from "@/components/dashboard/modules/configuracoes-page";
+import { ConfiguracoesModulePage } from "@/components/dashboard/modules/configuracoes-page";
 
 const MODULE_PAGES: Record<string, () => React.ReactNode> = {
   curriculo: () => <CurriculoModulePage />,
-  portfolio: () => <PortfolioModulePage />,
   objetivos: () => <ObjetivosModulePage />,
   mensagens: () => <MensagensModulePage />,
-  assistente: () => <AssistenteModulePage />,
-  empresas: () => <EmpresasModulePage />,
   agenda: () => <AgendaModulePage />,
   entrevistas: () => <EntrevistasModulePage />,
   configuracoes: () => <ConfiguracoesModulePage />,
-  mercado: () => <MercadoModulePage />,
 };
 
 export function DashboardModuleRouter() {

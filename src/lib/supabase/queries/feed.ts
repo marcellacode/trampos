@@ -6,7 +6,6 @@ import type {
   FeedPage,
   FeedPost,
 } from "@/types/feed";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { formatRelativeTime } from "@/lib/supabase/utils";
 import { fetchFollowedAuthorIds } from "@/lib/supabase/queries/follows";
 import { fetchBlockedUserIds } from "@/lib/supabase/queries/moderation";
@@ -62,7 +61,7 @@ export async function fetchFeedPosts(
     blockedUserIds = blocked;
   }
 
-  let query = fromExtendedTable(supabase, "posts")
+  let query = supabase.from("posts")
     .select(POST_SELECT)
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
@@ -134,7 +133,7 @@ export async function createFeedPost(
   }
 
   if (input.authorCompanyId) {
-    const { data, error } = await fromExtendedTable(supabase, "posts")
+    const { data, error } = await supabase.from("posts")
       .insert({
         author_company_id: input.authorCompanyId,
         content,
@@ -149,7 +148,7 @@ export async function createFeedPost(
     return mapFeedPostRow(data as DbFeedPostRow);
   }
 
-  const { data, error } = await fromExtendedTable(supabase, "posts")
+  const { data, error } = await supabase.from("posts")
     .insert({
       author_user_id: userId,
       content,
@@ -168,7 +167,7 @@ export async function deleteFeedPost(
   supabase: SupabaseClient,
   postId: string
 ): Promise<void> {
-  const { error } = await fromExtendedTable(supabase, "posts").delete().eq("id", postId);
+  const { error } = await supabase.from("posts").delete().eq("id", postId);
   if (error) throw error;
 }
 

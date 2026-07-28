@@ -18,7 +18,7 @@ function isAuthRoute(pathname: string): boolean {
   );
 }
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
 
   const { url, anonKey } = getSupabaseEnv();
@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
 
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = profile?.onboarding_completed
-      ? "/dashboard/feed"
+      ? "/dashboard/inicio"
       : "/onboarding";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);

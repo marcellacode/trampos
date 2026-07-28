@@ -336,7 +336,7 @@ export async function fetchJobById(
       compatibility: 0,
       href:
         company?.href ??
-        `/dashboard/empresas/${company?.slug ?? company?.id ?? ""}`,
+        `/empresa/${company?.slug ?? company?.id ?? ""}`,
     };
   });
 

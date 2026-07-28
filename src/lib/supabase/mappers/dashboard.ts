@@ -162,7 +162,7 @@ export function mapInterestedCompanies(
       color: company?.brand_color ?? "#6366F1",
       href: job?.slug
         ? `/dashboard/vagas/${job.slug}`
-        : `/dashboard/empresas/${company?.slug ?? ""}`,
+        : `/empresa/${company?.slug ?? ""}`,
     };
   });
 }

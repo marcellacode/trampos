@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 
 export type SystemPostEventKind =
   | "onboarding_completed"
@@ -34,7 +33,7 @@ export async function createSystemPostIfEnabled(
   const content = template(context).trim();
   if (!content) return null;
 
-  const { data: existing } = await fromExtendedTable(supabase, "posts")
+  const { data: existing } = await supabase.from("posts")
     .select("id")
     .eq("author_user_id", userId)
     .eq("post_source", "system")
@@ -44,7 +43,7 @@ export async function createSystemPostIfEnabled(
 
   if (existing?.id) return existing.id as string;
 
-  const { data, error } = await fromExtendedTable(supabase, "posts")
+  const { data, error } = await supabase.from("posts")
     .insert({
       author_user_id: userId,
       content,

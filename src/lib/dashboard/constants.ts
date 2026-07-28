@@ -3,19 +3,23 @@ import {
   Building2,
   Calendar,
   FileText,
+  LayoutDashboard,
   MessageSquare,
   Mic,
   Newspaper,
   Settings,
+  Target,
   Users,
 } from "lucide-react";
 import type { NavItem } from "@/types/dashboard";
 
 export const DASHBOARD_NAV_ITEMS: NavItem[] = [
+  { label: "Início", href: "/dashboard/inicio", icon: LayoutDashboard },
   { label: "Feed", href: "/dashboard/feed", icon: Newspaper },
   { label: "Vagas", href: "/dashboard/vagas", icon: Briefcase },
   { label: "Rede", href: "/dashboard/rede", icon: Users },
   { label: "Currículo", href: "/dashboard/curriculo", icon: FileText },
+  { label: "Empregabilidade", href: "/dashboard/empregabilidade", icon: Target },
   { label: "Mensagens", href: "/dashboard/mensagens", icon: MessageSquare },
   { label: "Entrevistas", href: "/dashboard/entrevistas", icon: Mic },
   { label: "Agenda", href: "/dashboard/agenda", icon: Calendar },

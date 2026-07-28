@@ -1,7 +1,6 @@
 "use server";
 
 import { AuthError, requireAuth } from "@/lib/auth/require-auth";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { checkRateLimit } from "@/lib/ai/rate-limit";
 import { chatCompletion } from "@/lib/ai/groq";
 import { isGroqConfigured } from "@/lib/ai/env";
@@ -9,6 +8,7 @@ import { loadUserProfile } from "@/lib/matching/compute-compatibility";
 import { isInternalJobRef } from "@/lib/external-jobs/resolve-job-ref";
 import { getExternalJobByKey } from "@/lib/external-jobs/upsert-external-job";
 import type { ActionResult } from "@/app/actions/ai";
+import type { Json } from "@/lib/supabase/database.types";
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof AuthError) return error.message;
@@ -148,7 +148,7 @@ Retorne JSON: { "question": string }`,
       { role: "interviewer", content: question, timestamp: now },
     ];
 
-    const { data, error } = await fromExtendedTable(supabase, "interview_sessions")
+    const { data, error } = await supabase.from("interview_sessions")
       .insert({
         user_id: user.id,
         job_id: jobContext?.jobId ?? null,
@@ -156,8 +156,8 @@ Retorne JSON: { "question": string }`,
         role_title: roleTitle,
         company_name: companyName,
         status: "active",
-        questions: [{ question }],
-        messages,
+        questions: [{ question }] as Json,
+        messages: messages as unknown as Json,
       })
       .select("id")
       .single();
@@ -194,10 +194,7 @@ export async function submitInterviewAnswerAction(
       return { success: false, error: "Aguarde e tente novamente." };
     }
 
-    const { data: session, error: fetchError } = await fromExtendedTable(
-      supabase,
-      "interview_sessions"
-    )
+    const { data: session, error: fetchError } = await supabase.from("interview_sessions")
       .select("*")
       .eq("id", sessionId)
       .eq("user_id", user.id)
@@ -207,7 +204,7 @@ export async function submitInterviewAnswerAction(
       return { success: false, error: "Sessão não encontrada." };
     }
 
-    const messages = (session.messages ?? []) as InterviewMessage[];
+    const messages = (session.messages ?? []) as unknown as InterviewMessage[];
     const now = new Date().toISOString();
     messages.push({ role: "user", content: trimmed, timestamp: now });
 
@@ -262,17 +259,17 @@ export async function submitInterviewAnswerAction(
     }
 
     if (done) {
-      await fromExtendedTable(supabase, "interview_sessions")
+      await supabase.from("interview_sessions")
         .update({
-          messages,
+          messages: messages as unknown as Json,
           status: "completed",
           score,
           feedback_summary: feedbackSummary || feedback,
         })
         .eq("id", sessionId);
     } else {
-      await fromExtendedTable(supabase, "interview_sessions")
-        .update({ messages, status: "active" })
+      await supabase.from("interview_sessions")
+        .update({ messages: messages as unknown as Json, status: "active" })
         .eq("id", sessionId);
     }
 
@@ -301,10 +298,7 @@ export async function endInterviewSessionAction(
       return { success: false, error: "Aguarde e tente novamente." };
     }
 
-    const { data: session, error: fetchError } = await fromExtendedTable(
-      supabase,
-      "interview_sessions"
-    )
+    const { data: session, error: fetchError } = await supabase.from("interview_sessions")
       .select("*")
       .eq("id", sessionId)
       .eq("user_id", user.id)
@@ -314,7 +308,7 @@ export async function endInterviewSessionAction(
       return { success: false, error: "Sessão não encontrada." };
     }
 
-    const messages = (session.messages ?? []) as InterviewMessage[];
+    const messages = (session.messages ?? []) as unknown as InterviewMessage[];
 
     if (session.status === "completed" && session.score != null) {
       return {
@@ -363,9 +357,9 @@ export async function endInterviewSessionAction(
       timestamp: now,
     });
 
-    await fromExtendedTable(supabase, "interview_sessions")
+    await supabase.from("interview_sessions")
       .update({
-        messages,
+        messages: messages as unknown as Json,
         status: "completed",
         score,
         feedback_summary: feedbackSummary,
@@ -395,7 +389,7 @@ export async function listInterviewSessionsAction(): Promise<
 > {
   try {
     const { supabase, user } = await requireAuth();
-    const { data, error } = await fromExtendedTable(supabase, "interview_sessions")
+    const { data, error } = await supabase.from("interview_sessions")
       .select("id, role_title, company_name, status, score, created_at")
       .eq("user_id", user.id)
       .order("created_at", { ascending: false })

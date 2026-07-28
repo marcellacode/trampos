@@ -1,7 +1,6 @@
 import { createAdminSupabaseClient } from "@/lib/supabase/admin";
 import { isSupabaseServiceConfigured } from "@/lib/supabase/env";
 import type { CreateNotificationInput } from "@/lib/supabase/queries/mutations/notifications";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 interface PostAuthorRow {
@@ -19,7 +18,7 @@ export async function getPostNotificationRecipients(
   supabase: SupabaseClient,
   postId: string
 ): Promise<string[]> {
-  const { data: post, error } = await fromExtendedTable(supabase, "posts")
+  const { data: post, error } = await supabase.from("posts")
     .select("author_user_id, author_company_id")
     .eq("id", postId)
     .maybeSingle();

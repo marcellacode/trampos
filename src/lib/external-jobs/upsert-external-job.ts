@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { detectAtsProvider } from "@/lib/integrations/ats/detect-provider";
 import { enrichJobFromGreenhouseUrl } from "@/lib/integrations/ats/providers/greenhouse/client";
 import type { ExternalJobInput, ExternalJobRow } from "@/lib/external-jobs/types";
@@ -28,7 +27,7 @@ export async function getExternalJobByKey(
   supabase: SupabaseClient,
   externalKey: string
 ): Promise<ExternalJobRow | null> {
-  const { data, error } = await fromExtendedTable(supabase, "external_jobs")
+  const { data, error } = await supabase.from("external_jobs")
     .select("*")
     .eq("external_key", externalKey)
     .maybeSingle();
@@ -41,7 +40,7 @@ export async function getExternalJobById(
   supabase: SupabaseClient,
   id: string
 ): Promise<ExternalJobRow | null> {
-  const { data, error } = await fromExtendedTable(supabase, "external_jobs")
+  const { data, error } = await supabase.from("external_jobs")
     .select("*")
     .eq("id", id)
     .maybeSingle();
@@ -54,7 +53,7 @@ export async function upsertExternalJob(
   supabase: SupabaseClient,
   input: ExternalJobInput
 ): Promise<ExternalJobRow> {
-  const { data, error } = await fromExtendedTable(supabase, "external_jobs")
+  const { data, error } = await supabase.from("external_jobs")
     .upsert(
       {
         external_key: input.externalKey,
@@ -135,7 +134,7 @@ export async function resolveExternalJobId(
     if (row) return row.id;
   }
 
-  const { data, error } = await fromExtendedTable(supabase, "external_jobs")
+  const { data, error } = await supabase.from("external_jobs")
     .upsert(
       {
         external_key: externalKey,

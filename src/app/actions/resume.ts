@@ -4,7 +4,6 @@ import { AuthError, requireAuth } from "@/lib/auth/require-auth";
 import { checkRateLimit } from "@/lib/ai/rate-limit";
 import { chatCompletion } from "@/lib/ai/groq";
 import { isGroqConfigured } from "@/lib/ai/env";
-import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { prepareApplication } from "@/lib/integrations/ats/application-service";
 import { loadUserProfile } from "@/lib/matching/compute-compatibility";
 import type { ActionResult } from "@/app/actions/ai";
@@ -67,7 +66,7 @@ export async function listTailoredResumeVersionsAction(): Promise<
 
     let externalMap = new Map<string, { external_key: string; company_name: string }>();
     if (externalIds.length > 0) {
-      const { data: externals } = await fromExtendedTable(supabase, "external_jobs")
+      const { data: externals } = await supabase.from("external_jobs")
         .select("id, external_key, company_name")
         .in("id", externalIds);
       externalMap = new Map(

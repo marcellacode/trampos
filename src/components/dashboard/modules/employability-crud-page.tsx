@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
 import {
   EntityCrudSection,
   ModuleCrudShell,
@@ -19,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Check } from "lucide-react";
 import type { CrudModuleConfig } from "@/lib/crud/types";
 import { crudRow } from "@/lib/crud/types";
+import { cn } from "@/lib/utils";
 
 const EMPREGABILIDADE_CRUD: CrudModuleConfig = {
   title: "Empregabilidade",
@@ -64,7 +67,12 @@ const EMPREGABILIDADE_CRUD: CrudModuleConfig = {
   ],
 };
 
-export function EmployabilityCrudSection() {
+export function EmployabilityCrudSection({
+  advancedOnly = false,
+}: {
+  advancedOnly?: boolean;
+}) {
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const missionsQuery = useDailyMissions();
   const createMission = useCreateDailyMission();
   const updateMission = useUpdateDailyMission();
@@ -78,7 +86,7 @@ export function EmployabilityCrudSection() {
 
   const [missions, skills] = EMPREGABILIDADE_CRUD.entities;
 
-  return (
+  const content = (
     <div className="space-y-6">
       <EntityCrudSection
         config={missions}
@@ -151,6 +159,32 @@ export function EmployabilityCrudSection() {
           await deleteSkill.mutateAsync(id);
         }}
       />
+    </div>
+  );
+
+  if (!advancedOnly) {
+    return content;
+  }
+
+  return (
+    <div className="rounded-2xl border border-border bg-card/50">
+      <Button
+        type="button"
+        variant="ghost"
+        className="flex w-full items-center justify-between px-4 py-3 text-sm font-medium"
+        aria-expanded={advancedOpen}
+        onClick={() => setAdvancedOpen((open) => !open)}
+      >
+        Avançado — editar missões e competências
+        <ChevronDown
+          className={cn(
+            "h-4 w-4 text-muted-foreground transition-transform",
+            advancedOpen && "rotate-180"
+          )}
+          aria-hidden="true"
+        />
+      </Button>
+      {advancedOpen ? <div className="border-t border-border p-4">{content}</div> : null}
     </div>
   );
 }
