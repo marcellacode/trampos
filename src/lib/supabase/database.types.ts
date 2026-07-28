@@ -1794,8 +1794,11 @@ export type Database = {
       jobs: {
         Row: {
           ai_summary: string
+          application_mode: Database["public"]["Enums"]["job_application_mode"]
           company_id: string
           created_at: string
+          created_by_user_id: string | null
+          external_apply_url: string | null
           id: string
           is_active: boolean
           location: string
@@ -1812,8 +1815,11 @@ export type Database = {
         }
         Insert: {
           ai_summary?: string
+          application_mode?: Database["public"]["Enums"]["job_application_mode"]
           company_id: string
           created_at?: string
+          created_by_user_id?: string | null
+          external_apply_url?: string | null
           id?: string
           is_active?: boolean
           location?: string
@@ -1830,8 +1836,11 @@ export type Database = {
         }
         Update: {
           ai_summary?: string
+          application_mode?: Database["public"]["Enums"]["job_application_mode"]
           company_id?: string
           created_at?: string
+          created_by_user_id?: string | null
+          external_apply_url?: string | null
           id?: string
           is_active?: boolean
           location?: string
@@ -3193,6 +3202,7 @@ export type Database = {
         | "model"
       hide_reason: "distance" | "salary" | "tech" | "company" | "other"
       import_method: "linkedin" | "github" | "resume" | "scratch"
+      job_application_mode: "internal" | "external_redirect"
       job_section_type:
         | "summary"
         | "responsibilities"

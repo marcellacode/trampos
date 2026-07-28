@@ -51,6 +51,8 @@ export type JobSource =
   | "remoteok"
   | "jobicy";
 
+export type JobApplicationMode = "internal" | "external_redirect";
+
 export interface JobRecommendation {
   id: string;
   companyId: string;
@@ -58,7 +60,9 @@ export interface JobRecommendation {
   role: string;
   /** Data source — internal Supabase jobs vs external Adzuna listings */
   source?: JobSource;
-  /** External apply URL (Adzuna redirect_url) */
+  /** How candidates apply on Jobera-published jobs */
+  applicationMode?: JobApplicationMode;
+  /** External apply URL (Adzuna redirect_url or hybrid Jobera job) */
   externalUrl?: string;
   /** Plain-text description for external jobs */
   description?: string;

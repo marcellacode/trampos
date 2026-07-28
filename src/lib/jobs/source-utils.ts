@@ -1,4 +1,4 @@
-import type { JobRecommendation } from "@/types/jobs";
+import type { JobApplicationMode, JobRecommendation } from "@/types/jobs";
 
 export const EXTERNAL_JOB_SOURCES = [
   "adzuna",
@@ -42,13 +42,60 @@ export function isExternalJobSource(
   return source != null && source !== "internal";
 }
 
-export function isExternalJob(job: Pick<JobRecommendation, "source" | "externalUrl">): boolean {
-  return isExternalJobSource(job.source) || Boolean(job.externalUrl);
+export function usesExternalApply(
+  job: Pick<JobRecommendation, "source" | "externalUrl" | "applicationMode">
+): boolean {
+  if (isExternalJobSource(job.source)) return true;
+  if (job.applicationMode === "external_redirect") return true;
+  return false;
+}
+
+export function isExternalJob(
+  job: Pick<JobRecommendation, "source" | "externalUrl" | "applicationMode">
+): boolean {
+  return usesExternalApply(job);
+}
+
+export function isExternalListing(
+  job: Pick<JobRecommendation, "source">
+): boolean {
+  return isExternalJobSource(job.source);
+}
+
+export function isPlatformApply(
+  job: Pick<JobRecommendation, "source" | "applicationMode">
+): boolean {
+  return job.source === "internal" && (job.applicationMode ?? "internal") === "internal";
 }
 
 export function getJobSourceLabel(source: JobRecommendation["source"]): string | null {
   if (!source || source === "internal") return null;
   return SOURCE_LABELS[source] ?? source;
+}
+
+export function getJobDiscoveryBadge(
+  job: Pick<JobRecommendation, "source">
+): "Vaga Jobera" | "Externa" {
+  return job.source === "internal" ? "Vaga Jobera" : "Externa";
+}
+
+export function getApplyButtonLabel(
+  state: "idle" | "preparing" | "prepared" | "completed",
+  options: {
+    applyUrl?: string | null;
+    usesExternalApply: boolean;
+    applicationMode?: JobApplicationMode;
+  }
+): string {
+  if (state === "preparing") return "Preparando...";
+  if (state === "completed") return "Concluída";
+  if (state === "prepared" && options.applyUrl) return "Abrir candidatura";
+  if (state === "prepared") return "Candidatura registrada";
+  if (options.applicationMode === "internal" && !options.usesExternalApply) {
+    return "Candidatar-se na plataforma";
+  }
+  if (options.usesExternalApply) return "Preparar candidatura com IA";
+  return "Candidatar-se na plataforma";
 }
 
 export function providerFromExternalKey(externalKey: string): ExternalJobSource | "unknown" {

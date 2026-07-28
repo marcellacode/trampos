@@ -20,7 +20,7 @@ import { ApprovalProbabilityCard } from "@/components/dashboard/jobs/approval-pr
 import { BestSendTimeCard } from "@/components/dashboard/jobs/best-send-time-card";
 import { HIDE_REASONS } from "@/lib/jobs/constants";
 import { useJobApplication } from "@/lib/applications/hooks";
-import { isExternalJob, getJobSourceLabel } from "@/lib/jobs/source-utils";
+import { getJobDiscoveryBadge, isExternalListing } from "@/lib/jobs/source-utils";
 import type { HideReason, JobRecommendation } from "@/types/jobs";
 import { cn } from "@/lib/utils";
 
@@ -61,8 +61,8 @@ export function RecommendationCard({
     isExternal: applyIsExternal,
   } = useJobApplication({ job });
 
-  const isExternal = isExternalJob(job);
-  const sourceLabel = getJobSourceLabel(job.source);
+  const isExternalProvider = isExternalListing(job);
+  const discoveryBadge = getJobDiscoveryBadge(job);
 
   function handleHide(reason: HideReason) {
     onHide(job.id, reason);
@@ -124,11 +124,16 @@ export function RecommendationCard({
             <h3 className="mt-0.5 text-base font-semibold text-foreground sm:text-lg">
               {job.role}
             </h3>
-            {isExternal && sourceLabel && (
-              <span className="mt-1.5 inline-flex items-center rounded-md border border-[#6366F1]/30 bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#A5B4FC]">
-                {sourceLabel}
-              </span>
-            )}
+            <span
+              className={cn(
+                "mt-1.5 inline-flex items-center rounded-md border px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                job.source === "internal"
+                  ? "border-primary/30 bg-primary/10 text-primary"
+                  : "border-[#6366F1]/30 bg-[#6366F1]/10 text-[#A5B4FC]"
+              )}
+            >
+              {discoveryBadge}
+            </span>
             <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
               <span className="inline-flex items-center gap-1">
                 <MapPin className="h-3 w-3" aria-hidden="true" />
@@ -162,7 +167,7 @@ export function RecommendationCard({
         />
       </div>
 
-      {!isExternal && (
+      {!isExternalProvider && (
         <>
           <div className="relative mt-4">
             <ApprovalProbabilityCard data={job.approvalProbability} />
@@ -174,13 +179,13 @@ export function RecommendationCard({
         </>
       )}
 
-      {isExternal && job.aiSummary && (
+      {isExternalProvider && job.aiSummary && (
         <p className="relative mt-4 text-sm leading-relaxed text-muted-foreground">
           {job.aiSummary}
         </p>
       )}
 
-      {!isExternal && (
+      {!isExternalProvider && (
         <>
           {/* Por que essa vaga? */}
           <div className="relative mt-5 rounded-xl border border-border bg-muted/30 p-4">
@@ -230,7 +235,7 @@ export function RecommendationCard({
       )}
 
       {/* Stats */}
-      {!isExternal && (
+      {!isExternalProvider && (
       <div className="relative mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[
           {
@@ -275,7 +280,7 @@ export function RecommendationCard({
           variant="outline"
           className="h-9 flex-1 border-border bg-transparent sm:flex-none sm:px-5"
         >
-          {isExternal ? "Resumo" : "Ver detalhes"}
+          {isExternalProvider ? "Resumo" : "Ver detalhes"}
         </Button>
         <Button
           className="h-9 flex-1 gap-1.5 sm:flex-none sm:px-5"

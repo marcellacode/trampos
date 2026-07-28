@@ -38,7 +38,7 @@ import {
   saveJobAction,
   unsaveJobAction,
 } from "@/app/actions/discovery";
-import { isExternalJob } from "@/lib/jobs/source-utils";
+import { isExternalListing } from "@/lib/jobs/source-utils";
 import type { JobDetail } from "@/types/jobs";
 
 interface JobDetailsPageProps {
@@ -86,9 +86,9 @@ function JobDetailsContent({ job }: { job: JobDetail }) {
     }
   }
 
-  const isExternal = isExternalJob(job);
+  const isExternalProvider = isExternalListing(job);
 
-  if (isExternal) {
+  if (isExternalProvider) {
     return (
       <div className="space-y-6 pb-24 lg:pb-8">
         <JobHero

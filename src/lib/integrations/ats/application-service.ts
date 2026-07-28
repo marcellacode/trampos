@@ -147,9 +147,12 @@ export async function prepareApplication(
   const profile = await loadUserProfile(supabase, userId);
   await validateProfileForApplication(supabase, userId, profile);
 
-  const isExternal = !isInternalJobRef(input.jobRef);
+  const isInternalRef = isInternalJobRef(input.jobRef);
+  const usesExternal =
+    !isInternalRef || input.job?.applicationMode === "external_redirect";
+  const isExternal = usesExternal;
   let externalJobId: string | null = null;
-  let applyUrl = input.externalUrl ?? null;
+  let applyUrl = input.externalUrl ?? input.job?.externalUrl ?? null;
 
   if (isExternal) {
     if (input.job) {

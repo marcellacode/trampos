@@ -105,11 +105,19 @@ export function mapJobRecommendation(
 
   const hasMatch = Boolean(match);
 
+  const applicationMode = job.application_mode ?? "internal";
+
   return {
     id: job.id,
     companyId: company?.id ?? "",
     company: companyName(company),
     role: job.title,
+    source: job.created_by_user_id ? ("internal" as const) : undefined,
+    applicationMode,
+    externalUrl:
+      applicationMode === "external_redirect"
+        ? job.external_apply_url ?? undefined
+        : undefined,
     hasMatch,
     compatibility: hasMatch ? match!.compatibility : 0,
     approvalProbability: mapApproval(match),

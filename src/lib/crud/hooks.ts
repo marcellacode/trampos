@@ -896,3 +896,23 @@ export function useCompanyActiveJobs(companyId: string | null) {
     enabled: Boolean(companyId),
   });
 }
+
+export function useCompanyJobsForRecruiter(companyId: string | null) {
+  return useQuery({
+    queryKey: ["company", "jobs", "recruiter", companyId ?? "none"],
+    queryFn: async () => {
+      if (!companyId) return [];
+      const supabase = createBrowserSupabaseClient();
+      const { data, error } = await supabase
+        .from("jobs")
+        .select(
+          "id, slug, title, location, salary_display, remote, is_active, application_mode, published_at"
+        )
+        .eq("company_id", companyId)
+        .order("published_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: Boolean(companyId),
+  });
+}

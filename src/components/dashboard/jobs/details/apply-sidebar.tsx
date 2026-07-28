@@ -24,6 +24,7 @@ import type {
   JobDetail,
 } from "@/types/jobs";
 import { copyToClipboard, useJobApplication } from "@/lib/applications/hooks";
+import { isPlatformApply } from "@/lib/jobs/source-utils";
 import { cn } from "@/lib/utils";
 
 interface ApplySidebarProps {
@@ -163,6 +164,7 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
   } = useJobApplication({ job });
 
   const showPreview = Boolean(tailoredResumeText || coverLetterText);
+  const platformApply = isPlatformApply(job);
 
   async function handlePrimaryAction() {
     if (isDone) return;
@@ -242,6 +244,12 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
           <p className="mt-2 text-center text-xs text-muted-foreground">
             A IA preparou currículo e carta. Copie, cole no site e confirme quando
             terminar.
+          </p>
+        )}
+
+        {state === "prepared" && platformApply && (
+          <p className="mt-2 text-center text-xs text-muted-foreground">
+            Sua candidatura foi registrada na plataforma Jobera.
           </p>
         )}
 

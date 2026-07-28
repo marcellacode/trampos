@@ -3,6 +3,7 @@ import type { DiscoveryData, JobRecommendation } from "@/types/jobs";
 import {
   fetchAllExternalJobs,
 } from "@/lib/discovery/fetch-external-jobs";
+import { fetchInternalJobsForDiscovery } from "@/lib/discovery/fetch-internal-jobs";
 import { fetchDiscoveryData } from "@/lib/supabase/queries/discovery";
 import { checkMatchSyncRateLimit } from "@/lib/matching/match-rate-limit";
 import {
@@ -76,13 +77,13 @@ export async function fetchDiscoveryWithExternalJobs(
 ): Promise<DiscoveryData> {
   const defaults = await loadProfileSearchDefaults(supabase, userId);
 
-  const [discovery, externalJobs] = await Promise.all([
+  const [discovery, externalJobs, internalJobs] = await Promise.all([
     fetchDiscoveryData(supabase, userId),
     fetchAllExternalJobs({ ...options, perProvider: 12 }, defaults),
+    fetchInternalJobsForDiscovery(supabase, 24),
   ]);
 
-  // Real listings come from external providers only.
-  let jobs = externalJobs;
+  let jobs = [...internalJobs, ...externalJobs];
 
   if (options.what?.trim()) {
     jobs = filterJobsByQuery(jobs, options.what);

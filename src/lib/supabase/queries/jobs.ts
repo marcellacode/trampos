@@ -22,6 +22,9 @@ const JOB_LIST_SELECT = `
   published_at,
   verified,
   ai_summary,
+  application_mode,
+  external_apply_url,
+  created_by_user_id,
   companies!jobs_company_id_fkey (
     id,
     slug,

@@ -6,7 +6,7 @@ import {
   prepareJobApplicationAction,
 } from "@/app/actions/applications";
 import type { JobRecommendation } from "@/types/jobs";
-import { isExternalJob } from "@/lib/jobs/source-utils";
+import { isExternalJob, getApplyButtonLabel, usesExternalApply } from "@/lib/jobs/source-utils";
 
 export type ApplicationUiState = "idle" | "preparing" | "prepared" | "completed";
 
@@ -19,6 +19,7 @@ interface UseJobApplicationOptions {
     | "role"
     | "externalUrl"
     | "source"
+    | "applicationMode"
     | "location"
     | "salary"
     | "salaryMin"
@@ -47,7 +48,7 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
   const [coverLetterText, setCoverLetterText] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const isExternal = isExternalJob(job);
+  const isExternal = usesExternalApply(job);
 
   const prepare = useCallback(async () => {
     setState("preparing");
@@ -86,16 +87,11 @@ export function useJobApplication({ job }: UseJobApplicationOptions) {
     window.open(applyUrl, "_blank", "noopener,noreferrer");
   }, [applyUrl]);
 
-  const buttonLabel =
-    state === "preparing"
-      ? "Preparando..."
-      : state === "completed"
-        ? "Concluída"
-        : state === "prepared" && applyUrl
-          ? "Abrir candidatura"
-          : state === "prepared"
-            ? "Candidatura registrada"
-            : "Preparar candidatura com IA";
+  const buttonLabel = getApplyButtonLabel(state, {
+    applyUrl,
+    usesExternalApply: isExternal,
+    applicationMode: job.applicationMode,
+  });
 
   return {
     state,

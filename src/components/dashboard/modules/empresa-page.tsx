@@ -127,17 +127,25 @@ export function EmpresaDashboardPage() {
         ) : (
           <>
             <CompanyEditor company={company} />
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <h2 className="text-lg font-semibold text-foreground">Vagas ativas</h2>
-              {selectedMembership ? (
+              <div className="flex flex-wrap items-center gap-3">
                 <Link
-                  href={`/empresa/${selectedMembership.company.slug}`}
-                  className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                  href="/dashboard/empresa/vagas"
+                  className="text-sm font-medium text-primary hover:underline"
                 >
-                  Ver página pública
-                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  Gerenciar vagas
                 </Link>
-              ) : null}
+                {selectedMembership ? (
+                  <Link
+                    href={`/empresa/${selectedMembership.company.slug}`}
+                    className="inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                  >
+                    Ver página pública
+                    <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  </Link>
+                ) : null}
+              </div>
             </div>
             <CompanyJobsList
               jobs={mapDashboardJobs(jobsQuery.data ?? [])}

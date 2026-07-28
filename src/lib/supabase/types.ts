@@ -31,9 +31,17 @@ export interface DbJob {
   published_at: string | null;
   verified: boolean;
   ai_summary: string;
+  application_mode?: "internal" | "external_redirect";
+  external_apply_url?: string | null;
+  created_by_user_id?: string | null;
   companies: DbCompany | DbCompany[] | null;
   job_stack?: { tech_name: string; sort_order: number }[];
   job_benefits?: { benefit: string; sort_order: number }[];
+  job_section_items?: {
+    section_type: string;
+    content: string;
+    sort_order: number;
+  }[];
   job_stats?:
     | {
         response_days: number;
