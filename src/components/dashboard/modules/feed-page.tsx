@@ -35,7 +35,7 @@ export function FeedPage() {
         <header>
           <h1 className="text-2xl font-bold text-foreground">Feed</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Atualizações profissionais e vagas compartilhadas pela comunidade
+            Publicações de quem você segue e das empresas que acompanha
           </p>
         </header>
 
@@ -55,7 +55,14 @@ export function FeedPage() {
           </div>
         ) : posts.length === 0 ? (
           <div className="rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground">
-            Nenhuma publicação ainda. Seja o primeiro a compartilhar algo!
+            <p>Seu feed está vazio.</p>
+            <p className="mt-2">
+              Siga profissionais e empresas na{" "}
+              <a href="/dashboard/rede" className="text-primary hover:underline">
+                Rede
+              </a>{" "}
+              para ver publicações aqui.
+            </p>
           </div>
         ) : (
           <div className="space-y-4">

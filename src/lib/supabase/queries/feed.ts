@@ -7,6 +7,7 @@ import type {
 } from "@/types/feed";
 import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { formatRelativeTime } from "@/lib/supabase/utils";
+import { fetchFollowedAuthorIds } from "@/lib/supabase/queries/follows";
 import { fetchPostEngagementBatch } from "@/lib/supabase/queries/post-engagement";
 import {
   applyEngagementToPost,
@@ -43,11 +44,37 @@ export async function fetchFeedPosts(
 ): Promise<FeedPage> {
   const limit = options.limit ?? FEED_PAGE_SIZE;
 
+  let authorUserIds: string[] = [];
+  let authorCompanyIds: string[] = [];
+
+  if (options.viewerUserId) {
+    const followed = await fetchFollowedAuthorIds(supabase, options.viewerUserId);
+    authorUserIds = [...new Set([options.viewerUserId, ...followed.userIds])];
+    authorCompanyIds = followed.companyIds;
+  }
+
+  if (options.viewerUserId && authorUserIds.length === 0 && authorCompanyIds.length === 0) {
+    return { posts: [], nextCursor: null };
+  }
+
   let query = fromExtendedTable(supabase, "posts")
     .select(POST_SELECT)
     .order("created_at", { ascending: false })
     .order("id", { ascending: false })
     .limit(limit + 1);
+
+  if (options.viewerUserId) {
+    const orFilters: string[] = [];
+    if (authorUserIds.length > 0) {
+      orFilters.push(`author_user_id.in.(${authorUserIds.join(",")})`);
+    }
+    if (authorCompanyIds.length > 0) {
+      orFilters.push(`author_company_id.in.(${authorCompanyIds.join(",")})`);
+    }
+    if (orFilters.length > 0) {
+      query = query.or(orFilters.join(","));
+    }
+  }
 
   if (options.cursor) {
     const { createdAt, id } = options.cursor;

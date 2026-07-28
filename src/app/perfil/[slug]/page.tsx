@@ -7,13 +7,13 @@ import {
   Briefcase,
   ExternalLink,
   FolderKanban,
-  Globe,
   GraduationCap,
   Languages,
-  MapPin,
 } from "lucide-react";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
+import { ProfileHeroRow } from "@/components/follows/profile-hero-row";
+import { fetchFollowStatusForUser } from "@/lib/supabase/queries/follows";
 import { fetchPublicProfileBySlug } from "@/lib/supabase/queries/public-profile";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { PublicProfile } from "@/lib/supabase/queries/public-profile";
@@ -25,6 +25,9 @@ interface PublicProfilePageProps {
 async function resolveProfile(slug: string): Promise<{
   profile: PublicProfile;
   isOwnerPreview: boolean;
+  isOwner: boolean;
+  isAuthenticated: boolean;
+  followStatus: { isFollowing: boolean; followerCount: number; followingCount: number };
 } | null> {
   const supabase = await createServerSupabaseClient();
   const {
@@ -37,7 +40,23 @@ async function resolveProfile(slug: string): Promise<{
   const isOwner = user?.id === profile.id;
   if (!profile.isPublic && !isOwner) return null;
 
-  return { profile, isOwnerPreview: isOwner && !profile.isPublic };
+  const followStatus = await fetchFollowStatusForUser(
+    supabase,
+    user?.id ?? null,
+    profile.id
+  );
+
+  return {
+    profile,
+    isOwnerPreview: isOwner && !profile.isPublic,
+    isOwner,
+    isAuthenticated: Boolean(user),
+    followStatus: {
+      isFollowing: followStatus.isFollowing,
+      followerCount: followStatus.followerCount,
+      followingCount: followStatus.followingCount ?? 0,
+    },
+  };
 }
 
 export async function generateMetadata({
@@ -75,16 +94,22 @@ export default async function PublicProfileRoute({
 
   if (!resolved) notFound();
 
-  const { profile, isOwnerPreview } = resolved;
+  const { profile, isOwnerPreview, isOwner, isAuthenticated, followStatus } = resolved;
 
   return (
     <div className="min-h-full bg-background">
       <header className="border-b border-border bg-background/80 backdrop-blur-sm">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4 sm:px-6">
           <Logo />
-          <Button variant="outline" size="sm" render={<Link href="/login" />}>
-            Entrar na Jobera
-          </Button>
+          {isAuthenticated ? (
+            <Button variant="outline" size="sm" render={<Link href="/dashboard" />}>
+              Ir para o dashboard
+            </Button>
+          ) : (
+            <Button variant="outline" size="sm" render={<Link href="/login" />}>
+              Entrar na Jobera
+            </Button>
+          )}
         </div>
       </header>
 
@@ -101,7 +126,12 @@ export default async function PublicProfileRoute({
       )}
 
       <main className="mx-auto max-w-5xl px-4 pb-16 pt-0 sm:px-6">
-        <ProfileHero profile={profile} />
+        <ProfileHero
+          profile={profile}
+          followStatus={followStatus}
+          isAuthenticated={isAuthenticated}
+          isOwner={isOwner}
+        />
         <div className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
           <div className="space-y-6">
             {profile.summary ? <SummarySection summary={profile.summary} /> : null}
@@ -135,7 +165,21 @@ export default async function PublicProfileRoute({
   );
 }
 
-function ProfileHero({ profile }: { profile: PublicProfile }) {
+function ProfileHero({
+  profile,
+  followStatus,
+  isAuthenticated,
+  isOwner,
+}: {
+  profile: PublicProfile;
+  followStatus: {
+    isFollowing: boolean;
+    followerCount: number;
+    followingCount: number;
+  };
+  isAuthenticated: boolean;
+  isOwner: boolean;
+}) {
   const websiteHref = profile.websiteUrl?.startsWith("http")
     ? profile.websiteUrl
     : profile.websiteUrl
@@ -146,9 +190,9 @@ function ProfileHero({ profile }: { profile: PublicProfile }) {
     <section aria-label="Cabeçalho do perfil">
       <div className="relative -mx-4 h-36 overflow-hidden rounded-b-2xl bg-gradient-to-r from-primary/40 via-primary/20 to-indigo-500/30 sm:-mx-6 sm:h-44" />
 
-      <div className="relative -mt-16 flex flex-col gap-4 px-1 sm:-mt-20 sm:flex-row sm:items-end sm:justify-between">
-        <div className="flex items-end gap-4">
-          {profile.avatarUrl ? (
+      <ProfileHeroRow
+        avatar={
+          profile.avatarUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={profile.avatarUrl}
@@ -159,8 +203,10 @@ function ProfileHero({ profile }: { profile: PublicProfile }) {
             <div className="flex h-28 w-28 items-center justify-center rounded-2xl border-4 border-background bg-gradient-to-br from-primary to-primary/70 text-3xl font-semibold text-primary-foreground shadow-lg sm:h-32 sm:w-32">
               {profile.avatarInitials}
             </div>
-          )}
-          <div className="pb-1">
+          )
+        }
+        nameBlock={
+          <>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
               {profile.fullName}
             </h1>
@@ -170,29 +216,19 @@ function ProfileHero({ profile }: { profile: PublicProfile }) {
             {profile.seniority ? (
               <p className="mt-0.5 text-sm text-primary">{profile.seniority}</p>
             ) : null}
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
-              {profile.location ? (
-                <span className="inline-flex items-center gap-1.5">
-                  <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
-                  {profile.location}
-                </span>
-              ) : null}
-              {websiteHref ? (
-                <a
-                  href={websiteHref}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 text-primary hover:underline"
-                >
-                  <Globe className="h-3.5 w-3.5" aria-hidden="true" />
-                  {profile.websiteUrl}
-                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
-                </a>
-              ) : null}
-            </div>
-          </div>
-        </div>
-      </div>
+          </>
+        }
+        profileId={profile.id}
+        profileSlug={profile.slug}
+        location={profile.location}
+        websiteUrl={profile.websiteUrl}
+        websiteHref={websiteHref}
+        initialIsFollowing={followStatus.isFollowing}
+        initialFollowerCount={followStatus.followerCount}
+        initialFollowingCount={followStatus.followingCount}
+        isAuthenticated={isAuthenticated}
+        isOwner={isOwner}
+      />
     </section>
   );
 }

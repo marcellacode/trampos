@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BadgeCheck, Heart, Sparkles } from "lucide-react";
+import { BadgeCheck, Sparkles } from "lucide-react";
 import { ClaimCompanyBanner } from "@/components/company/claim-company-banner";
 import { CompanyJobsList } from "@/components/company/company-jobs-list";
 import { CompanyAnalysis } from "@/components/dashboard/jobs/details/company-analysis";
 import { Logo } from "@/components/shared/logo";
 import { Button } from "@/components/ui/button";
+import { FollowButton } from "@/components/follows/follow-button";
 import { fetchPublicCompanyBySlug } from "@/lib/supabase/queries/company";
+import { fetchFollowStatusForCompany } from "@/lib/supabase/queries/follows";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import type { PublicCompany } from "@/types/company";
 
@@ -19,6 +21,7 @@ async function resolveCompany(slug: string): Promise<{
   company: PublicCompany;
   isAuthenticated: boolean;
   isMember: boolean;
+  followStatus: { isFollowing: boolean; followerCount: number };
 } | null> {
   const supabase = await createServerSupabaseClient();
   const {
@@ -39,10 +42,20 @@ async function resolveCompany(slug: string): Promise<{
     isMember = Boolean(data);
   }
 
+  const followStatus = await fetchFollowStatusForCompany(
+    supabase,
+    user?.id ?? null,
+    company.id
+  );
+
   return {
     company,
     isAuthenticated: Boolean(user),
     isMember,
+    followStatus: {
+      isFollowing: followStatus.isFollowing,
+      followerCount: followStatus.followerCount,
+    },
   };
 }
 
@@ -81,7 +94,7 @@ export default async function CompanyPublicRoute({
 
   if (!resolved) notFound();
 
-  const { company, isAuthenticated, isMember } = resolved;
+  const { company, isAuthenticated, isMember, followStatus } = resolved;
 
   return (
     <div className="min-h-full bg-background">
@@ -101,7 +114,12 @@ export default async function CompanyPublicRoute({
       </header>
 
       <main className="mx-auto max-w-5xl px-4 pb-16 pt-0 sm:px-6">
-        <CompanyHero company={company} />
+        <CompanyHero
+          company={company}
+          followStatus={followStatus}
+          isAuthenticated={isAuthenticated}
+          isMember={isMember}
+        />
 
         <div className="mt-6 space-y-6">
           {!company.isClaimed ? (
@@ -158,7 +176,17 @@ export default async function CompanyPublicRoute({
   );
 }
 
-function CompanyHero({ company }: { company: PublicCompany }) {
+function CompanyHero({
+  company,
+  followStatus,
+  isAuthenticated,
+  isMember,
+}: {
+  company: PublicCompany;
+  followStatus: { isFollowing: boolean; followerCount: number };
+  isAuthenticated: boolean;
+  isMember: boolean;
+}) {
   return (
     <section aria-label="Cabeçalho da empresa">
       <div
@@ -206,11 +234,16 @@ function CompanyHero({ company }: { company: PublicCompany }) {
           </div>
         </div>
 
-        <Button type="button" variant="outline" disabled className="w-fit">
-          <Heart className="h-4 w-4" aria-hidden="true" />
-          Seguir empresa
-          <span className="sr-only"> (em breve)</span>
-        </Button>
+        <FollowButton
+          targetType="company"
+          targetId={company.id}
+          initialIsFollowing={followStatus.isFollowing}
+          initialFollowerCount={followStatus.followerCount}
+          isAuthenticated={isAuthenticated}
+          isOwner={isMember}
+          revalidateSlug={company.slug}
+          labelFollow="Seguir empresa"
+        />
       </div>
     </section>
   );
