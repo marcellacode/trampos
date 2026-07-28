@@ -2,6 +2,8 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { mapPublicProfile } from "@/lib/supabase/mappers/public-profile";
 import type {
   DbProfileCertificate,
+  DbProfileCourse,
+  DbProfileEducation,
   DbProfileExperience,
   DbProfileLanguage,
   DbProfileProject,
@@ -59,6 +61,22 @@ export interface PublicProfile {
     issuer: string;
     year: string;
   }[];
+  education: {
+    id: string;
+    institution: string;
+    degree: string;
+    fieldOfStudy: string;
+    period: string;
+    description: string;
+  }[];
+  courses: {
+    id: string;
+    name: string;
+    provider: string;
+    completionDate: string | null;
+    credentialUrl: string | null;
+    description: string;
+  }[];
 }
 
 export interface ProfileVisibilitySettings {
@@ -107,6 +125,8 @@ export async function fetchPublicProfileBySlug(
     languagesResult,
     projectsResult,
     certificatesResult,
+    educationResult,
+    coursesResult,
   ] = await Promise.all([
     supabase
       .from("profile_experiences")
@@ -141,6 +161,20 @@ export async function fetchPublicProfileBySlug(
       .select("id, name, issuer, year_label, sort_order")
       .eq("user_id", userId)
       .order("sort_order"),
+    supabase
+      .from("profile_education")
+      .select(
+        "id, institution, degree, field_of_study, start_date, end_date, is_current, description, sort_order"
+      )
+      .eq("user_id", userId)
+      .order("sort_order"),
+    supabase
+      .from("profile_courses")
+      .select(
+        "id, name, provider, completion_date, credential_url, description, sort_order"
+      )
+      .eq("user_id", userId)
+      .order("sort_order"),
   ]);
 
   for (const result of [
@@ -149,6 +183,8 @@ export async function fetchPublicProfileBySlug(
     languagesResult,
     projectsResult,
     certificatesResult,
+    educationResult,
+    coursesResult,
   ]) {
     if (result.error) throw result.error;
   }
@@ -159,6 +195,8 @@ export async function fetchPublicProfileBySlug(
     languages: (languagesResult.data ?? []) as DbProfileLanguage[],
     projects: (projectsResult.data ?? []) as DbProfileProject[],
     certificates: (certificatesResult.data ?? []) as DbProfileCertificate[],
+    education: (educationResult.data ?? []) as DbProfileEducation[],
+    courses: (coursesResult.data ?? []) as DbProfileCourse[],
   });
 }
 

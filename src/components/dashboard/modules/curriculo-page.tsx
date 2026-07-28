@@ -6,18 +6,26 @@ import {
 } from "@/components/crud/module-crud-page";
 import {
   useCertificates,
+  useCourses,
   useCreateCertificate,
+  useCreateCourse,
+  useCreateEducation,
   useCreateExperience,
   useCreateLanguage,
   useCreateSkill,
   useDeleteCertificate,
+  useDeleteCourse,
+  useDeleteEducation,
   useDeleteExperience,
   useDeleteLanguage,
   useDeleteSkill,
+  useEducation,
   useExperiences,
   useLanguages,
   useSkills,
   useUpdateCertificate,
+  useUpdateCourse,
+  useUpdateEducation,
   useUpdateExperience,
   useUpdateLanguage,
 } from "@/lib/crud/hooks";
@@ -25,11 +33,21 @@ import { CURRICULO_MODULE } from "@/lib/crud/modules";
 import { TailoredResumeVersions } from "@/components/dashboard/curriculo/tailored-resume-versions";
 import { ProfileVisibilitySection } from "@/components/dashboard/curriculo/profile-visibility-section";
 
+function parseOptionalDate(value: unknown): string | null {
+  const raw = String(value ?? "").trim();
+  return raw ? raw : null;
+}
+
 export function CurriculoModulePage() {
   const experiencesQuery = useExperiences();
   const createExperience = useCreateExperience();
   const updateExperience = useUpdateExperience();
   const deleteExperience = useDeleteExperience();
+
+  const educationQuery = useEducation();
+  const createEducation = useCreateEducation();
+  const updateEducation = useUpdateEducation();
+  const deleteEducation = useDeleteEducation();
 
   const skillsQuery = useSkills();
   const createSkill = useCreateSkill();
@@ -45,7 +63,13 @@ export function CurriculoModulePage() {
   const updateCertificate = useUpdateCertificate();
   const deleteCertificate = useDeleteCertificate();
 
-  const [experiences, skills, languages, certificates] = CURRICULO_MODULE.entities;
+  const coursesQuery = useCourses();
+  const createCourse = useCreateCourse();
+  const updateCourse = useUpdateCourse();
+  const deleteCourse = useDeleteCourse();
+
+  const [experiences, education, skills, languages, certificates, courses] =
+    CURRICULO_MODULE.entities;
 
   return (
     <ModuleCrudShell config={CURRICULO_MODULE}>
@@ -71,6 +95,31 @@ export function CurriculoModulePage() {
         }}
         onDelete={async (id) => {
           await deleteExperience.mutateAsync(id);
+        }}
+      />
+
+      <EntityCrudSection
+        config={education}
+        items={educationQuery.data ?? []}
+        isLoading={educationQuery.isLoading}
+        isMutating={createEducation.isPending || updateEducation.isPending}
+        onCreate={async (payload) => {
+          await createEducation.mutateAsync({
+            institution: String(payload.institution ?? ""),
+            degree: String(payload.degree ?? ""),
+            field_of_study: String(payload.field_of_study ?? ""),
+            start_date: parseOptionalDate(payload.start_date),
+            end_date: parseOptionalDate(payload.end_date),
+            is_current: Boolean(payload.is_current),
+            description: String(payload.description ?? ""),
+            sort_order: Number(payload.sort_order ?? 0),
+          });
+        }}
+        onUpdate={async (id, payload) => {
+          await updateEducation.mutateAsync({ id, input: payload });
+        }}
+        onDelete={async (id) => {
+          await deleteEducation.mutateAsync(id);
         }}
       />
 
@@ -129,6 +178,29 @@ export function CurriculoModulePage() {
         }}
         onDelete={async (id) => {
           await deleteCertificate.mutateAsync(id);
+        }}
+      />
+
+      <EntityCrudSection
+        config={courses}
+        items={coursesQuery.data ?? []}
+        isLoading={coursesQuery.isLoading}
+        isMutating={createCourse.isPending || updateCourse.isPending}
+        onCreate={async (payload) => {
+          await createCourse.mutateAsync({
+            name: String(payload.name ?? ""),
+            provider: String(payload.provider ?? ""),
+            completion_date: parseOptionalDate(payload.completion_date),
+            credential_url: parseOptionalDate(payload.credential_url),
+            description: String(payload.description ?? ""),
+            sort_order: Number(payload.sort_order ?? 0),
+          });
+        }}
+        onUpdate={async (id, payload) => {
+          await updateCourse.mutateAsync({ id, input: payload });
+        }}
+        onDelete={async (id) => {
+          await deleteCourse.mutateAsync(id);
         }}
       />
     </ModuleCrudShell>

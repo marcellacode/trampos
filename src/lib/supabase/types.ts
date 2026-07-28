@@ -198,6 +198,28 @@ export interface DbProfileCertificate {
   sort_order: number;
 }
 
+export interface DbProfileEducation {
+  id: string;
+  institution: string;
+  degree: string;
+  field_of_study: string;
+  start_date: string | null;
+  end_date: string | null;
+  is_current: boolean;
+  description: string;
+  sort_order: number;
+}
+
+export interface DbProfileCourse {
+  id: string;
+  name: string;
+  provider: string;
+  completion_date: string | null;
+  credential_url: string | null;
+  description: string;
+  sort_order: number;
+}
+
 export interface DbProfileLanguage {
   id: string;
   name: string;

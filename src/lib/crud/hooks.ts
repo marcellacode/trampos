@@ -69,22 +69,30 @@ import {
 } from "@/lib/supabase/queries/mutations/notifications";
 import {
   createCertificate,
+  createCourse,
+  createEducation,
   createExperience,
   createLanguage,
   createProject,
   createSkill,
   deleteCertificate,
+  deleteCourse,
+  deleteEducation,
   deleteExperience,
   deleteLanguage,
   deleteProject,
   deleteSkill,
   listCertificates,
+  listCourses,
+  listEducation,
   listExperiences,
   listLanguages,
   listProjects,
   listSkills,
   setProjectTech,
   updateCertificate,
+  updateCourse,
+  updateEducation,
   updateExperience,
   updateLanguage,
   updateProfileSummary,
@@ -724,6 +732,66 @@ export function useDeleteCertificate() {
   return useCrudMutation(
     (id: string) => withUser((s, u) => deleteCertificate(s, u, id)),
     crudKeys.certificates
+  );
+}
+
+export function useEducation() {
+  return useQuery({
+    queryKey: crudKeys.education,
+    queryFn: () => withUser(listEducation),
+  });
+}
+
+export function useCreateEducation() {
+  return useCrudMutation(
+    (input: Parameters<typeof createEducation>[2]) =>
+      withUser((s, u) => createEducation(s, u, input)),
+    crudKeys.education
+  );
+}
+
+export function useUpdateEducation() {
+  return useCrudMutation(
+    ({ id, input }: { id: string; input: Parameters<typeof updateEducation>[3] }) =>
+      withUser((s, u) => updateEducation(s, u, id, input)),
+    crudKeys.education
+  );
+}
+
+export function useDeleteEducation() {
+  return useCrudMutation(
+    (id: string) => withUser((s, u) => deleteEducation(s, u, id)),
+    crudKeys.education
+  );
+}
+
+export function useCourses() {
+  return useQuery({
+    queryKey: crudKeys.courses,
+    queryFn: () => withUser(listCourses),
+  });
+}
+
+export function useCreateCourse() {
+  return useCrudMutation(
+    (input: Parameters<typeof createCourse>[2]) =>
+      withUser((s, u) => createCourse(s, u, input)),
+    crudKeys.courses
+  );
+}
+
+export function useUpdateCourse() {
+  return useCrudMutation(
+    ({ id, input }: { id: string; input: Parameters<typeof updateCourse>[3] }) =>
+      withUser((s, u) => updateCourse(s, u, id, input)),
+    crudKeys.courses
+  );
+}
+
+export function useDeleteCourse() {
+  return useCrudMutation(
+    (id: string) => withUser((s, u) => deleteCourse(s, u, id)),
+    crudKeys.courses
   );
 }
 

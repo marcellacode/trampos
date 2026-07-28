@@ -4,7 +4,7 @@ import { crudRow } from "@/lib/crud/types";
 export const CURRICULO_MODULE: CrudModuleConfig = {
   title: "Currículo",
   description:
-    "Gerencie experiências, habilidades, idiomas e certificados do seu perfil profissional.",
+    "Gerencie experiências, formação, habilidades, idiomas, certificados e cursos do seu perfil profissional.",
   entities: [
     {
       id: "experiences",
@@ -24,6 +24,50 @@ export const CURRICULO_MODULE: CrudModuleConfig = {
         { key: "company", label: "Empresa" },
         { key: "role", label: "Cargo" },
         { key: "period_label", label: "Período" },
+      ],
+    },
+    {
+      id: "education",
+      title: "Formação acadêmica",
+      description: "Graduações, pós-graduações e estudos formais.",
+      getItemId: (item) => String(crudRow(item).id),
+      getItemLabel: (item) =>
+        String(crudRow(item).degree ?? crudRow(item).institution ?? "formação"),
+      fields: [
+        { key: "institution", label: "Instituição", required: true },
+        { key: "degree", label: "Grau", placeholder: "Bacharelado, Mestrado…" },
+        { key: "field_of_study", label: "Área de estudo" },
+        {
+          key: "start_date",
+          label: "Início",
+          placeholder: "AAAA-MM-DD",
+        },
+        {
+          key: "end_date",
+          label: "Conclusão",
+          placeholder: "AAAA-MM-DD",
+        },
+        { key: "is_current", label: "Em andamento", type: "checkbox" },
+        { key: "description", label: "Descrição", type: "textarea" },
+        { key: "sort_order", label: "Ordem", type: "number" },
+      ],
+      columns: [
+        { key: "institution", label: "Instituição" },
+        { key: "degree", label: "Grau" },
+        { key: "field_of_study", label: "Área" },
+        {
+          key: "start_date",
+          label: "Período",
+          render: (_value, row) => {
+            const start = row.start_date ? String(row.start_date).slice(0, 4) : "";
+            const end = row.is_current
+              ? "Atual"
+              : row.end_date
+                ? String(row.end_date).slice(0, 4)
+                : "";
+            return start && end ? `${start} — ${end}` : start || end || "—";
+          },
+        },
       ],
     },
     {
@@ -68,6 +112,39 @@ export const CURRICULO_MODULE: CrudModuleConfig = {
         { key: "name", label: "Certificado" },
         { key: "issuer", label: "Emissor" },
         { key: "year_label", label: "Ano" },
+      ],
+    },
+    {
+      id: "courses",
+      title: "Cursos",
+      description: "Cursos livres e complementares (distintos de certificados).",
+      getItemId: (item) => String(crudRow(item).id),
+      getItemLabel: (item) => String(crudRow(item).name),
+      fields: [
+        { key: "name", label: "Curso", required: true },
+        { key: "provider", label: "Provedor / plataforma" },
+        {
+          key: "completion_date",
+          label: "Conclusão",
+          placeholder: "AAAA-MM-DD",
+        },
+        {
+          key: "credential_url",
+          label: "URL da credencial",
+          placeholder: "https://…",
+        },
+        { key: "description", label: "Descrição", type: "textarea" },
+        { key: "sort_order", label: "Ordem", type: "number" },
+      ],
+      columns: [
+        { key: "name", label: "Curso" },
+        { key: "provider", label: "Provedor" },
+        {
+          key: "completion_date",
+          label: "Conclusão",
+          render: (value) =>
+            value ? String(value).slice(0, 4) : "—",
+        },
       ],
     },
   ],

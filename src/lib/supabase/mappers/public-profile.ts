@@ -1,12 +1,25 @@
 import type { PublicProfile, PublicProfileRow } from "@/lib/supabase/queries/public-profile";
 import type {
   DbProfileCertificate,
+  DbProfileCourse,
+  DbProfileEducation,
   DbProfileExperience,
   DbProfileLanguage,
   DbProfileProject,
   DbProfileSkill,
 } from "@/lib/supabase/types";
 import { sortByOrder } from "@/lib/supabase/types";
+
+function formatEducationPeriod(item: DbProfileEducation): string {
+  const start = item.start_date ? item.start_date.slice(0, 4) : "";
+  const end = item.is_current
+    ? "Atual"
+    : item.end_date
+      ? item.end_date.slice(0, 4)
+      : "";
+  if (start && end) return `${start} — ${end}`;
+  return start || end || "";
+}
 
 export function mapPublicProfile(
   profile: PublicProfileRow,
@@ -16,6 +29,8 @@ export function mapPublicProfile(
     languages: DbProfileLanguage[];
     projects: DbProfileProject[];
     certificates: DbProfileCertificate[];
+    education: DbProfileEducation[];
+    courses: DbProfileCourse[];
   }
 ): PublicProfile {
   return {
@@ -57,6 +72,22 @@ export function mapPublicProfile(
       name: item.name,
       issuer: item.issuer,
       year: item.year_label,
+    })),
+    education: sortByOrder(related.education).map((item) => ({
+      id: item.id,
+      institution: item.institution,
+      degree: item.degree,
+      fieldOfStudy: item.field_of_study,
+      period: formatEducationPeriod(item),
+      description: item.description,
+    })),
+    courses: sortByOrder(related.courses).map((item) => ({
+      id: item.id,
+      name: item.name,
+      provider: item.provider,
+      completionDate: item.completion_date,
+      credentialUrl: item.credential_url,
+      description: item.description,
     })),
   };
 }

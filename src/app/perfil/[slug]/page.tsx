@@ -3,10 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   Award,
+  BookOpen,
   Briefcase,
   ExternalLink,
   FolderKanban,
   Globe,
+  GraduationCap,
   Languages,
   MapPin,
 } from "lucide-react";
@@ -106,11 +108,17 @@ export default async function PublicProfileRoute({
             {profile.experiences.length > 0 ? (
               <ExperiencesSection experiences={profile.experiences} />
             ) : null}
+            {profile.education.length > 0 ? (
+              <EducationSection education={profile.education} />
+            ) : null}
             {profile.projects.length > 0 ? (
               <ProjectsSection projects={profile.projects} />
             ) : null}
             {profile.certificates.length > 0 ? (
               <CertificatesSection certificates={profile.certificates} />
+            ) : null}
+            {profile.courses.length > 0 ? (
+              <CoursesSection courses={profile.courses} />
             ) : null}
           </div>
           <aside className="space-y-6">
@@ -301,6 +309,89 @@ function CertificatesSection({
             </p>
           </li>
         ))}
+      </ul>
+    </SectionCard>
+  );
+}
+
+function EducationSection({
+  education,
+}: {
+  education: PublicProfile["education"];
+}) {
+  return (
+    <SectionCard title="Formação acadêmica" icon={GraduationCap}>
+      <ul className="space-y-4">
+        {education.map((item) => (
+          <li
+            key={item.id}
+            className="border-b border-border/60 pb-4 last:border-0 last:pb-0"
+          >
+            <h3 className="font-medium text-foreground">
+              {[item.degree, item.fieldOfStudy].filter(Boolean).join(" em ") ||
+                item.institution}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {[item.institution, item.period].filter(Boolean).join(" · ")}
+            </p>
+            {item.description ? (
+              <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                {item.description}
+              </p>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </SectionCard>
+  );
+}
+
+function CoursesSection({
+  courses,
+}: {
+  courses: PublicProfile["courses"];
+}) {
+  return (
+    <SectionCard title="Cursos" icon={BookOpen}>
+      <ul className="space-y-4">
+        {courses.map((course) => {
+          const credentialHref = course.credentialUrl?.startsWith("http")
+            ? course.credentialUrl
+            : course.credentialUrl
+              ? `https://${course.credentialUrl}`
+              : null;
+          const completionYear = course.completionDate
+            ? course.completionDate.slice(0, 4)
+            : "";
+
+          return (
+            <li
+              key={course.id}
+              className="border-b border-border/60 pb-4 last:border-0 last:pb-0"
+            >
+              <h3 className="font-medium text-foreground">{course.name}</h3>
+              <p className="text-sm text-muted-foreground">
+                {[course.provider, completionYear].filter(Boolean).join(" · ")}
+              </p>
+              {course.description ? (
+                <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                  {course.description}
+                </p>
+              ) : null}
+              {credentialHref ? (
+                <a
+                  href={credentialHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+                >
+                  Ver credencial
+                  <ExternalLink className="h-3 w-3" aria-hidden="true" />
+                </a>
+              ) : null}
+            </li>
+          );
+        })}
       </ul>
     </SectionCard>
   );

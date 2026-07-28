@@ -34,6 +34,30 @@ export interface ProfileCertificateRow {
   sort_order: number;
 }
 
+export interface ProfileEducationRow {
+  id: string;
+  user_id: string;
+  institution: string;
+  degree: string;
+  field_of_study: string;
+  start_date: string | null;
+  end_date: string | null;
+  is_current: boolean;
+  description: string;
+  sort_order: number;
+}
+
+export interface ProfileCourseRow {
+  id: string;
+  user_id: string;
+  name: string;
+  provider: string;
+  completion_date: string | null;
+  credential_url: string | null;
+  description: string;
+  sort_order: number;
+}
+
 export interface ProfileProjectRow {
   id: string;
   user_id: string;
@@ -60,6 +84,18 @@ const certificateCrud = createCrud<
   Partial<Omit<ProfileCertificateRow, "id" | "user_id">>
 >("profile_certificates", { orderColumn: "sort_order", ascending: true });
 
+const educationCrud = createCrud<
+  ProfileEducationRow,
+  Omit<ProfileEducationRow, "id" | "user_id">,
+  Partial<Omit<ProfileEducationRow, "id" | "user_id">>
+>("profile_education", { orderColumn: "sort_order", ascending: true });
+
+const courseCrud = createCrud<
+  ProfileCourseRow,
+  Omit<ProfileCourseRow, "id" | "user_id">,
+  Partial<Omit<ProfileCourseRow, "id" | "user_id">>
+>("profile_courses", { orderColumn: "sort_order", ascending: true });
+
 const projectCrud = createCrud<
   ProfileProjectRow,
   Omit<ProfileProjectRow, "id" | "user_id">,
@@ -80,6 +116,16 @@ export const listCertificates = certificateCrud.list;
 export const createCertificate = certificateCrud.create;
 export const updateCertificate = certificateCrud.update;
 export const deleteCertificate = certificateCrud.remove;
+
+export const listEducation = educationCrud.list;
+export const createEducation = educationCrud.create;
+export const updateEducation = educationCrud.update;
+export const deleteEducation = educationCrud.remove;
+
+export const listCourses = courseCrud.list;
+export const createCourse = courseCrud.create;
+export const updateCourse = courseCrud.update;
+export const deleteCourse = courseCrud.remove;
 
 export const listProjects = projectCrud.list;
 export const createProject = projectCrud.create;

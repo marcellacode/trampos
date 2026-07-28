@@ -2200,6 +2200,106 @@ export type Database = {
           },
         ]
       }
+      profile_courses: {
+        Row: {
+          completion_date: string | null
+          created_at: string
+          credential_url: string | null
+          description: string
+          id: string
+          name: string
+          provider: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completion_date?: string | null
+          created_at?: string
+          credential_url?: string | null
+          description?: string
+          id?: string
+          name: string
+          provider?: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completion_date?: string | null
+          created_at?: string
+          credential_url?: string | null
+          description?: string
+          id?: string
+          name?: string
+          provider?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_courses_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profile_education: {
+        Row: {
+          created_at: string
+          degree: string
+          description: string
+          end_date: string | null
+          field_of_study: string
+          id: string
+          institution: string
+          is_current: boolean
+          sort_order: number
+          start_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          degree?: string
+          description?: string
+          end_date?: string | null
+          field_of_study?: string
+          id?: string
+          institution: string
+          is_current?: boolean
+          sort_order?: number
+          start_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          degree?: string
+          description?: string
+          end_date?: string | null
+          field_of_study?: string
+          id?: string
+          institution?: string
+          is_current?: boolean
+          sort_order?: number
+          start_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profile_education_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profile_experiences: {
         Row: {
           company: string

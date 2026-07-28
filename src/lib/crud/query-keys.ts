@@ -16,6 +16,8 @@ export const crudKeys = {
   skills: ["crud", "skills"] as const,
   languages: ["crud", "languages"] as const,
   certificates: ["crud", "certificates"] as const,
+  education: ["crud", "education"] as const,
+  courses: ["crud", "courses"] as const,
   projects: ["crud", "projects"] as const,
   profile: ["profile"] as const,
   profileVisibility: ["profile", "visibility"] as const,
