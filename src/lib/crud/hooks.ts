@@ -718,8 +718,12 @@ export function useCertificates() {
 
 export function useCreateCertificate() {
   return useCrudMutation(
-    (input: Parameters<typeof createCertificate>[2]) =>
-      withUser((s, u) => createCertificate(s, u, input)),
+    async (input: Parameters<typeof createCertificate>[2]) => {
+      const { createCertificateAction } = await import("@/app/actions/profile-entities");
+      const result = await createCertificateAction(input);
+      if (!result.success) throw new Error(result.error);
+      return { id: result.data.id };
+    },
     crudKeys.certificates
   );
 }

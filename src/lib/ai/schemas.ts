@@ -140,6 +140,17 @@ export const universalSearchResponseSchema = z.discriminatedUnion("type", [
     type: z.literal("answer"),
     content: z.string(),
   }),
+  z.object({
+    type: z.literal("entities"),
+    items: z.array(
+      z.object({
+        type: z.enum(["job", "profile", "company"]),
+        label: z.string(),
+        subtitle: z.string(),
+        href: z.string(),
+      })
+    ),
+  }),
 ]);
 
 export type UniversalSearchResult = z.infer<

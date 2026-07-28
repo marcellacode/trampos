@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { EmpresaVagaEditorPage } from "@/components/dashboard/modules/empresa-vaga-editor-page";
 
 interface EditVagaRouteProps {
@@ -6,5 +7,9 @@ interface EditVagaRouteProps {
 
 export default async function EditVagaRoute({ params }: EditVagaRouteProps) {
   const { id } = await params;
-  return <EmpresaVagaEditorPage jobId={id} />;
+  return (
+    <Suspense fallback={null}>
+      <EmpresaVagaEditorPage jobId={id} />
+    </Suspense>
+  );
 }

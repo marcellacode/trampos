@@ -3,10 +3,26 @@
 import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { ArrowRight, Command, Loader2, Search, Sparkles } from "lucide-react";
+import {
+  ArrowRight,
+  Briefcase,
+  Building2,
+  Command,
+  Loader2,
+  Search,
+  Sparkles,
+  User,
+} from "lucide-react";
 import { universalSearchAction } from "@/app/actions/ai";
 import { SEARCH_EXAMPLES } from "@/lib/dashboard/constants";
 import { cn } from "@/lib/utils";
+
+interface SearchEntity {
+  type: "job" | "profile" | "company";
+  label: string;
+  subtitle: string;
+  href: string;
+}
 
 interface UniversalSearchProps {
   open?: boolean;
@@ -14,6 +30,18 @@ interface UniversalSearchProps {
   className?: string;
   compact?: boolean;
 }
+
+const ENTITY_ICONS = {
+  job: Briefcase,
+  profile: User,
+  company: Building2,
+} as const;
+
+const ENTITY_LABELS = {
+  job: "Vagas",
+  profile: "Perfis",
+  company: "Empresas",
+} as const;
 
 export function UniversalSearch({
   open: controlledOpen,
@@ -27,6 +55,7 @@ export function UniversalSearch({
   const [exampleIndex, setExampleIndex] = useState(0);
   const [loading, setLoading] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [entities, setEntities] = useState<SearchEntity[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
   const listId = useId();
 
@@ -48,6 +77,7 @@ export function UniversalSearch({
 
   const openSearch = useCallback(() => {
     setFeedback(null);
+    setEntities([]);
     setOpen(true);
   }, [setOpen]);
 
@@ -77,6 +107,7 @@ export function UniversalSearch({
 
       setLoading(true);
       setFeedback(null);
+      setEntities([]);
 
       const result = await universalSearchAction(q);
       setLoading(false);
@@ -93,11 +124,27 @@ export function UniversalSearch({
         return;
       }
 
+      if (result.data.type === "entities") {
+        setEntities(result.data.items);
+        if (result.data.items.length === 1) {
+          setOpen(false);
+          setQuery("");
+          router.push(result.data.items[0].href);
+        }
+        return;
+      }
+
       setFeedback(result.data.content);
       setQuery("");
     },
     [query, loading, router, setOpen]
   );
+
+  const grouped = entities.reduce<Record<string, SearchEntity[]>>((acc, item) => {
+    acc[item.type] = acc[item.type] ?? [];
+    acc[item.type].push(item);
+    return acc;
+  }, {});
 
   return (
     <>
@@ -118,7 +165,7 @@ export function UniversalSearch({
         {!compact && (
           <>
             <span className="flex-1 truncate text-sm text-muted-foreground">
-              Pergunte qualquer coisa...
+              Buscar vagas, perfis, empresas…
             </span>
             <kbd className="hidden items-center gap-0.5 rounded-md border border-border bg-muted/50 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground sm:inline-flex">
               {isMac ? (
@@ -164,7 +211,7 @@ export function UniversalSearch({
                   onKeyDown={(e) => {
                     if (e.key === "Enter") void handleSubmit();
                   }}
-                  placeholder="Pergunte qualquer coisa..."
+                  placeholder="Buscar vagas, perfis, empresas…"
                   className="flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
                   aria-autocomplete="list"
                   aria-controls={listId}
@@ -185,24 +232,62 @@ export function UniversalSearch({
                 </div>
               )}
 
-              <div id={listId} className="p-2">
-                <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
-                  Sugestões
-                </p>
-                {SEARCH_EXAMPLES.map((example) => (
-                  <button
-                    key={example}
-                    type="button"
-                    onClick={() => void handleSubmit(example)}
-                    disabled={loading}
-                    className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-40"
-                  >
-                    <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
-                    <span className="flex-1">{example}</span>
-                    <ArrowRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
-                  </button>
-                ))}
-              </div>
+              {entities.length > 0 ? (
+                <div id={listId} className="max-h-[50vh] overflow-y-auto p-2">
+                  {(Object.keys(grouped) as Array<keyof typeof ENTITY_LABELS>).map((type) => {
+                    const Icon = ENTITY_ICONS[type];
+                    return (
+                      <div key={type} className="mb-2">
+                        <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                          {ENTITY_LABELS[type]}
+                        </p>
+                        {grouped[type].map((item) => (
+                          <button
+                            key={`${item.type}-${item.href}`}
+                            type="button"
+                            onClick={() => {
+                              setOpen(false);
+                              setQuery("");
+                              router.push(item.href);
+                            }}
+                            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors hover:bg-muted/50"
+                          >
+                            <Icon className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate font-medium text-foreground">
+                                {item.label}
+                              </span>
+                              <span className="block truncate text-xs text-muted-foreground">
+                                {item.subtitle}
+                              </span>
+                            </span>
+                            <ArrowRight className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          </button>
+                        ))}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div id={listId} className="p-2">
+                  <p className="px-3 py-2 text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70">
+                    Sugestões
+                  </p>
+                  {SEARCH_EXAMPLES.map((example) => (
+                    <button
+                      key={example}
+                      type="button"
+                      onClick={() => void handleSubmit(example)}
+                      disabled={loading}
+                      className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-40"
+                    >
+                      <Search className="h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+                      <span className="flex-1">{example}</span>
+                      <ArrowRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </button>
+                  ))}
+                </div>
+              )}
 
               <div className="border-t border-border px-4 py-2.5">
                 <AnimatePresence mode="wait">

@@ -55,14 +55,18 @@ A conta demo vem com catálogo interno, candidaturas e matches pré-populados.
 
 | Área | O que faz |
 |------|-----------|
+| **Rede social profissional** | Feed, seguir perfis/empresas, perfis públicos, posts e engajamento |
+| **Recrutamento** | Vagas internas na plataforma, pipeline de candidatos, mensagens recrutador ↔ candidato |
 | **Matching** | Score de compatibilidade % (heurística + refinamento Groq) |
-| **Candidatura assistida** | IA prepara currículo + carta; você conclui no site da empresa |
-| **Vagas externas (Adzuna)** | Busca, detalhe, apply/hide/save unificados com vagas internas |
-| **Discovery** | Hide/save persistidos, filtros inteligentes (NL → chips), summary recalculado |
-| **Onboarding** | PDF → Storage, import GitHub, colar texto LinkedIn (sem API paga) |
-| **Entrevistas** | Simulador com feedback por turno e score final |
-| **Jobe Chat** | Assistente IA + bulk prepare de candidaturas |
-| **Currículo** | Versões adaptadas por vaga visíveis e regeneráveis |
+| **Candidatura assistida** | Apply interno na Jobera ou preparação + redirect para vagas externas |
+| **Vagas externas** | Adzuna, Remotive, RemoteOK, Jobicy — badges e confirmação pós-redirect |
+| **Discovery** | Filtro "Só candidatura na plataforma", hide/save, filtros inteligentes |
+| **Onboarding** | PDF → Storage, import GitHub, colar LinkedIn |
+| **Entrevistas** | Simulador com feedback por turno |
+| **Jobe Chat** | Assistente IA + bulk prepare (interno vs externo) |
+| **Privacidade (LGPD)** | Perfil público opt-in, exportação JSON, denunciar/bloquear no feed |
+
+> **Home do dashboard:** `/dashboard` redireciona para `/dashboard/feed` após login/onboarding.
 
 ## Degradação graceful (sem `GROQ_API_KEY`)
 
@@ -93,13 +97,26 @@ A conta demo vem com catálogo interno, candidaturas e matches pré-populados.
 4. **Discovery:** salve/oculte vagas → recarregue → persistência confirmada.
 5. Filtro inteligente: digite algo como *"vagas remotas de React sênior"*.
 
-### 3. Vagas externas
+### 4. Rede + feed + recrutamento
 
-1. **Sem config:** Remotive, Arbeitnow, RemoteOK e Jobicy já aparecem no discovery (remote/internacional).
-2. **Com Adzuna** (`ADZUNA_APP_ID` + `ADZUNA_APP_KEY`): vagas BR somam ao catálogo.
-3. Abra vaga externa (`adzuna-*`, `remotive-*`, etc.) → apply abre URL externa.
-4. Confirme conclusão no sidebar após candidatar no site da empresa.
-5. Teste hide/save em vaga externa.
+1. **Feed:** abas Para você / Explorar; siga alguém em `/dashboard/rede` → Descobrir.
+2. **Perfil público:** Currículo → Visibilidade → ativar perfil público e toggles por seção.
+3. **Auto-post:** toggle "Compartilhar conquistas" → adicione certificado ou candidate-se a vaga interna.
+4. **Empresa:** `/dashboard/empresa` → publique vaga interna → candidatos em Candidatos → Enviar mensagem.
+5. **Candidato:** responda em Mensagens → Pessoas; badge unread no header.
+6. **Moderação:** menu ⋯ em post de outro usuário → Denunciar ou Bloquear.
+
+### 5. Apply interno vs externo
+
+1. Vaga **Vaga Jobera** → botão "Enviar candidatura" (sidebar interno).
+2. Vaga **Externa** → "Preparar candidatura com IA" → copiar → abrir site → "Já concluí no site".
+3. Discovery → chip **Só candidatura na plataforma** filtra apply interno.
+4. Busca universal (Ctrl+K): digite nome de vaga, perfil ou empresa.
+
+### 6. Privacidade
+
+1. Configurações → Exportar meus dados (JSON).
+2. Perfil público só exibe seções habilitadas nos toggles de visibilidade.
 
 ## Scripts
 

@@ -8,9 +8,10 @@ import { cn } from "@/lib/utils";
 interface FeedJobMiniCardProps {
   job: FeedJobPreview;
   className?: string;
+  badge?: "Vaga Jobera" | "Externa";
 }
 
-export function FeedJobMiniCard({ job, className }: FeedJobMiniCardProps) {
+export function FeedJobMiniCard({ job, className, badge = "Vaga Jobera" }: FeedJobMiniCardProps) {
   return (
     <Link
       href={`/dashboard/vagas/${job.slug}`}
@@ -39,7 +40,12 @@ export function FeedJobMiniCard({ job, className }: FeedJobMiniCardProps) {
       </div>
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-semibold text-foreground">{job.title}</p>
-        <p className="truncate text-xs text-muted-foreground">{job.companyName}</p>
+        <div className="flex items-center gap-2">
+          <p className="truncate text-xs text-muted-foreground">{job.companyName}</p>
+          <span className="shrink-0 rounded border border-border px-1 py-0.5 text-[9px] uppercase text-muted-foreground">
+            {badge}
+          </span>
+        </div>
         <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
           {job.location ? (
             <span className="inline-flex items-center gap-1">

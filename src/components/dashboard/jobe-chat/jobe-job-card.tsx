@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import type { ChatJob } from "@/types/jobe-chat";
+import { getJobDiscoveryBadge } from "@/lib/jobs/source-utils";
 import { cn } from "@/lib/utils";
 
 interface JobeJobCardProps {
@@ -46,6 +47,9 @@ export function JobeJobCard({
             <p className="truncate text-sm font-medium text-foreground">{job.role}</p>
             <p className="truncate text-xs text-muted-foreground">{job.company}</p>
             <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+              <span className="rounded border border-border px-1 py-0.5 text-[9px] uppercase">
+                {getJobDiscoveryBadge(job)}
+              </span>
               <span className="inline-flex items-center gap-0.5">
                 <MapPin className="h-3 w-3" aria-hidden="true" />
                 {job.location}

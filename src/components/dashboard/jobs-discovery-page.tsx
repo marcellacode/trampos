@@ -16,6 +16,7 @@ import {
   SmartFilters,
 } from "@/components/dashboard/jobs";
 import { sortByCompatibility } from "@/lib/jobs/sort";
+import { isPlatformApply } from "@/lib/jobs/source-utils";
 import { isDiscoveryEmpty } from "@/lib/jobs/empty-data";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { useDiscovery } from "@/lib/jobs/hooks";
@@ -40,6 +41,7 @@ export function JobsDiscoveryPage() {
   const [compareIds, setCompareIds] = useState<string[]>([]);
   const [showComparison, setShowComparison] = useState(false);
   const [aiFilterQuery, setAiFilterQuery] = useState("");
+  const [platformOnly, setPlatformOnly] = useState(false);
 
   useEffect(() => {
     if (data && !filtersInitialized) {
@@ -82,8 +84,12 @@ export function JobsDiscoveryPage() {
       });
     }
 
+    if (platformOnly) {
+      jobs = jobs.filter((job) => isPlatformApply(job));
+    }
+
     return sortByCompatibility(jobs, (job) => job.company);
-  }, [data, hiddenJobs, aiFilterQuery, filters]);
+  }, [data, hiddenJobs, aiFilterQuery, filters, platformOnly]);
 
   const compareJobs = useMemo(() => {
     if (!data) return [];
@@ -211,6 +217,19 @@ export function JobsDiscoveryPage() {
             onChange={setFilters}
             onAiQuery={(q) => void handleAiFilter(q)}
           />
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setPlatformOnly((value) => !value)}
+              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                platformOnly
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-muted/30 text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Só candidatura na plataforma
+            </button>
+          </div>
           {compareIds.length > 0 && (
             <div className="flex items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
               <p className="text-xs text-muted-foreground">

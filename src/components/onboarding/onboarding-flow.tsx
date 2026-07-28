@@ -546,7 +546,7 @@ export function OnboardingFlow() {
           )}
 
           {step === "success" && (
-            <SuccessScreen onEnterDashboard={() => router.push("/dashboard")} />
+            <SuccessScreen onEnterDashboard={() => router.push("/dashboard/feed")} />
           )}
         </motion.div>
       </AnimatePresence>

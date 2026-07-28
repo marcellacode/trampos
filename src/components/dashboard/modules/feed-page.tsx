@@ -1,6 +1,8 @@
 "use client";
 
 import { Loader2 } from "lucide-react";
+import Link from "next/link";
+import { useState } from "react";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { PostCard } from "@/components/dashboard/feed/post-card";
 import { PostComposer } from "@/components/dashboard/feed/post-composer";
@@ -8,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { useCompanyMemberships } from "@/lib/crud/hooks";
 import { useDashboardShell } from "@/lib/dashboard/hooks";
 import { flattenFeedPages, useDeletePost, useFeed } from "@/lib/feed/hooks";
+import type { FeedMode } from "@/types/feed";
 
 function shellLayoutProps(shell: ReturnType<typeof useDashboardShell>["shell"]) {
   return {
@@ -18,9 +21,15 @@ function shellLayoutProps(shell: ReturnType<typeof useDashboardShell>["shell"]) 
   };
 }
 
+const FEED_TABS: { id: FeedMode; label: string }[] = [
+  { id: "for_you", label: "Para você" },
+  { id: "explore", label: "Explorar" },
+];
+
 export function FeedPage() {
   const { shell } = useDashboardShell();
-  const feedQuery = useFeed();
+  const [mode, setMode] = useState<FeedMode>("for_you");
+  const feedQuery = useFeed(mode);
   const deletePost = useDeletePost();
   const membershipsQuery = useCompanyMemberships();
 
@@ -35,9 +44,30 @@ export function FeedPage() {
         <header>
           <h1 className="text-2xl font-bold text-foreground">Feed</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Publicações de quem você segue e das empresas que acompanha
+            Publicações de quem você segue, empresas e conteúdo público
           </p>
         </header>
+
+        <div
+          className="flex gap-1 rounded-xl border border-border bg-muted/30 p-1"
+          role="tablist"
+          aria-label="Modo do feed"
+        >
+          {FEED_TABS.map((tab) => (
+            <Button
+              key={tab.id}
+              type="button"
+              role="tab"
+              aria-selected={mode === tab.id}
+              variant={mode === tab.id ? "secondary" : "ghost"}
+              size="sm"
+              className="flex-1"
+              onClick={() => setMode(tab.id)}
+            >
+              {tab.label}
+            </Button>
+          ))}
+        </div>
 
         <PostComposer
           userName={shell.user.name}
@@ -58,10 +88,10 @@ export function FeedPage() {
             <p>Seu feed está vazio.</p>
             <p className="mt-2">
               Siga profissionais e empresas na{" "}
-              <a href="/dashboard/rede" className="text-primary hover:underline">
+              <Link href="/dashboard/rede" className="text-primary hover:underline">
                 Rede
-              </a>{" "}
-              para ver publicações aqui.
+              </Link>{" "}
+              ou explore publicações na aba Explorar.
             </p>
           </div>
         ) : (

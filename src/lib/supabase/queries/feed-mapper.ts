@@ -1,5 +1,6 @@
 import type {
   FeedPost,
+  PostSource,
   PostVisibility,
 } from "@/types/feed";
 
@@ -12,6 +13,8 @@ export const POST_SELECT = `
   job_id,
   shared_post_id,
   visibility,
+  post_source,
+  source_event_kind,
   created_at,
   updated_at,
   author_profile:profiles!posts_author_user_id_fkey (
@@ -126,6 +129,8 @@ export interface DbFeedPostRow {
   job_id: string | null;
   shared_post_id: string | null;
   visibility: PostVisibility;
+  post_source?: PostSource | null;
+  source_event_kind?: string | null;
   created_at: string;
   updated_at: string;
   author_profile: DbProfileAuthor | DbProfileAuthor[] | null;
@@ -196,6 +201,8 @@ export function mapFeedPostRow(
     content: row.content,
     mediaUrls,
     visibility: row.visibility,
+    postSource: (row.post_source as PostSource) ?? "manual",
+    sourceEventKind: row.source_event_kind ?? null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     authorUser: profile

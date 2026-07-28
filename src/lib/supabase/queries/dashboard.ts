@@ -18,6 +18,7 @@ import {
   mapRecommendation,
   mapTimelineEvents,
 } from "@/lib/supabase/mappers/dashboard";
+import { countUnreadDirectMessages } from "@/lib/supabase/queries/direct-messages";
 import { fetchJobCardsForUser } from "@/lib/supabase/queries/jobs";
 import type { DbProfile } from "@/lib/supabase/types";
 
@@ -73,6 +74,7 @@ export async function fetchDashboardData(
     notificationsResult,
     unreadNotificationsResult,
     unreadMessagesResult,
+    unreadDirectMessagesResult,
   ] = await Promise.all([
     supabase
       .from("timeline_events")
@@ -173,6 +175,10 @@ export async function fetchDashboardData(
       .eq("user_id", userId)
       .eq("role", "assistant")
       .gt("created_at", new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+    countUnreadDirectMessages(supabase, userId).then((count) => ({
+      count,
+      error: null,
+    })),
   ]);
 
   const demoKpiKeys = new Set([
@@ -221,6 +227,12 @@ export async function fetchDashboardData(
     chat: mapChatMessages(chatResult.data ?? []),
     notifications: mapNotifications(notificationsResult.data ?? []),
     unreadNotifications: unreadNotificationsResult.count ?? 0,
-    unreadMessages: unreadMessagesResult.count ?? 0,
+    unreadMessages:
+      (unreadMessagesResult.count ?? 0) +
+      (typeof unreadDirectMessagesResult === "object" &&
+      unreadDirectMessagesResult &&
+      "count" in unreadDirectMessagesResult
+        ? Number(unreadDirectMessagesResult.count)
+        : 0),
   });
 }

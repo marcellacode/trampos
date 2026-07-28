@@ -12,6 +12,35 @@ import {
 } from "@/lib/crud/hooks";
 import type { ProfileVisibilitySettings } from "@/lib/supabase/queries/public-profile";
 
+function SectionToggle({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  disabled,
+}: {
+  label: string;
+  description: string;
+  checked: boolean;
+  onCheckedChange: (value: boolean) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-border bg-muted/20 p-4">
+      <Checkbox
+        checked={checked}
+        onCheckedChange={(value) => onCheckedChange(value === true)}
+        disabled={disabled}
+        className="mt-0.5"
+      />
+      <span className="space-y-1">
+        <span className="block text-sm font-medium text-foreground">{label}</span>
+        <span className="block text-sm text-muted-foreground">{description}</span>
+      </span>
+    </label>
+  );
+}
+
 function ProfileVisibilityForm({
   initial,
 }: {
@@ -22,6 +51,19 @@ function ProfileVisibilityForm({
   const [location, setLocation] = useState(initial.location);
   const [websiteUrl, setWebsiteUrl] = useState(initial.websiteUrl ?? "");
   const [isPublic, setIsPublic] = useState(initial.isPublic);
+  const [autoPostEnabled, setAutoPostEnabled] = useState(initial.autoPostEnabled);
+  const [showExperiencesPublic, setShowExperiencesPublic] = useState(
+    initial.showExperiencesPublic
+  );
+  const [showEducationPublic, setShowEducationPublic] = useState(
+    initial.showEducationPublic
+  );
+  const [showCertificatesPublic, setShowCertificatesPublic] = useState(
+    initial.showCertificatesPublic
+  );
+  const [showProjectsPublic, setShowProjectsPublic] = useState(
+    initial.showProjectsPublic
+  );
 
   const isSaving = updateVisibility.isPending;
   const publicUrl = initial.slug ? `/perfil/${initial.slug}` : null;
@@ -32,6 +74,11 @@ function ProfileVisibilityForm({
       location,
       websiteUrl: websiteUrl.trim() || null,
       isPublic,
+      autoPostEnabled,
+      showExperiencesPublic,
+      showEducationPublic,
+      showCertificatesPublic,
+      showProjectsPublic,
     });
   }
 
@@ -43,8 +90,7 @@ function ProfileVisibilityForm({
             Visibilidade do perfil
           </h2>
           <p className="mt-1 max-w-xl text-sm text-muted-foreground">
-            Controle o que visitantes veem em seu perfil público. Os dados vêm
-            do seu currículo — experiências, habilidades, projetos e mais.
+            Controle o que visitantes veem em seu perfil público e no feed.
           </p>
         </div>
         {publicUrl ? (
@@ -73,18 +119,52 @@ function ProfileVisibilityForm({
               Perfil público
             </span>
             <span className="block text-sm text-muted-foreground">
-              Quando ativado, qualquer pessoa pode ver seu perfil em{" "}
-              {publicUrl ? (
-                <code className="rounded bg-muted px-1.5 py-0.5 text-xs">
-                  jobera.com.br{publicUrl}
-                </code>
-              ) : (
-                "seu link público"
-              )}
-              .
+              Quando ativado, qualquer pessoa pode ver seu perfil em seu link público.
             </span>
           </span>
         </label>
+
+        <SectionToggle
+          label="Compartilhar conquistas automaticamente no feed"
+          description="Publica no feed quando você conclui onboarding, adiciona certificação ou se candidata a vagas internas. Você pode excluir esses posts depois."
+          checked={autoPostEnabled}
+          onCheckedChange={setAutoPostEnabled}
+          disabled={isSaving}
+        />
+
+        {isPublic ? (
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-foreground">Seções visíveis no perfil</p>
+            <SectionToggle
+              label="Experiências"
+              description="Histórico profissional no perfil público."
+              checked={showExperiencesPublic}
+              onCheckedChange={setShowExperiencesPublic}
+              disabled={isSaving}
+            />
+            <SectionToggle
+              label="Educação e cursos"
+              description="Formação acadêmica e cursos complementares."
+              checked={showEducationPublic}
+              onCheckedChange={setShowEducationPublic}
+              disabled={isSaving}
+            />
+            <SectionToggle
+              label="Certificados"
+              description="Certificações profissionais."
+              checked={showCertificatesPublic}
+              onCheckedChange={setShowCertificatesPublic}
+              disabled={isSaving}
+            />
+            <SectionToggle
+              label="Projetos"
+              description="Portfólio e projetos pessoais."
+              checked={showProjectsPublic}
+              onCheckedChange={setShowProjectsPublic}
+              disabled={isSaving}
+            />
+          </div>
+        ) : null}
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
@@ -159,7 +239,7 @@ export function ProfileVisibilitySection() {
         </div>
       ) : data ? (
         <ProfileVisibilityForm
-          key={`${data.slug ?? "no-slug"}-${data.isPublic}-${data.headline}-${data.location}-${data.websiteUrl ?? ""}`}
+          key={`${data.slug ?? "no-slug"}-${data.isPublic}-${data.autoPostEnabled}-${data.headline}`}
           initial={data}
         />
       ) : null}

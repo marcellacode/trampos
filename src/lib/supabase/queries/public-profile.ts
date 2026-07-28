@@ -25,6 +25,10 @@ export interface PublicProfileRow {
   seniority: string;
   website_url: string | null;
   is_public: boolean;
+  show_experiences_public?: boolean;
+  show_education_public?: boolean;
+  show_certificates_public?: boolean;
+  show_projects_public?: boolean;
 }
 
 export interface PublicProfile {
@@ -85,6 +89,11 @@ export interface ProfileVisibilitySettings {
   location: string;
   websiteUrl: string | null;
   isPublic: boolean;
+  autoPostEnabled: boolean;
+  showExperiencesPublic: boolean;
+  showEducationPublic: boolean;
+  showCertificatesPublic: boolean;
+  showProjectsPublic: boolean;
 }
 
 const PROFILE_SELECT = `
@@ -119,6 +128,63 @@ export async function fetchPublicProfileBySlug(
 
   const userId = profile.id;
 
+  const { data: visibilityRow } = await supabase
+    .from("profiles")
+    .select(
+      "show_experiences_public, show_education_public, show_certificates_public, show_projects_public, is_public"
+    )
+    .eq("id", userId)
+    .maybeSingle();
+
+  const showExperiences = visibilityRow?.show_experiences_public ?? true;
+  const showEducation = visibilityRow?.show_education_public ?? true;
+  const showCertificates = visibilityRow?.show_certificates_public ?? true;
+  const showProjects = visibilityRow?.show_projects_public ?? true;
+
+  if (!profile.is_public) return null;
+
+  const fetchExperiences = showExperiences
+    ? supabase
+        .from("profile_experiences")
+        .select("id, company, role, period_label, description, sort_order")
+        .eq("user_id", userId)
+        .order("sort_order")
+    : Promise.resolve({ data: [], error: null });
+
+  const fetchEducation = showEducation
+    ? supabase
+        .from("profile_education")
+        .select(
+          "id, institution, degree, field_of_study, start_date, end_date, is_current, description, sort_order"
+        )
+        .eq("user_id", userId)
+        .order("sort_order")
+    : Promise.resolve({ data: [], error: null });
+
+  const fetchCertificates = showCertificates
+    ? supabase
+        .from("profile_certificates")
+        .select("id, name, issuer, year_label, sort_order")
+        .eq("user_id", userId)
+        .order("sort_order")
+    : Promise.resolve({ data: [], error: null });
+
+  const fetchProjects = showProjects
+    ? supabase
+        .from("profile_projects")
+        .select(
+          `
+        id,
+        name,
+        description,
+        sort_order,
+        profile_project_tech (tech_name, sort_order)
+      `
+        )
+        .eq("user_id", userId)
+        .order("sort_order")
+    : Promise.resolve({ data: [], error: null });
+
   const [
     experiencesResult,
     skillsResult,
@@ -128,11 +194,7 @@ export async function fetchPublicProfileBySlug(
     educationResult,
     coursesResult,
   ] = await Promise.all([
-    supabase
-      .from("profile_experiences")
-      .select("id, company, role, period_label, description, sort_order")
-      .eq("user_id", userId)
-      .order("sort_order"),
+    fetchExperiences,
     supabase
       .from("profile_skills")
       .select("skill_name, sort_order")
@@ -143,38 +205,18 @@ export async function fetchPublicProfileBySlug(
       .select("id, name, level_label, sort_order")
       .eq("user_id", userId)
       .order("sort_order"),
-    supabase
-      .from("profile_projects")
-      .select(
-        `
-        id,
-        name,
-        description,
-        sort_order,
-        profile_project_tech (tech_name, sort_order)
-      `
-      )
-      .eq("user_id", userId)
-      .order("sort_order"),
-    supabase
-      .from("profile_certificates")
-      .select("id, name, issuer, year_label, sort_order")
-      .eq("user_id", userId)
-      .order("sort_order"),
-    supabase
-      .from("profile_education")
-      .select(
-        "id, institution, degree, field_of_study, start_date, end_date, is_current, description, sort_order"
-      )
-      .eq("user_id", userId)
-      .order("sort_order"),
-    supabase
-      .from("profile_courses")
-      .select(
-        "id, name, provider, completion_date, credential_url, description, sort_order"
-      )
-      .eq("user_id", userId)
-      .order("sort_order"),
+    fetchProjects,
+    fetchCertificates,
+    fetchEducation,
+    showEducation
+      ? supabase
+          .from("profile_courses")
+          .select(
+            "id, name, provider, completion_date, credential_url, description, sort_order"
+          )
+          .eq("user_id", userId)
+          .order("sort_order")
+      : Promise.resolve({ data: [], error: null }),
   ]);
 
   for (const result of [
@@ -206,7 +248,9 @@ export async function fetchProfileVisibilitySettings(
 ): Promise<ProfileVisibilitySettings | null> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("slug, headline, location, website_url, is_public")
+    .select(
+      "slug, headline, location, website_url, is_public, auto_post_enabled, show_experiences_public, show_education_public, show_certificates_public, show_projects_public"
+    )
     .eq("id", userId)
     .maybeSingle();
 
@@ -219,5 +263,10 @@ export async function fetchProfileVisibilitySettings(
     location: data.location,
     websiteUrl: data.website_url,
     isPublic: data.is_public,
+    autoPostEnabled: data.auto_post_enabled ?? false,
+    showExperiencesPublic: data.show_experiences_public ?? true,
+    showEducationPublic: data.show_education_public ?? true,
+    showCertificatesPublic: data.show_certificates_public ?? true,
+    showProjectsPublic: data.show_projects_public ?? true,
   };
 }

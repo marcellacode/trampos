@@ -58,6 +58,7 @@ export interface CreatePostActionInput {
 export interface ListFeedActionInput {
   cursor?: string | null;
   limit?: number;
+  mode?: "for_you" | "explore";
 }
 
 export interface ListFeedActionResult extends FeedPage {
@@ -74,6 +75,7 @@ export async function listFeedAction(
       cursor,
       limit: input.limit,
       viewerUserId: user.id,
+      mode: input.mode ?? "for_you",
     });
 
     return {

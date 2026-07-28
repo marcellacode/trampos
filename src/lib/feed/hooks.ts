@@ -24,13 +24,14 @@ import { crudKeys } from "@/lib/crud/query-keys";
 import type {
   CreateCommentInput,
   FeedComment,
+  FeedMode,
   FeedPost,
   SharePostInput,
 } from "@/types/feed";
 
 export const feedKeys = {
   all: ["feed"] as const,
-  list: () => [...feedKeys.all, "list"] as const,
+  list: (mode: FeedMode = "for_you") => [...feedKeys.all, "list", mode] as const,
   comments: (postId: string) => [...feedKeys.all, "comments", postId] as const,
 };
 
@@ -54,8 +55,8 @@ function updateFeedPosts(
   queryClient: ReturnType<typeof useQueryClient>,
   updater: (post: FeedPost) => FeedPost
 ) {
-  queryClient.setQueriesData<FeedInfiniteData>(
-    { queryKey: feedKeys.list() },
+    queryClient.setQueriesData<FeedInfiniteData>(
+      { queryKey: feedKeys.all },
     (old) => {
       if (!old) return old;
       return {
@@ -69,12 +70,12 @@ function updateFeedPosts(
   );
 }
 
-export function useFeed() {
+export function useFeed(mode: FeedMode = "for_you") {
   return useInfiniteQuery({
-    queryKey: feedKeys.list(),
+    queryKey: feedKeys.list(mode),
     initialPageParam: null as string | null,
     queryFn: async ({ pageParam }) => {
-      const result = await listFeedAction({ cursor: pageParam });
+      const result = await listFeedAction({ cursor: pageParam, mode });
       if (!result.success) throw new Error(result.error);
       return result.data;
     },
@@ -121,8 +122,7 @@ export function useTogglePostLike() {
       return result.data;
     },
     onMutate: async (engagementPostId) => {
-      await queryClient.cancelQueries({ queryKey: feedKeys.list() });
-      const previous = queryClient.getQueryData<FeedInfiniteData>(feedKeys.list());
+      await queryClient.cancelQueries({ queryKey: feedKeys.all });
 
       updateFeedPosts(queryClient, (post) => {
         if (getEngagementPostId(post) !== engagementPostId) return post;
@@ -133,12 +133,10 @@ export function useTogglePostLike() {
         });
       });
 
-      return { previous };
+      return {};
     },
-    onError: (_error, _postId, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(feedKeys.list(), context.previous);
-      }
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: feedKeys.all });
     },
     onSettled: () => {
       void queryClient.invalidateQueries({ queryKey: feedKeys.all });
@@ -170,12 +168,7 @@ export function useCreatePostComment() {
     },
     onMutate: async (input) => {
       await queryClient.cancelQueries({ queryKey: feedKeys.comments(input.postId) });
-      await queryClient.cancelQueries({ queryKey: feedKeys.list() });
-
-      const previousComments = queryClient.getQueryData<FeedComment[]>(
-        feedKeys.comments(input.postId)
-      );
-      const previousFeed = queryClient.getQueryData<FeedInfiniteData>(feedKeys.list());
+      await queryClient.cancelQueries({ queryKey: feedKeys.all });
 
       const optimistic: FeedComment = {
         id: `optimistic-${Date.now()}`,
@@ -214,18 +207,11 @@ export function useCreatePostComment() {
         })
       );
 
-      return { previousComments, previousFeed, postId: input.postId };
+      return { postId: input.postId };
     },
-    onError: (_error, input, context) => {
-      if (context?.previousComments) {
-        queryClient.setQueryData(
-          feedKeys.comments(input.postId),
-          context.previousComments
-        );
-      }
-      if (context?.previousFeed) {
-        queryClient.setQueryData(feedKeys.list(), context.previousFeed);
-      }
+    onError: (_error, input) => {
+      void queryClient.invalidateQueries({ queryKey: feedKeys.comments(input.postId) });
+      void queryClient.invalidateQueries({ queryKey: feedKeys.all });
     },
     onSuccess: (comment, input) => {
       queryClient.setQueryData<FeedComment[]>(feedKeys.comments(input.postId), (old) => {
@@ -333,12 +319,7 @@ export function useDeletePostComment() {
     },
     onMutate: async ({ commentId, postId }) => {
       await queryClient.cancelQueries({ queryKey: feedKeys.comments(postId) });
-      await queryClient.cancelQueries({ queryKey: feedKeys.list() });
-
-      const previousComments = queryClient.getQueryData<FeedComment[]>(
-        feedKeys.comments(postId)
-      );
-      const previousFeed = queryClient.getQueryData<FeedInfiniteData>(feedKeys.list());
+      await queryClient.cancelQueries({ queryKey: feedKeys.all });
 
       const removeFromList = (items: FeedComment[]): FeedComment[] =>
         items
@@ -358,15 +339,11 @@ export function useDeletePostComment() {
         })
       );
 
-      return { previousComments, previousFeed, postId };
+      return { postId };
     },
-    onError: (_error, { postId }, context) => {
-      if (context?.previousComments) {
-        queryClient.setQueryData(feedKeys.comments(postId), context.previousComments);
-      }
-      if (context?.previousFeed) {
-        queryClient.setQueryData(feedKeys.list(), context.previousFeed);
-      }
+    onError: (_error, { postId }) => {
+      void queryClient.invalidateQueries({ queryKey: feedKeys.comments(postId) });
+      void queryClient.invalidateQueries({ queryKey: feedKeys.all });
     },
     onSettled: (postId) => {
       if (postId) {
@@ -387,8 +364,7 @@ export function useSharePost() {
       return result.data;
     },
     onMutate: async (input) => {
-      await queryClient.cancelQueries({ queryKey: feedKeys.list() });
-      const previous = queryClient.getQueryData<FeedInfiniteData>(feedKeys.list());
+      await queryClient.cancelQueries({ queryKey: feedKeys.all });
 
       updateFeedPosts(queryClient, (post) =>
         patchEngagement(post, input.postId, {
@@ -396,12 +372,10 @@ export function useSharePost() {
         })
       );
 
-      return { previous };
+      return {};
     },
-    onError: (_error, _input, context) => {
-      if (context?.previous) {
-        queryClient.setQueryData(feedKeys.list(), context.previous);
-      }
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: feedKeys.all });
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: feedKeys.all });

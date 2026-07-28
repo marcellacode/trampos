@@ -89,6 +89,11 @@ export const FEATURES = [
 ] as const;
 
 export const COMPARISON_FEATURES = [
+  { label: "Feed profissional", indeed: false, linkedin: true, jobera: true },
+  { label: "Perfis públicos", indeed: false, linkedin: true, jobera: true },
+  { label: "Seguir empresas e profissionais", indeed: false, linkedin: true, jobera: true },
+  { label: "Vagas internas na plataforma", indeed: false, linkedin: false, jobera: true },
+  { label: "Apply interno vs externo", indeed: true, linkedin: false, jobera: true },
   { label: "Currículo adaptado por vaga", indeed: false, linkedin: false, jobera: true },
   { label: "Score de compatibilidade", indeed: false, linkedin: false, jobera: true },
   { label: "Simulador de entrevista", indeed: false, linkedin: false, jobera: true },
@@ -116,7 +121,7 @@ export const FAQ_ITEMS = [
   {
     question: "A plataforma envia candidaturas automaticamente?",
     answer:
-      "Não. Preparamos currículo e materiais para cada vaga, mas você revisa e conclui a candidatura no site da empresa — mantendo controle total.",
+      "Depende da vaga. Em vagas internas (Candidatura Jobera), você envia currículo e carta direto na plataforma. Em vagas externas, a IA prepara os materiais e você conclui no site da empresa — mantendo controle total.",
   },
   {
     question: "Meu currículo é adaptado para cada vaga?",
@@ -131,7 +136,7 @@ export const FAQ_ITEMS = [
   {
     question: "É seguro compartilhar meus dados?",
     answer:
-      "Utilizamos criptografia e seguimos a LGPD. Seus dados não são compartilhados com terceiros sem consentimento.",
+      "Utilizamos criptografia e seguimos a LGPD. Seu perfil público é opt-in: você escolhe o que exibir e pode exportar ou excluir seus dados a qualquer momento. Dados não são compartilhados com terceiros sem consentimento.",
   },
   {
     question: "Funciona para qualquer área?",

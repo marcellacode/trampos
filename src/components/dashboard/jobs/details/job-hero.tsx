@@ -15,6 +15,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { CompatibilityBar } from "@/components/dashboard/jobs/compatibility-bar";
 import type { JobDetail } from "@/types/jobs";
+import {
+  getJobDiscoveryBadge,
+  getJobSourceLabel,
+} from "@/lib/jobs/source-utils";
 import { cn } from "@/lib/utils";
 
 interface JobHeroProps {
@@ -98,8 +102,15 @@ export function JobHero({
                 {job.role}
               </h1>
               {isExternal && (
-                <span className="mt-2 inline-flex items-center rounded-md border border-[#6366F1]/30 bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#A5B4FC]">
-                  Fonte externa · Adzuna
+                <span className="mt-2 inline-flex items-center gap-2">
+                  <span className="inline-flex items-center rounded-md border border-[#6366F1]/30 bg-[#6366F1]/10 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#A5B4FC]">
+                    {getJobDiscoveryBadge(job)}
+                  </span>
+                  {getJobSourceLabel(job.source) ? (
+                    <span className="text-[10px] text-muted-foreground">
+                      {getJobSourceLabel(job.source)}
+                    </span>
+                  ) : null}
                 </span>
               )}
               <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-muted-foreground">

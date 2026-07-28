@@ -31,7 +31,7 @@ export default async function Page() {
           .eq("id", user.id)
           .maybeSingle();
 
-        redirect(profile?.onboarding_completed ? "/dashboard" : "/onboarding");
+        redirect(profile?.onboarding_completed ? "/dashboard/feed" : "/onboarding");
       }
     } catch (error) {
       if (error instanceof Error && error.message === "NEXT_REDIRECT") {

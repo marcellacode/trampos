@@ -20,6 +20,8 @@ import { AuthError, requireAuth } from "@/lib/auth/require-auth";
 import { parseGoalText } from "@/lib/onboarding/goal-parser";
 import { fetchProfileData } from "@/lib/supabase/queries/profile";
 import { fetchJobCardsForUser } from "@/lib/supabase/queries/jobs";
+import { searchPlatformEntities } from "@/lib/supabase/queries/universal-search";
+import { createSystemPostIfEnabled } from "@/lib/feed/system-posts";
 import {
   createChatMessage,
   listChatMessagesByContext,
@@ -419,6 +421,8 @@ Baseie-se apenas no perfil real. PT-BR.`,
       color_token: "blue",
     });
 
+    await createSystemPostIfEnabled(supabase, user.id, "onboarding_completed");
+
     return {
       success: true,
       data: { suggestionsCount },
@@ -438,16 +442,47 @@ export async function universalSearchAction(
     }
 
     const { supabase, user } = await requireAuth();
+
+    const platformResults = await searchPlatformEntities(supabase, trimmed);
+    if (platformResults.items.length > 0 && !platformResults.looksLikeQuestion) {
+      return {
+        success: true,
+        data: {
+          type: "entities",
+          items: platformResults.items.map((item) => ({
+            type: item.type,
+            label: item.label,
+            subtitle: item.subtitle,
+            href: item.href,
+          })),
+        },
+      };
+    }
+
     const rateError = enforceRateLimit(user.id);
     if (rateError) return rateError;
 
     if (!isGroqConfigured()) {
+      if (platformResults.items.length > 0) {
+        return {
+          success: true,
+          data: {
+            type: "entities",
+            items: platformResults.items.map((item) => ({
+              type: item.type,
+              label: item.label,
+              subtitle: item.subtitle,
+              href: item.href,
+            })),
+          },
+        };
+      }
       return {
         success: true,
         data: {
           type: "answer",
           content:
-            "A busca inteligente requer GROQ_API_KEY configurada. Enquanto isso, use o menu Vagas no dashboard.",
+            "Configure GROQ_API_KEY para busca inteligente ou digite o nome de uma vaga, perfil ou empresa.",
         },
       };
     }

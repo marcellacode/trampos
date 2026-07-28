@@ -20,7 +20,7 @@ type RedeTab = "following" | "followers" | "suggestions";
 const TABS: { id: RedeTab; label: string }[] = [
   { id: "following", label: "Seguindo" },
   { id: "followers", label: "Seguidores" },
-  { id: "suggestions", label: "Sugestões" },
+  { id: "suggestions", label: "Descobrir" },
 ];
 
 function shellLayoutProps(shell: ReturnType<typeof useDashboardShell>["shell"]) {
@@ -249,19 +249,43 @@ function SuggestionsTab() {
   }
 
   const users = suggestionsQuery.data?.users ?? [];
+  const companies = suggestionsQuery.data?.companies ?? [];
 
-  if (users.length === 0) {
+  if (users.length === 0 && companies.length === 0) {
     return (
       <EmptyState message="Nenhuma sugestão no momento. Complete seu perfil com skills e localização." />
     );
   }
 
   return (
-    <ul className="space-y-3">
-      {users.map((user) => (
-        <UserListItem key={user.id} user={user} />
-      ))}
-    </ul>
+    <div className="space-y-6">
+      {users.length > 0 ? (
+        <section>
+          <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Profissionais com skills em comum
+          </h2>
+          <ul className="space-y-3">
+            {users.map((user) => (
+              <UserListItem key={user.id} user={user} />
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {companies.length > 0 ? (
+        <section>
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            <Building2 className="h-4 w-4" aria-hidden="true" />
+            Empresas verificadas
+          </h2>
+          <ul className="space-y-3">
+            {companies.map((company) => (
+              <CompanyListItem key={company.id} company={company} />
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </div>
   );
 }
 

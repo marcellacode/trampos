@@ -39,6 +39,7 @@ export interface FollowersList {
 
 export interface FollowSuggestions {
   users: FollowUserSummary[];
+  companies: FollowCompanySummary[];
 }
 
 export interface ToggleFollowResult {

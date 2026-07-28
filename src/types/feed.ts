@@ -1,4 +1,6 @@
 export type PostVisibility = "public" | "followers";
+export type PostSource = "manual" | "system";
+export type FeedMode = "for_you" | "explore";
 
 export interface FeedAuthorUser {
   id: string;
@@ -46,6 +48,8 @@ export interface FeedPost {
   content: string;
   mediaUrls: string[];
   visibility: PostVisibility;
+  postSource: PostSource;
+  sourceEventKind: string | null;
   createdAt: string;
   updatedAt: string;
   authorUser: FeedAuthorUser | null;

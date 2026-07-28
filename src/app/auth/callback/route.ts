@@ -40,7 +40,7 @@ export async function GET(request: Request) {
           .maybeSingle();
 
         const destination = profile?.onboarding_completed
-          ? "/dashboard"
+          ? "/dashboard/feed"
           : next.startsWith("/onboarding")
             ? next
             : "/onboarding";

@@ -62,7 +62,7 @@ export async function middleware(request: NextRequest) {
 
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = profile?.onboarding_completed
-      ? "/dashboard"
+      ? "/dashboard/feed"
       : "/onboarding";
     redirectUrl.search = "";
     return NextResponse.redirect(redirectUrl);

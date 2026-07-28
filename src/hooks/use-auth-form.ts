@@ -55,7 +55,7 @@ export function useAuthForm() {
 
       setStatus("success");
       await new Promise((resolve) => setTimeout(resolve, 700));
-      router.push("/dashboard");
+      router.push("/dashboard/feed");
       router.refresh();
     },
     [form, router]

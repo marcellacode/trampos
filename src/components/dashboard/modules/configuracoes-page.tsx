@@ -19,6 +19,7 @@ import {
   useUpdateResumeUpload,
 } from "@/lib/crud/hooks";
 import { CONFIGURACOES_MODULE, MERCADO_MODULE } from "@/lib/crud/modules";
+import { PrivacyDataSection } from "@/components/dashboard/privacy-data-section";
 
 export function ConfiguracoesModulePage() {
   const resumeQuery = useResumeUploads();
@@ -35,6 +36,7 @@ export function ConfiguracoesModulePage() {
 
   return (
     <ModuleCrudShell config={CONFIGURACOES_MODULE}>
+      <PrivacyDataSection />
       <EntityCrudSection
         config={resumeUploads}
         items={resumeQuery.data ?? []}

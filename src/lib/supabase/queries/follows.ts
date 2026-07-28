@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fromExtendedTable } from "@/lib/supabase/extended-client";
+import { fetchBlockedUserIds } from "@/lib/supabase/queries/moderation";
 import type {
   FollowCompanySummary,
   FollowersList,
@@ -386,8 +387,26 @@ export async function fetchFollowSuggestions(
 
   if (followsError) throw followsError;
 
+  const blockedIds = new Set(await fetchBlockedUserIds(supabase, userId));
+
+  const { data: myCompanyFollows, error: companyFollowsError } = await fromExtendedTable(
+    supabase,
+    "follows"
+  )
+    .select("followed_company_id")
+    .eq("follower_user_id", userId);
+
+  if (companyFollowsError) throw companyFollowsError;
+
+  const followedCompanyIds = new Set(
+    ((myCompanyFollows ?? []) as Pick<DbFollowRow, "followed_company_id">[])
+      .map((row) => row.followed_company_id)
+      .filter((id): id is string => Boolean(id))
+  );
+
   const excludeIds = new Set<string>([
     userId,
+    ...blockedIds,
     ...((myFollows ?? []) as Pick<DbFollowRow, "followed_user_id">[])
       .map((row) => row.followed_user_id)
       .filter((id): id is string => Boolean(id)),
@@ -439,8 +458,39 @@ export async function fetchFollowSuggestions(
     .filter((id) => !excludeIds.has(id))
     .slice(0, limit);
 
+  const { data: verifiedCompanies, error: companiesError } = await supabase
+    .from("companies")
+    .select("id, slug, name, logo, brand_color, segment")
+    .eq("is_claimed", true)
+    .limit(6);
+
+  if (companiesError) throw companiesError;
+
+  const companies: FollowCompanySummary[] = [];
+
+  for (const company of verifiedCompanies ?? []) {
+    if (followedCompanyIds.has(company.id)) continue;
+
+    const { data: countData, error: countError } = await supabase.rpc(
+      "get_company_follower_count",
+      { target_company_id: company.id }
+    );
+    if (countError) throw countError;
+
+    companies.push({
+      id: company.id,
+      slug: company.slug,
+      name: company.name,
+      logo: company.logo,
+      brandColor: company.brand_color,
+      segment: company.segment,
+      isFollowing: false,
+      followerCount: Number(countData ?? 0),
+    });
+  }
+
   if (uniqueIds.length === 0) {
-    return { users: [] };
+    return { users: [], companies };
   }
 
   const { data: profiles, error: profilesError } = await supabase
@@ -454,8 +504,9 @@ export async function fetchFollowSuggestions(
   if (profilesError) throw profilesError;
 
   return {
-    users: (profiles ?? []).map((profile) =>
-      mapFollowUser(profile as DbFollowProfile, false)
-    ),
+    users: (profiles ?? [])
+      .filter((profile) => !blockedIds.has(profile.id))
+      .map((profile) => mapFollowUser(profile as DbFollowProfile, false)),
+    companies,
   };
 }

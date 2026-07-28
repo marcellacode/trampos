@@ -14,6 +14,11 @@ export function fromExtendedTable(
     | "post_comments"
     | "post_shares"
     | "post_counts"
+    | "post_reports"
+    | "blocked_users"
+    | "conversations"
+    | "conversation_participants"
+    | "direct_messages"
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return (supabase as any).from(table);

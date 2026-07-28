@@ -14,6 +14,7 @@ import { applicationStatusLabel } from "@/lib/applications/status-labels";
 import type { JobApplicationRow } from "@/lib/supabase/queries/mutations/applications";
 import { createNotification } from "@/lib/supabase/queries/mutations/notifications";
 import { createTimelineEvent } from "@/lib/supabase/queries/mutations/timeline";
+import { createSystemPostIfEnabled } from "@/lib/feed/system-posts";
 
 export interface PrepareApplicationInput {
   jobRef: string;
@@ -433,6 +434,11 @@ export async function applyInternalJob(
     notification_group: "today",
   });
 
+  await createSystemPostIfEnabled(supabase, userId, "internal_application_submitted", {
+    roleTitle,
+    companyName,
+  });
+
   return {
     application,
     applyUrl: null,
@@ -456,6 +462,7 @@ export async function confirmExternalApplication(
       submission_status: "completed",
       status_label: "Candidatura concluída",
       user_confirmed_at: now,
+      confirmed_externally_at: now,
       last_activity_at: now,
     })
     .eq("id", applicationId)

@@ -6,12 +6,14 @@ import {
   Heart,
   Loader2,
   MessageCircle,
+  MoreHorizontal,
   Pencil,
   Repeat2,
   Send,
   Trash2,
   X,
 } from "lucide-react";
+import { blockUserAction, reportPostAction } from "@/app/actions/moderation";
 import { FeedJobMiniCard } from "@/components/dashboard/feed/feed-job-mini-card";
 import { Button } from "@/components/ui/button";
 import {
@@ -386,6 +388,8 @@ export function PostCard({
 }: PostCardProps) {
   const [commentsOpen, setCommentsOpen] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [moderationMessage, setModerationMessage] = useState<string | null>(null);
   const toggleLike = useTogglePostLike();
 
   const engagementPostId = getEngagementPostId(post);
@@ -395,6 +399,33 @@ export function PostCard({
     (post.authorUser?.id === currentUserId) ||
     (post.authorCompany != null &&
       editableCompanyIds.includes(post.authorCompany.id));
+
+  const canModerate =
+    post.authorUser?.id &&
+    post.authorUser.id !== currentUserId &&
+    currentUserId;
+
+  async function handleReport() {
+    const result = await reportPostAction({
+      postId: post.id,
+      reason: "Conteúdo inadequado",
+    });
+    setMenuOpen(false);
+    setModerationMessage(
+      result.success ? "Denúncia registrada. Obrigado." : result.error
+    );
+  }
+
+  async function handleBlock() {
+    if (!post.authorUser?.id) return;
+    const result = await blockUserAction(post.authorUser.id);
+    setMenuOpen(false);
+    setModerationMessage(
+      result.success
+        ? "Usuário bloqueado. Você não verá mais publicações dele."
+        : result.error
+    );
+  }
 
   const subtitle =
     post.authorUser?.headline ||
@@ -437,8 +468,49 @@ export function PostCard({
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
+            ) : canModerate ? (
+              <div className="relative">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 shrink-0 p-0"
+                  onClick={() => setMenuOpen((value) => !value)}
+                  aria-label="Mais opções"
+                >
+                  <MoreHorizontal className="h-4 w-4" />
+                </Button>
+                {menuOpen ? (
+                  <div className="absolute right-0 z-10 mt-1 w-44 rounded-lg border border-border bg-card py-1 shadow-lg">
+                    <button
+                      type="button"
+                      className="block w-full px-3 py-2 text-left text-sm hover:bg-muted/50"
+                      onClick={() => void handleReport()}
+                    >
+                      Denunciar
+                    </button>
+                    <button
+                      type="button"
+                      className="block w-full px-3 py-2 text-left text-sm text-destructive hover:bg-muted/50"
+                      onClick={() => void handleBlock()}
+                    >
+                      Bloquear usuário
+                    </button>
+                  </div>
+                ) : null}
+              </div>
             ) : null}
           </div>
+
+          {post.postSource === "system" ? (
+            <p className="mt-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+              Conquista automática
+            </p>
+          ) : null}
+
+          {moderationMessage ? (
+            <p className="mt-2 text-xs text-muted-foreground">{moderationMessage}</p>
+          ) : null}
 
           {post.content ? (
             <p className="mt-3 whitespace-pre-wrap text-sm text-foreground">

@@ -25,7 +25,11 @@ import type {
   JobDetail,
 } from "@/types/jobs";
 import { copyToClipboard, useJobApplication } from "@/lib/applications/hooks";
-import { isPlatformApply } from "@/lib/jobs/source-utils";
+import {
+  getJobDiscoveryBadge,
+  getJobSourceLabel,
+  isPlatformApply,
+} from "@/lib/jobs/source-utils";
 import { cn } from "@/lib/utils";
 
 interface ApplySidebarProps {
@@ -148,6 +152,35 @@ function PreviewBlock({
   );
 }
 
+function buildExternalChecklist(
+  state: "idle" | "preparing" | "prepared" | "completed",
+  hasPreview: boolean,
+  isDone: boolean
+): ApplyChecklistItem[] {
+  return [
+    {
+      id: "tailored",
+      label: "Copiar currículo adaptado",
+      status: hasPreview ? "done" : state === "preparing" ? "auto" : "pending",
+    },
+    {
+      id: "cover",
+      label: "Copiar carta de apresentação",
+      status: hasPreview ? "done" : state === "preparing" ? "auto" : "pending",
+    },
+    {
+      id: "open",
+      label: "Abrir site da empresa",
+      status: state === "prepared" || isDone ? "done" : "pending",
+    },
+    {
+      id: "confirm",
+      label: "Confirmar candidatura concluída",
+      status: isDone ? "done" : "pending",
+    },
+  ];
+}
+
 function buildInternalChecklist(
   state: "idle" | "preparing" | "prepared" | "completed",
   isDone: boolean,
@@ -192,9 +225,13 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
 
   const showPreview = Boolean(tailoredResumeText || coverLetterText);
   const platformApply = isPlatformApply(job);
+  const discoveryBadge = getJobDiscoveryBadge(job);
+  const sourceLabel = getJobSourceLabel(job.source);
   const checklist = isInternalPlatform
     ? buildInternalChecklist(state, isDone, showPreview)
-    : job.applyChecklist;
+    : isExternal
+      ? buildExternalChecklist(state, showPreview, isDone)
+      : job.applyChecklist;
 
   async function handlePrimaryAction() {
     if (isDone) return;
@@ -214,6 +251,23 @@ export function ApplySidebar({ job, className }: ApplySidebarProps) {
       <ReportCard className="sticky top-24 border-primary/15 p-5">
         <div className="flex flex-col items-center">
           <CompatibilityCard value={job.compatibility} hasMatch={job.hasMatch} size={120} />
+          <div className="mt-3 flex flex-wrap justify-center gap-2">
+            <span
+              className={cn(
+                "rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide",
+                discoveryBadge === "Vaga Jobera"
+                  ? "border border-primary/30 bg-primary/10 text-primary"
+                  : "border border-[#6366F1]/30 bg-[#6366F1]/10 text-[#A5B4FC]"
+              )}
+            >
+              {discoveryBadge}
+            </span>
+            {sourceLabel ? (
+              <span className="rounded-md border border-border bg-muted/40 px-2 py-0.5 text-[10px] text-muted-foreground">
+                {sourceLabel}
+              </span>
+            ) : null}
+          </div>
         </div>
 
         <div className="mt-4">

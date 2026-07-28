@@ -2,12 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   CreatePostInput,
   FeedCursor,
+  FeedMode,
   FeedPage,
   FeedPost,
 } from "@/types/feed";
 import { fromExtendedTable } from "@/lib/supabase/extended-client";
 import { formatRelativeTime } from "@/lib/supabase/utils";
 import { fetchFollowedAuthorIds } from "@/lib/supabase/queries/follows";
+import { fetchBlockedUserIds } from "@/lib/supabase/queries/moderation";
 import { fetchPostEngagementBatch } from "@/lib/supabase/queries/post-engagement";
 import {
   applyEngagementToPost,
@@ -40,21 +42,24 @@ export async function fetchFeedPosts(
     cursor?: FeedCursor | null;
     limit?: number;
     viewerUserId?: string;
+    mode?: FeedMode;
   } = {}
 ): Promise<FeedPage> {
   const limit = options.limit ?? FEED_PAGE_SIZE;
+  const mode = options.mode ?? "for_you";
 
   let authorUserIds: string[] = [];
   let authorCompanyIds: string[] = [];
+  let blockedUserIds: string[] = [];
 
   if (options.viewerUserId) {
-    const followed = await fetchFollowedAuthorIds(supabase, options.viewerUserId);
+    const [followed, blocked] = await Promise.all([
+      fetchFollowedAuthorIds(supabase, options.viewerUserId),
+      fetchBlockedUserIds(supabase, options.viewerUserId),
+    ]);
     authorUserIds = [...new Set([options.viewerUserId, ...followed.userIds])];
     authorCompanyIds = followed.companyIds;
-  }
-
-  if (options.viewerUserId && authorUserIds.length === 0 && authorCompanyIds.length === 0) {
-    return { posts: [], nextCursor: null };
+    blockedUserIds = blocked;
   }
 
   let query = fromExtendedTable(supabase, "posts")
@@ -63,17 +68,17 @@ export async function fetchFeedPosts(
     .order("id", { ascending: false })
     .limit(limit + 1);
 
-  if (options.viewerUserId) {
-    const orFilters: string[] = [];
+  if (mode === "explore") {
+    query = query.eq("visibility", "public");
+  } else if (options.viewerUserId) {
+    const orFilters: string[] = ["visibility.eq.public"];
     if (authorUserIds.length > 0) {
       orFilters.push(`author_user_id.in.(${authorUserIds.join(",")})`);
     }
     if (authorCompanyIds.length > 0) {
       orFilters.push(`author_company_id.in.(${authorCompanyIds.join(",")})`);
     }
-    if (orFilters.length > 0) {
-      query = query.or(orFilters.join(","));
-    }
+    query = query.or(orFilters.join(","));
   }
 
   if (options.cursor) {
@@ -86,7 +91,15 @@ export async function fetchFeedPosts(
   const { data, error } = await query;
   if (error) throw error;
 
-  const rows = (data ?? []) as DbFeedPostRow[];
+  let rows = (data ?? []) as DbFeedPostRow[];
+
+  if (blockedUserIds.length > 0) {
+    const blockedSet = new Set(blockedUserIds);
+    rows = rows.filter(
+      (row) => !row.author_user_id || !blockedSet.has(row.author_user_id)
+    );
+  }
+
   const hasMore = rows.length > limit;
   const pageRows = hasMore ? rows.slice(0, limit) : rows;
   let posts = pageRows.map((row) => mapFeedPostRow(row));

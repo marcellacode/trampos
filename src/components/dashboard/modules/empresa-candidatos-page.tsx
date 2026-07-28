@@ -2,11 +2,13 @@
 
 import { useEffect, useState, useTransition } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronDown, User } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { ArrowLeft, ChevronDown, MessageSquare, User } from "lucide-react";
 import {
   listCompanyApplicationsAction,
   updateApplicationStatusAction,
 } from "@/app/actions/applications";
+import { startConversationFromApplicationAction } from "@/app/actions/direct-messages";
 import { DashboardLayout } from "@/components/dashboard/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import {
@@ -50,6 +52,24 @@ function CandidateDetail({
   const [status, setStatus] = useState<ApplicationStatus>(application.status);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [messaging, setMessaging] = useState(false);
+  const router = useRouter();
+
+  function handleMessage() {
+    setMessaging(true);
+    setError(null);
+    startTransition(async () => {
+      const result = await startConversationFromApplicationAction(application.id);
+      setMessaging(false);
+      if (!result.success) {
+        setError(result.error);
+        return;
+      }
+      router.push(
+        `/dashboard/mensagens?tab=pessoas&conversation=${result.data.conversationId}`
+      );
+    });
+  }
 
   function handleStatusChange(next: ApplicationStatus) {
     setStatus(next);
@@ -129,6 +149,18 @@ function CandidateDetail({
               {error}
             </p>
           ) : null}
+
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            disabled={messaging || isPending}
+            onClick={handleMessage}
+          >
+            <MessageSquare className="h-4 w-4" aria-hidden="true" />
+            {messaging ? "Abrindo…" : "Enviar mensagem"}
+          </Button>
 
           {application.tailoredResumeText ? (
             <div>
