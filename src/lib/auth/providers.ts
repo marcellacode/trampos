@@ -3,6 +3,7 @@ import type {
   OAuthSignInOptions,
   ResetPasswordForEmailOptions,
   SignInWithPasswordOptions,
+  SignUpWithPasswordOptions,
   UpdatePasswordOptions,
 } from "@/types/auth";
 import {
@@ -24,6 +25,30 @@ export async function signInWithPassword({
   const supabase = createBrowserSupabaseClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
   return { error: error?.message ?? null };
+}
+
+export async function signUpWithPassword({
+  fullName,
+  email,
+  password,
+}: SignUpWithPasswordOptions): Promise<{
+  error: string | null;
+  confirmationRequired: boolean;
+}> {
+  const supabase = createBrowserSupabaseClient();
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: { full_name: fullName },
+      emailRedirectTo: getAuthCallbackUrl("/onboarding"),
+    },
+  });
+
+  return {
+    error: error?.message ?? null,
+    confirmationRequired: !error && !data.session,
+  };
 }
 
 export async function signInWithOAuth({
