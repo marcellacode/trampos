@@ -5,7 +5,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { getSupabaseEnv } from "@/lib/supabase/env";
 
 const PROTECTED_PREFIXES = ["/dashboard", "/onboarding"];
-const AUTH_ROUTES = ["/login"];
+const AUTH_ROUTES = ["/login", "/cadastro"];
 
 function isProtectedPath(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(
