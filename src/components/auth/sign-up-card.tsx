@@ -11,7 +11,7 @@ import { useSignUpForm } from "@/hooks/use-sign-up-form";
 import { cn } from "@/lib/utils";
 
 export function SignUpCard() {
-  const { form, status, rootError, confirmationEmail, clearRootError, onSubmit, isSubmitting } = useSignUpForm();
+  const { form, status, rootError, confirmationEmail, clearRootError, setRootError, onSubmit, isSubmitting } = useSignUpForm();
   const { register, formState: { errors, isValid }, watch } = form;
 
   if (status === "success" && confirmationEmail) {
@@ -63,7 +63,7 @@ export function SignUpCard() {
               {isSubmitting ? <span className="inline-flex items-center gap-2"><Loader2 className="h-4 w-4 animate-spin" />Criando conta...</span> : "Criar conta"}
             </motion.button>
           </form>
-          <SocialButtons disabled={isSubmitting} onError={() => undefined} />
+          <SocialButtons disabled={isSubmitting} onError={setRootError} />
           <p className="text-center text-xs leading-relaxed text-muted-foreground">Ao criar uma conta, você concorda com os <Link href="/termos" className="text-primary hover:text-primary/80">Termos de Uso</Link> e a <Link href="/privacidade" className="text-primary hover:text-primary/80">Política de Privacidade</Link>.</p>
           <AuthFooter prompt="Já possui conta?" actionLabel="Entrar" actionHref="/login" />
         </div>
