@@ -56,13 +56,32 @@ export async function signInWithOAuth({
   redirectTo = "/onboarding",
 }: OAuthSignInOptions): Promise<{ error: string | null }> {
   const supabase = createBrowserSupabaseClient();
-  const { error } = await supabase.auth.signInWithOAuth({
-    provider: mapProvider(provider),
+  const mappedProvider = mapProvider(provider);
+
+  const scopes =
+    provider === "google"
+      ? "openid email profile"
+      : provider === "github"
+        ? "read:user user:email"
+        : "openid profile email";
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: mappedProvider,
     options: {
       redirectTo: getAuthCallbackUrl(redirectTo),
+      scopes,
+      skipBrowserRedirect: true,
     },
   });
-  return { error: error?.message ?? null };
+
+  if (error) return { error: error.message };
+
+  if (!data.url) {
+    return { error: "Não foi possível iniciar a autenticação social." };
+  }
+
+  window.location.assign(data.url);
+  return { error: null };
 }
 
 export async function resetPasswordForEmail({
