@@ -6,12 +6,23 @@ import type {
 
 const BASE_URL = "https://www.arbeitnow.com/api/job-board-api";
 
+function isNextDynamicServerUsage(error: unknown): boolean {
+  if (!error || typeof error !== "object") return false;
+  const candidate = error as { digest?: unknown; message?: unknown };
+  return (
+    candidate.digest === "DYNAMIC_SERVER_USAGE" ||
+    (typeof candidate.message === "string" &&
+      candidate.message.includes("Dynamic server usage"))
+  );
+}
+
 export async function searchArbeitnowJobs(
   params: ArbeitnowSearchParams = {}
 ): Promise<ArbeitnowJob[]> {
   try {
-    // The Arbeitnow payload is currently larger than Next.js' 2 MB data-cache
-    // item limit, so fetch it without the framework data cache.
+    // The Arbeitnow payload exceeds Next.js' 2 MB data-cache item limit.
+    // Keep it uncached at runtime. During static prerender Next.js throws its
+    // own dynamic-usage signal; rethrow it so the framework can handle it.
     const response = await fetch(BASE_URL, {
       headers: { Accept: "application/json" },
       cache: "no-store",
@@ -41,6 +52,7 @@ export async function searchArbeitnowJobs(
 
     return jobs;
   } catch (error) {
+    if (isNextDynamicServerUsage(error)) throw error;
     console.error("[arbeitnow] search failed:", error);
     return [];
   }
