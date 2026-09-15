@@ -1,66 +1,8 @@
-"use client";
-
 import Link from "next/link";
-import { ArrowRight, Sparkles } from "lucide-react";
-import { motion } from "framer-motion";
+import { ArrowRight, Building2, UserRound } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/components/ui/button";
 
 export function CtaFinal() {
-  return (
-    <section className="landing-section" aria-labelledby="cta-heading">
-      <Container>
-        <motion.div
-          initial={{ opacity: 0, y: 32 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="relative overflow-hidden rounded-3xl border border-primary/20 bg-gradient-to-br from-primary/15 via-white/[0.04] to-glow/10 p-10 text-center sm:p-14 glow-primary"
-        >
-          <div
-            className="pointer-events-none absolute -top-24 left-1/2 h-48 w-96 -translate-x-1/2 rounded-full bg-primary/30 blur-[80px]"
-            aria-hidden="true"
-          />
-
-          <div className="relative">
-            <div className="mx-auto mb-6 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/20 ring-1 ring-primary/30">
-              <Sparkles className="h-7 w-7 text-primary" aria-hidden="true" />
-            </div>
-
-            <h2
-              id="cta-heading"
-              className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl"
-            >
-              Pronto para encontrar a vaga certa?
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-muted-foreground sm:text-lg">
-              Cadastre seu currículo gratuitamente e deixe o Jobera encontrar
-              oportunidades compatíveis com seu perfil.
-            </p>
-
-            <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-              <Button
-                size="lg"
-                className="h-12 min-w-[220px] rounded-xl font-semibold shadow-lg shadow-primary/25"
-                render={<Link href="/onboarding" />}
-                nativeButton={false}
-              >
-                Cadastrar currículo grátis
-                <ArrowRight className="ml-1 h-4 w-4" aria-hidden="true" />
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="h-12 min-w-[220px] rounded-xl border-white/15 bg-white/5 font-semibold hover:bg-white/10"
-                render={<Link href="/dashboard/vagas" />}
-                nativeButton={false}
-              >
-                Buscar vagas
-              </Button>
-            </div>
-          </div>
-        </motion.div>
-      </Container>
-    </section>
-  );
+  return <section className="bg-[#f7f9fc] py-16 text-slate-950 sm:py-20"><Container><div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm sm:p-10"><div className="mx-auto max-w-2xl text-center"><h2 className="text-3xl font-bold">Qual é o seu próximo passo?</h2><p className="mt-3 text-slate-600">Use o Jobera para encontrar uma oportunidade ou para encontrar as pessoas certas para sua empresa.</p></div><div className="mx-auto mt-8 grid max-w-3xl gap-4 md:grid-cols-2"><div className="rounded-xl border border-slate-200 p-6"><UserRound className="h-6 w-6 text-primary"/><h3 className="mt-4 font-semibold">Quero encontrar uma vaga</h3><p className="mt-2 text-sm leading-6 text-slate-600">Crie seu perfil profissional e comece a buscar oportunidades.</p><Button className="mt-5 w-full" render={<Link href="/onboarding" />} nativeButton={false}>Criar perfil <ArrowRight className="ml-1 h-4 w-4"/></Button></div><div className="rounded-xl border border-slate-200 p-6"><Building2 className="h-6 w-6 text-primary"/><h3 className="mt-4 font-semibold">Quero publicar uma vaga</h3><p className="mt-2 text-sm leading-6 text-slate-600">Cadastre sua empresa e acesse as ferramentas de recrutamento.</p><Button variant="outline" className="mt-5 w-full" render={<Link href="/empresa/cadastro" />} nativeButton={false}>Cadastrar empresa <ArrowRight className="ml-1 h-4 w-4"/></Button></div></div></div></Container></section>;
 }
