@@ -1,5 +1,7 @@
 # Jobera
 
+<!-- Git-triggered production deployment. -->
+
 Copiloto de carreira com IA: compatibilidade de vagas, candidatura assistida, discovery inteligente, simulador de entrevistas e currículo adaptado por vaga.
 
 Stack: **Next.js 16** · **Supabase** · **TanStack Query** · **Groq** (LLM) · **Adzuna, Remotive, Arbeitnow, RemoteOK, Jobicy** (vagas externas)
