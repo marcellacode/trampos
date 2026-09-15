@@ -18,6 +18,7 @@ import {
   buildRankContext,
   rankJobsWithContext,
 } from "@/lib/jobs/rank-with-context";
+import { filterBrazilJobs } from "@/lib/jobs/brazil-only";
 
 export interface DiscoverySearchOptions {
   what?: string;
@@ -88,7 +89,7 @@ export async function fetchDiscoveryWithExternalJobs(
     fetchInternalJobsForDiscovery(supabase, 24),
   ]);
 
-  let jobs = [...internalJobs, ...externalJobs];
+  let jobs = filterBrazilJobs([...internalJobs, ...externalJobs]);
 
   if (options.what?.trim()) {
     jobs = filterJobsByQuery(jobs, options.what);
