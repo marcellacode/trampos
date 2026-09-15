@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { AlertCircle, FileUp, Sparkles, Github, Linkedin } from "lucide-react";
+import { AlertCircle, FileUp, Sparkles, GitBranch, Network } from "lucide-react";
 import { OnboardingLayout } from "@/components/onboarding/onboarding-layout";
 import { ImportCard } from "@/components/onboarding/import-card";
 import { UploadArea } from "@/components/onboarding/upload-area";
@@ -22,119 +22,27 @@ import { signInWithOAuth } from "@/lib/auth/providers";
 import { useProfile } from "@/lib/profile/hooks";
 import type { AiSuggestion, AvailabilityOption, ContractType, ExtractedProfile, GoalChip, ImportMethod, OnboardingData, OnboardingError, OnboardingStep, WorkModel } from "@/types/onboarding";
 
-const stepVariants = {
-  initial: { opacity: 0, y: 24, filter: "blur(8px)" },
-  animate: { opacity: 1, y: 0, filter: "blur(0px)" },
-  exit: { opacity: 0, y: -16, filter: "blur(8px)" },
-};
-
-function getErrorMessage(error: unknown): OnboardingError {
-  if (typeof navigator !== "undefined" && !navigator.onLine) return { code: "offline", message: ERROR_MESSAGES.offline };
-  const code = error && typeof error === "object" && "code" in error ? String((error as { code?: string }).code) : "unknown";
-  if (code === "invalid_file" || code === "missing_file") return { code: "invalid_file", message: ERROR_MESSAGES.invalid_file };
-  if (code === "linkedin_failed") return { code: "linkedin_failed", message: ERROR_MESSAGES.linkedin_failed };
-  if (code === "github_failed") return { code: "github_failed", message: ERROR_MESSAGES.github_failed };
-  return { code: "unknown", message: ERROR_MESSAGES.unknown };
-}
+const stepVariants = { initial: { opacity: 0, y: 24, filter: "blur(8px)" }, animate: { opacity: 1, y: 0, filter: "blur(0px)" }, exit: { opacity: 0, y: -16, filter: "blur(8px)" } };
+function getErrorMessage(error: unknown): OnboardingError { if (typeof navigator !== "undefined" && !navigator.onLine) return { code: "offline", message: ERROR_MESSAGES.offline }; const code = error && typeof error === "object" && "code" in error ? String((error as { code?: string }).code) : "unknown"; if (code === "invalid_file" || code === "missing_file") return { code: "invalid_file", message: ERROR_MESSAGES.invalid_file }; if (code === "linkedin_failed") return { code: "linkedin_failed", message: ERROR_MESSAGES.linkedin_failed }; if (code === "github_failed") return { code: "github_failed", message: ERROR_MESSAGES.github_failed }; return { code: "unknown", message: ERROR_MESSAGES.unknown }; }
 
 export function OnboardingFlow() {
-  const router = useRouter();
-  const { data: savedProfile } = useProfile();
-  const [step, setStep] = useState<OnboardingStep>("import");
-  const [showUpload, setShowUpload] = useState(false);
-  const [error, setError] = useState<OnboardingError | null>(null);
-  const [data, setData] = useState<OnboardingData>({ importMethod: null, profile: EMPTY_PROFILE, goalText: "", goalChips: [], availability: null, workModels: [], contractTypes: [], appliedSuggestions: [], uploadedFileName: null });
-  const stepNumber = STEP_META[step].number;
-
-  useEffect(() => {
-    if (!savedProfile?.name) return;
-    setData((prev) => ({ ...prev, profile: savedProfile }));
-  }, [savedProfile]);
-
-  const importMutation = useMutation({
-    mutationFn: async ({ method, file }: { method: ImportMethod; file?: File | null }) => resolveImport(method, file),
-    onSuccess: (profile, variables) => {
-      setData((prev) => ({ ...prev, importMethod: variables.method, profile, uploadedFileName: variables.file?.name ?? prev.uploadedFileName }));
-      setError(null);
-    },
-    onError: (err) => {
-      setError(getErrorMessage(err));
-      setStep("import");
-    },
-  });
-
-  const persistMutation = useMutation({
-    mutationFn: async (payload: OnboardingData) => {
-      const result = await persistOnboardingProfile(payload);
-      await processOnboardingComplete({ event: "onboarding.completed", profileId: result.id, importMethod: payload.importMethod, goalText: payload.goalText });
-      return result;
-    },
-  });
-
+  const router = useRouter(); const { data: savedProfile } = useProfile(); const [step, setStep] = useState<OnboardingStep>("import"); const [showUpload, setShowUpload] = useState(false); const [error, setError] = useState<OnboardingError | null>(null); const [data, setData] = useState<OnboardingData>({ importMethod: null, profile: EMPTY_PROFILE, goalText: "", goalChips: [], availability: null, workModels: [], contractTypes: [], appliedSuggestions: [], uploadedFileName: null }); const stepNumber = STEP_META[step].number;
+  useEffect(() => { if (savedProfile?.name) setData((prev) => ({ ...prev, profile: savedProfile })); }, [savedProfile]);
+  const importMutation = useMutation({ mutationFn: async ({ method, file }: { method: ImportMethod; file?: File | null }) => resolveImport(method, file), onSuccess: (profile, variables) => { setData((prev) => ({ ...prev, importMethod: variables.method, profile, uploadedFileName: variables.file?.name ?? prev.uploadedFileName })); setError(null); }, onError: (err) => { setError(getErrorMessage(err)); setStep("import"); } });
+  const persistMutation = useMutation({ mutationFn: async (payload: OnboardingData) => { const result = await persistOnboardingProfile(payload); await processOnboardingComplete({ event: "onboarding.completed", profileId: result.id, importMethod: payload.importMethod, goalText: payload.goalText }); return result; } });
   const sourceLabel = useMemo(() => data.importMethod === "linkedin" ? "seu LinkedIn" : data.importMethod === "github" ? "seu GitHub" : data.importMethod === "resume" ? "seu currículo" : "seu perfil", [data.importMethod]);
-
-  const handleMethodSelect = async (method: ImportMethod) => {
-    setError(null);
-    if (method === "resume") {
-      setShowUpload(true);
-      setData((prev) => ({ ...prev, importMethod: method }));
-      return;
-    }
-    setShowUpload(false);
-    if (method === "github" || method === "linkedin") {
-      const result = await signInWithOAuth({ provider: method, redirectTo: `/onboarding?import=${method}` });
-      if (result.error) setError({ code: method === "github" ? "github_failed" : "linkedin_failed", message: result.error });
-      return;
-    }
-    setData((prev) => ({ ...prev, importMethod: method }));
-    importMutation.mutate({ method }, { onSuccess: () => setStep("goals") });
-  };
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const socialImport = params.get("import");
-    if (socialImport !== "github" && socialImport !== "linkedin") return;
-    setData((prev) => ({ ...prev, importMethod: socialImport }));
-    setStep("processing");
-    importMutation.mutate({ method: socialImport });
-    // OAuth callback query is consumed once.
-    window.history.replaceState({}, "", "/onboarding");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const handleFileSelect = (file: File) => {
-    setError(null);
-    setData((prev) => ({ ...prev, importMethod: "resume", uploadedFileName: file.name }));
-    setStep("processing");
-    importMutation.mutate({ method: "resume", file });
-  };
-
-  const handleProcessingComplete = useCallback(() => setStep("summary"), []);
-  const updateProfile = (profile: ExtractedProfile) => setData((prev) => ({ ...prev, profile }));
-  const handleApplySuggestion = (suggestion: AiSuggestion) => setData((prev) => ({ ...prev, appliedSuggestions: prev.appliedSuggestions.includes(suggestion.id) ? prev.appliedSuggestions : [...prev.appliedSuggestions, suggestion.id] }));
-  const professionalDna = useMemo(() => buildProfessionalDnaFromProfile(data.profile, data.goalChips), [data.profile, data.goalChips]);
-  const finishOnboarding = async () => { await persistMutation.mutateAsync(data); setStep("success"); };
-
-  return <OnboardingLayout step={stepNumber} totalSteps={ONBOARDING_TOTAL_STEPS} hideProgress={step === "success"}>
-    <AnimatePresence mode="wait"><motion.div key={step + String(showUpload)} variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="flex flex-1 flex-col">
-      {step === "import" && !showUpload && <div className="flex flex-1 flex-col justify-center gap-10 py-4">
-        <div className="mx-auto max-w-2xl space-y-4 text-center"><h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">Vamos construir seu <span className="text-gradient-primary">copiloto</span> de carreira.</h1><p className="text-base text-muted-foreground sm:text-lg">Importe seus dados e deixe a IA preparar seu perfil. Você poderá revisar tudo antes de continuar.</p></div>
-        <div className="space-y-4"><h2 className="text-center text-sm font-medium text-muted-foreground">Como deseja começar?</h2><div className="grid gap-4 sm:grid-cols-2" role="list" aria-label="Formas de começar o onboarding">
-          <ImportCard index={0} title="Importar LinkedIn" description="Conecte sua conta. A IA analisa os dados profissionais disponibilizados pelo LinkedIn." icon={Linkedin} onClick={() => void handleMethodSelect("linkedin")} disabled={importMutation.isPending} />
-          <ImportCard index={1} title="Importar GitHub" description="Conecte sua conta. A IA analisa perfil, tecnologias e projetos disponíveis." icon={Github} onClick={() => void handleMethodSelect("github")} disabled={importMutation.isPending} />
-          <ImportCard index={2} title="Enviar Currículo" description="Envie PDF ou DOCX. A IA extrai e organiza suas informações profissionais." icon={FileUp} onClick={() => void handleMethodSelect("resume")} featured disabled={importMutation.isPending} />
-          <ImportCard index={3} title="Começar do zero" description="Preencha seu perfil com a orientação do Jobera." icon={Sparkles} onClick={() => void handleMethodSelect("scratch")} disabled={importMutation.isPending} />
-        </div></div>
-        {error && <div role="alert" className="mx-auto flex max-w-lg items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{error.message}</span></div>}
-      </div>}
-      {step === "import" && showUpload && <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8"><div className="space-y-2 text-center"><h2 className="text-3xl font-semibold tracking-tight text-foreground">Enviar currículo</h2><p className="text-sm text-muted-foreground">Arraste um PDF ou DOCX. A IA extrai e organiza o seu perfil.</p></div><UploadArea onFileSelect={handleFileSelect} onCancel={() => { setShowUpload(false); setError(null); }} error={error?.message} isUploading={importMutation.isPending} /></div>}
-      {step === "processing" && <AIProcessing onComplete={handleProcessingComplete} fileName={data.uploadedFileName} sourceLabel={sourceLabel} />}
-      {step === "summary" && <div className="flex flex-1 flex-col justify-center py-6"><div className="mb-6 text-center"><h2 className="text-2xl font-semibold text-foreground">Revise o que a IA encontrou</h2><p className="mt-2 text-sm text-muted-foreground">Confira e ajuste as informações antes de continuar.</p></div><SummaryCards profile={data.profile} onChange={updateProfile} onContinue={() => setStep("goals")} /></div>}
-      {step === "goals" && <GoalsStep goalText={data.goalText} goalChips={data.goalChips} onTextChange={(goalText) => setData((prev) => ({ ...prev, goalText }))} onChipsChange={(goalChips: GoalChip[]) => setData((prev) => ({ ...prev, goalChips }))} onContinue={() => setStep("availability")} />}
-      {step === "availability" && <AvailabilityStep availability={data.availability} workModels={data.workModels} contractTypes={data.contractTypes} onAvailabilityChange={(availability: AvailabilityOption) => setData((prev) => ({ ...prev, availability }))} onWorkModelsChange={(workModels: WorkModel[]) => setData((prev) => ({ ...prev, workModels }))} onContractTypesChange={(contractTypes: ContractType[]) => setData((prev) => ({ ...prev, contractTypes }))} onContinue={() => setStep("profile")} />}
-      {step === "profile" && <div className="flex flex-1 flex-col justify-center gap-8 py-6"><ProfilePreview profile={data.profile} suggestions={[]} appliedSuggestions={data.appliedSuggestions} onApplySuggestion={handleApplySuggestion} /><div className="flex justify-center pb-4"><button type="button" onClick={() => setStep("dna")} className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground">Ver meu DNA Profissional</button></div></div>}
-      {step === "dna" && <ProfessionalDnaReveal dna={professionalDna} onContinue={finishOnboarding} isLoading={persistMutation.isPending} />}
-      {step === "success" && <SuccessScreen onEnterDashboard={() => router.push("/dashboard/inicio")} />}
-    </motion.div></AnimatePresence>
-  </OnboardingLayout>;
+  const handleMethodSelect = async (method: ImportMethod) => { setError(null); if (method === "resume") { setShowUpload(true); setData((prev) => ({ ...prev, importMethod: method })); return; } setShowUpload(false); if (method === "github" || method === "linkedin") { const result = await signInWithOAuth({ provider: method, redirectTo: `/onboarding?import=${method}` }); if (result.error) setError({ code: method === "github" ? "github_failed" : "linkedin_failed", message: result.error }); return; } setData((prev) => ({ ...prev, importMethod: method })); importMutation.mutate({ method }, { onSuccess: () => setStep("goals") }); };
+  useEffect(() => { const params = new URLSearchParams(window.location.search); const socialImport = params.get("import"); if (socialImport !== "github" && socialImport !== "linkedin") return; setData((prev) => ({ ...prev, importMethod: socialImport })); setStep("processing"); importMutation.mutate({ method: socialImport }); window.history.replaceState({}, "", "/onboarding"); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
+  const handleFileSelect = (file: File) => { setError(null); setData((prev) => ({ ...prev, importMethod: "resume", uploadedFileName: file.name })); setStep("processing"); importMutation.mutate({ method: "resume", file }); };
+  const handleProcessingComplete = useCallback(() => setStep("summary"), []); const updateProfile = (profile: ExtractedProfile) => setData((prev) => ({ ...prev, profile })); const handleApplySuggestion = (suggestion: AiSuggestion) => setData((prev) => ({ ...prev, appliedSuggestions: prev.appliedSuggestions.includes(suggestion.id) ? prev.appliedSuggestions : [...prev.appliedSuggestions, suggestion.id] })); const professionalDna = useMemo(() => buildProfessionalDnaFromProfile(data.profile, data.goalChips), [data.profile, data.goalChips]); const finishOnboarding = async () => { await persistMutation.mutateAsync(data); setStep("success"); };
+  return <OnboardingLayout step={stepNumber} totalSteps={ONBOARDING_TOTAL_STEPS} hideProgress={step === "success"}><AnimatePresence mode="wait"><motion.div key={step + String(showUpload)} variants={stepVariants} initial="initial" animate="animate" exit="exit" transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }} className="flex flex-1 flex-col">
+    {step === "import" && !showUpload && <div className="flex flex-1 flex-col justify-center gap-10 py-4"><div className="mx-auto max-w-2xl space-y-4 text-center"><h1 className="text-4xl font-semibold tracking-tight text-foreground sm:text-5xl lg:text-[3.25rem] lg:leading-[1.1]">Vamos construir seu <span className="text-gradient-primary">copiloto</span> de carreira.</h1><p className="text-base text-muted-foreground sm:text-lg">Importe seus dados e deixe a IA preparar seu perfil. Você poderá revisar tudo antes de continuar.</p></div><div className="space-y-4"><h2 className="text-center text-sm font-medium text-muted-foreground">Como deseja começar?</h2><div className="grid gap-4 sm:grid-cols-2" role="list" aria-label="Formas de começar o onboarding"><ImportCard index={0} title="Importar LinkedIn" description="Conecte sua conta. A IA analisa os dados profissionais disponibilizados pelo LinkedIn." icon={Network} onClick={() => void handleMethodSelect("linkedin")} disabled={importMutation.isPending} /><ImportCard index={1} title="Importar GitHub" description="Conecte sua conta. A IA analisa perfil, tecnologias e projetos disponíveis." icon={GitBranch} onClick={() => void handleMethodSelect("github")} disabled={importMutation.isPending} /><ImportCard index={2} title="Enviar Currículo" description="Envie PDF ou DOCX. A IA extrai e organiza suas informações profissionais." icon={FileUp} onClick={() => void handleMethodSelect("resume")} featured disabled={importMutation.isPending} /><ImportCard index={3} title="Começar do zero" description="Preencha seu perfil com a orientação do Jobera." icon={Sparkles} onClick={() => void handleMethodSelect("scratch")} disabled={importMutation.isPending} /></div></div>{error && <div role="alert" className="mx-auto flex max-w-lg items-start gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300"><AlertCircle className="mt-0.5 h-4 w-4 shrink-0" /><span>{error.message}</span></div>}</div>}
+    {step === "import" && showUpload && <div className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 py-8"><div className="space-y-2 text-center"><h2 className="text-3xl font-semibold tracking-tight text-foreground">Enviar currículo</h2><p className="text-sm text-muted-foreground">Arraste um PDF ou DOCX. A IA extrai e organiza o seu perfil.</p></div><UploadArea onFileSelect={handleFileSelect} onCancel={() => { setShowUpload(false); setError(null); }} error={error?.message} isUploading={importMutation.isPending} /></div>}
+    {step === "processing" && <AIProcessing onComplete={handleProcessingComplete} fileName={data.uploadedFileName} sourceLabel={sourceLabel} />}
+    {step === "summary" && <div className="flex flex-1 flex-col justify-center py-6"><div className="mb-6 text-center"><h2 className="text-2xl font-semibold text-foreground">Revise o que a IA encontrou</h2><p className="mt-2 text-sm text-muted-foreground">Confira e ajuste as informações antes de continuar.</p></div><SummaryCards profile={data.profile} onChange={updateProfile} onContinue={() => setStep("goals")} /></div>}
+    {step === "goals" && <GoalsStep goalText={data.goalText} goalChips={data.goalChips} onTextChange={(goalText) => setData((prev) => ({ ...prev, goalText }))} onChipsChange={(goalChips: GoalChip[]) => setData((prev) => ({ ...prev, goalChips }))} onContinue={() => setStep("availability")} />}
+    {step === "availability" && <AvailabilityStep availability={data.availability} workModels={data.workModels} contractTypes={data.contractTypes} onAvailabilityChange={(availability: AvailabilityOption) => setData((prev) => ({ ...prev, availability }))} onWorkModelsChange={(workModels: WorkModel[]) => setData((prev) => ({ ...prev, workModels }))} onContractTypesChange={(contractTypes: ContractType[]) => setData((prev) => ({ ...prev, contractTypes }))} onContinue={() => setStep("profile")} />}
+    {step === "profile" && <div className="flex flex-1 flex-col justify-center gap-8 py-6"><ProfilePreview profile={data.profile} suggestions={[]} appliedSuggestions={data.appliedSuggestions} onApplySuggestion={handleApplySuggestion} /><div className="flex justify-center pb-4"><button type="button" onClick={() => setStep("dna")} className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground">Ver meu DNA Profissional</button></div></div>}
+    {step === "dna" && <ProfessionalDnaReveal dna={professionalDna} onContinue={finishOnboarding} isLoading={persistMutation.isPending} />}{step === "success" && <SuccessScreen onEnterDashboard={() => router.push("/dashboard/inicio")} />}
+  </motion.div></AnimatePresence></OnboardingLayout>;
 }
