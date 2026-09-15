@@ -83,8 +83,10 @@ async function fetchAdzunaJobs(
   if (!isAdzunaConfigured()) return [];
 
   try {
-    const what = options.what?.trim() || defaults.what || "desenvolvedor";
-    const where = options.where?.trim() || defaults.where || "Brasil";
+    // Discovery without an explicit search must stay broad. Profile goals are
+    // used later for matching/ranking instead of restricting the source feed.
+    const what = options.what?.trim() || undefined;
+    const where = options.where?.trim() || undefined;
     const response = await searchAdzunaJobs({
       what,
       where,
