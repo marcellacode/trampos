@@ -62,13 +62,13 @@ export async function startConversationFromApplication(
 ): Promise<string> {
   const { data: application, error: appError } = await supabase
     .from("job_applications")
-    .select("id, user_id, company_id, role_title, application_source")
+    .select("id, user_id, company_id, role_title, source")
     .eq("id", applicationId)
     .maybeSingle();
 
   if (appError) throw appError;
   if (!application) throw new Error("Candidatura não encontrada.");
-  if (application.application_source !== "internal") {
+  if (application.source !== "internal") {
     throw new Error("Mensagens disponíveis apenas para candidaturas internas.");
   }
 
@@ -321,13 +321,6 @@ export async function countUnreadDirectMessages(
     target_user_id: userId,
   });
 
-  if (error) {
-    const { count } = await supabase.from("direct_messages")
-      .select("id", { count: "exact", head: true });
-
-    void count;
-    return 0;
-  }
-
+  if (error) return 0;
   return Number(data ?? 0);
 }
