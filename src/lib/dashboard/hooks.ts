@@ -8,9 +8,14 @@ import { fetchDashboardData } from "@/lib/supabase/queries/dashboard";
 import { getCurrentUserId } from "@/lib/supabase/queries/profile";
 
 async function fetchDashboard(): Promise<DashboardData> {
-  const supabase = createBrowserSupabaseClient();
-  const userId = await getCurrentUserId(supabase);
-  return fetchDashboardData(supabase, userId);
+  try {
+    const supabase = createBrowserSupabaseClient();
+    const userId = await getCurrentUserId(supabase);
+    return await fetchDashboardData(supabase, userId);
+  } catch (error) {
+    console.error("[dashboard.fetch] failed", error);
+    throw error;
+  }
 }
 
 export function useDashboard() {
@@ -18,6 +23,7 @@ export function useDashboard() {
     queryKey: ["dashboard"],
     queryFn: fetchDashboard,
     staleTime: 60_000,
+    retry: 1,
   });
 }
 
