@@ -22,9 +22,6 @@ const JOB_LIST_SELECT = `
   published_at,
   verified,
   ai_summary,
-  application_mode,
-  external_apply_url,
-  created_by_user_id,
   companies!jobs_company_id_fkey (
     id,
     slug,
@@ -93,374 +90,64 @@ const JOB_MATCH_SELECT = `
   )
 `;
 
-function matchByJobId(
-  matches: DbJobMatch[] | null | undefined
-): Map<string, DbJobMatch> {
+function matchByJobId(matches: DbJobMatch[] | null | undefined): Map<string, DbJobMatch> {
   return new Map((matches ?? []).map((match) => [match.job_id, match]));
 }
 
-export async function fetchActiveJobs(
-  supabase: SupabaseClient,
-  limit = 20
-): Promise<JobRecommendation[]> {
-  const { data, error } = await supabase
-    .from("jobs")
-    .select(JOB_LIST_SELECT)
-    .eq("is_active", true)
-    .order("published_at", { ascending: false })
-    .limit(limit);
-
+export async function fetchActiveJobs(supabase: SupabaseClient, limit = 20): Promise<JobRecommendation[]> {
+  const { data, error } = await supabase.from("jobs").select(JOB_LIST_SELECT).eq("is_active", true).order("published_at", { ascending: false }).limit(limit);
   if (error) throw error;
-
   return ((data ?? []) as DbJob[]).map((job) => mapJobRecommendation(job));
 }
 
-export async function fetchJobsForUser(
-  supabase: SupabaseClient,
-  userId: string | null,
-  limit = 20
-): Promise<JobRecommendation[]> {
-  const { data: jobs, error } = await supabase
-    .from("jobs")
-    .select(JOB_LIST_SELECT)
-    .eq("is_active", true)
-    .order("published_at", { ascending: false })
-    .limit(limit);
-
+export async function fetchJobsForUser(supabase: SupabaseClient, userId: string | null, limit = 20): Promise<JobRecommendation[]> {
+  const { data: jobs, error } = await supabase.from("jobs").select(JOB_LIST_SELECT).eq("is_active", true).order("published_at", { ascending: false }).limit(limit);
   if (error) throw error;
-
   let matches = new Map<string, DbJobMatch>();
   if (userId) {
-    const { data: matchRows } = await supabase
-      .from("job_matches")
-      .select(`${JOB_MATCH_SELECT}`)
-      .eq("user_id", userId);
-
+    const { data: matchRows } = await supabase.from("job_matches").select(`${JOB_MATCH_SELECT}`).eq("user_id", userId);
     matches = matchByJobId(matchRows as DbJobMatch[] | null);
   }
-
-  return filterOutDemoCatalogJobs(
-    ((jobs ?? []) as DbJob[]).map((job) =>
-      mapJobRecommendation(job, matches.get(job.id) ?? null)
-    )
-  );
+  return filterOutDemoCatalogJobs(((jobs ?? []) as DbJob[]).map((job) => mapJobRecommendation(job, matches.get(job.id) ?? null)));
 }
 
-export async function fetchJobCardsForUser(
-  supabase: SupabaseClient,
-  userId: string | null,
-  limit = 6
-) {
+export async function fetchJobCardsForUser(supabase: SupabaseClient, userId: string | null, limit = 6) {
   const jobs = await fetchJobsForUser(supabase, userId, limit);
-  return jobs.map((job) => ({
-    id: job.id,
-    company: job.company,
-    role: job.role,
-    hasMatch: job.hasMatch,
-    compatibility: job.compatibility,
-    salary: job.salary,
-    location: job.location,
-    logo: job.logo,
-    color: job.color,
-    href: job.href,
-  }));
+  return jobs.map((job) => ({ id: job.id, company: job.company, role: job.role, hasMatch: job.hasMatch, compatibility: job.compatibility, salary: job.salary, location: job.location, logo: job.logo, color: job.color, href: job.href }));
 }
 
-export async function fetchJobById(
-  supabase: SupabaseClient,
-  idOrSlug: string,
-  userId: string | null
-): Promise<JobDetail | null> {
-  const isUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      idOrSlug
-    );
-
+export async function fetchJobById(supabase: SupabaseClient, idOrSlug: string, userId: string | null): Promise<JobDetail | null> {
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(idOrSlug);
   let query = supabase.from("jobs").select(JOB_LIST_SELECT).eq("is_active", true);
-
   query = isUuid ? query.eq("id", idOrSlug) : query.eq("slug", idOrSlug);
-
   const { data: job, error } = await query.maybeSingle();
   if (error) throw error;
   if (!job) return null;
-
   const typedJob = job as DbJob;
   if (isDemoCatalogJobId(typedJob.id)) return null;
-
   let match: DbJobMatch | null = null;
   if (userId) {
-    const { data: matchRow } = await supabase
-      .from("job_matches")
-      .select(JOB_MATCH_SELECT)
-      .eq("user_id", userId)
-      .eq("job_id", typedJob.id)
-      .maybeSingle();
-
+    const { data: matchRow } = await supabase.from("job_matches").select(JOB_MATCH_SELECT).eq("user_id", userId).eq("job_id", typedJob.id).maybeSingle();
     match = (matchRow as DbJobMatch | null) ?? null;
   }
-
-  const [
-    sectionsResult,
-    cultureResult,
-    hiringResult,
-    faqsResult,
-    interviewResult,
-    aiReasonsResult,
-    teamResult,
-    teamStackResult,
-    relatedResult,
-    similarResult,
-  ] = await Promise.all([
-    supabase
-      .from("job_section_items")
-      .select("section_type, content, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_culture_indicators")
-      .select("id, label, score, description, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_hiring_stages")
-      .select("id, label, avg_days, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_faqs")
-      .select("id, question, answer, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_interview_questions")
-      .select("id, tech, question, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_ai_summary_reasons")
-      .select("reason, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_team_info")
-      .select("team_name, team_size, average_tenure_years, is_available")
-      .eq("job_id", typedJob.id)
-      .maybeSingle(),
-    supabase
-      .from("job_team_stack")
-      .select("tech_name, sort_order")
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_related")
-      .select(
-        `
-        sort_order,
-        related_job:jobs!job_related_related_job_id_fkey (
-          id,
-          slug,
-          title,
-          salary_display,
-          companies!jobs_company_id_fkey (name, logo, brand_color),
-          job_matches (compatibility)
-        )
-      `
-      )
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
-    supabase
-      .from("job_similar_companies")
-      .select(
-        `
-        sort_order,
-        companies!job_similar_companies_company_id_fkey (
-          id,
-          slug,
-          name,
-          logo,
-          brand_color,
-          href
-        )
-      `
-      )
-      .eq("job_id", typedJob.id)
-      .order("sort_order"),
+  const [sectionsResult,cultureResult,hiringResult,faqsResult,interviewResult,aiReasonsResult,teamResult,teamStackResult,relatedResult,similarResult] = await Promise.all([
+    supabase.from("job_section_items").select("section_type, content, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_culture_indicators").select("label, score, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_hiring_steps").select("label, duration_label, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_faqs").select("question, answer, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_interview_questions").select("question, answer_hint, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_ai_reasons").select("reason, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_team_members").select("name, role, avatar, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("job_team_stack").select("tech_name, sort_order").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("related_jobs").select("related_job_id, sort_order, jobs:related_job_id(id, slug, title, salary_display, location, remote, companies!jobs_company_id_fkey(name, logo, brand_color))").eq("job_id", typedJob.id).order("sort_order"),
+    supabase.from("similar_companies").select("company_id, similarity, sort_order, companies:company_id(id, slug, name, logo, brand_color, segment, employees_label, market_years, rating, verified, environment, remote_friendly, href)").eq("job_id", typedJob.id).order("sort_order"),
   ]);
-
-  const sections: Record<string, string[]> = {
-    summary: [],
-    responsibilities: [],
-    requirements: [],
-    differentials: [],
-    benefits: [],
-  };
-
-  for (const item of sectionsResult.data ?? []) {
-    const bucket = sections[item.section_type];
-    if (bucket) bucket.push(item.content);
-  }
-
-  const relatedJobs = sortByOrder(relatedResult.data ?? []).map((row) => {
-    const related = unwrapSingle(
-      row.related_job as unknown as DbJob & {
-        job_matches?: { compatibility: number }[];
-      }
-    );
-    const company = unwrapCompany(related?.companies ?? null);
-    const relatedMatch = related?.job_matches?.[0];
-    const hasMatch = Boolean(relatedMatch);
-
-    return {
-      id: related?.id ?? "",
-      company: company?.name ?? "",
-      role: related?.title ?? "",
-      hasMatch,
-      compatibility: hasMatch ? relatedMatch!.compatibility : 0,
-      salary: related?.salary_display ?? "",
-      logo: company?.logo || company?.name?.slice(0, 2) || "?",
-      color: company?.brand_color ?? "#6366F1",
-      href: related?.slug
-        ? `/dashboard/vagas/${related.slug}`
-        : `/dashboard/vagas/${related?.id ?? ""}`,
-    };
-  });
-
-  const similarCompanies = sortByOrder(similarResult.data ?? []).map((row) => {
-    const company = unwrapCompany(row.companies as DbJob["companies"]);
-    return {
-      id: company?.id ?? "",
-      name: company?.name ?? "",
-      logo: company?.logo || company?.name?.slice(0, 2) || "?",
-      color: company?.brand_color ?? "#6366F1",
-      hasMatch: false,
-      compatibility: 0,
-      href:
-        company?.href ??
-        `/empresa/${company?.slug ?? company?.id ?? ""}`,
-    };
-  });
-
-  const teamInfo = teamResult.data
-    ? {
-        teamName: teamResult.data.team_name,
-        size: teamResult.data.team_size,
-        stack: sortByOrder(teamStackResult.data ?? []).map(
-          (item) => item.tech_name
-        ),
-        averageTenureYears: Number(teamResult.data.average_tenure_years),
-        available: teamResult.data.is_available,
-      }
-    : null;
-
-  return mapJobDetail(typedJob, match, {
-    sections,
-    culture: sortByOrder(cultureResult.data ?? []).map((item) => ({
-      id: item.id,
-      label: item.label,
-      score: item.score,
-      description: item.description,
-    })),
-    hiringTimeline: sortByOrder(hiringResult.data ?? []).map((item) => ({
-      id: item.id,
-      label: item.label,
-      avgDays: item.avg_days,
-    })),
-    faqs: sortByOrder(faqsResult.data ?? []).map((item) => ({
-      id: item.id,
-      question: item.question,
-      answer: item.answer,
-    })),
-    interviewQuestions: sortByOrder(interviewResult.data ?? []).map((item) => ({
-      id: item.id,
-      tech: item.tech,
-      question: item.question,
-    })),
-    aiSummaryReasons: sortByOrder(aiReasonsResult.data ?? []).map(
-      (item) => item.reason
-    ),
-    teamInfo,
-    relatedJobs,
-    similarCompanies,
-  });
+  return mapJobDetail(typedJob, match, { sections: sectionsResult.data ?? [], culture: cultureResult.data ?? [], hiring: hiringResult.data ?? [], faqs: faqsResult.data ?? [], interview: interviewResult.data ?? [], aiReasons: aiReasonsResult.data ?? [], team: teamResult.data ?? [], teamStack: teamStackResult.data ?? [], related: relatedResult.data ?? [], similar: similarResult.data ?? [] });
 }
 
-export async function fetchCompanyJobs(
-  supabase: SupabaseClient,
-  companyIdOrSlug: string,
-  userId: string | null
-): Promise<JobRecommendation[]> {
-  const isUuid =
-    /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-      companyIdOrSlug
-    );
-
-  let companyQuery = supabase
-    .from("companies")
-    .select("id")
-    .limit(1);
-
-  companyQuery = isUuid
-    ? companyQuery.eq("id", companyIdOrSlug)
-    : companyQuery.eq("slug", companyIdOrSlug);
-
-  const { data: company } = await companyQuery.maybeSingle();
-  if (!company) return [];
-
-  const { data: jobs, error } = await supabase
-    .from("jobs")
-    .select(JOB_LIST_SELECT)
-    .eq("company_id", company.id)
-    .eq("is_active", true)
-    .order("published_at", { ascending: false });
-
+export async function fetchCompanyMatch(supabase: SupabaseClient, companyId: string, userId: string | null): Promise<ReturnType<typeof mapCompanyMatch> | null> {
+  if (!userId) return null;
+  const { data, error } = await supabase.from("company_matches").select("*").eq("company_id", companyId).eq("user_id", userId).maybeSingle();
   if (error) throw error;
-
-  let matches = new Map<string, DbJobMatch>();
-  if (userId) {
-    const { data: matchRows } = await supabase
-      .from("job_matches")
-      .select(`${JOB_MATCH_SELECT}`)
-      .eq("user_id", userId)
-      .in(
-        "job_id",
-        ((jobs ?? []) as DbJob[]).map((job) => job.id)
-      );
-
-    matches = matchByJobId(matchRows as DbJobMatch[] | null);
-  }
-
-  return ((jobs ?? []) as DbJob[]).map((job) =>
-    mapJobRecommendation(job, matches.get(job.id) ?? null)
-  );
+  return data ? mapCompanyMatch(data) : null;
 }
-
-export async function fetchCompanies(
-  supabase: SupabaseClient,
-  limit = 12
-) {
-  const { data, error } = await supabase
-    .from("companies")
-    .select(
-      `
-      id,
-      slug,
-      name,
-      logo,
-      brand_color,
-      environment,
-      remote_friendly,
-      href,
-      company_benefits (benefit, sort_order)
-    `
-    )
-    .order("name")
-    .limit(limit);
-
-  if (error) throw error;
-
-  return (data ?? []).map((company) =>
-    mapCompanyMatch(company as DbCompany, null)
-  );
-}
-
-export { mapJobCard };
