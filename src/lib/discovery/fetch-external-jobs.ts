@@ -10,6 +10,7 @@ import { searchRemoteOkJobs } from "@/lib/integrations/jobs/providers/remoteok/c
 import { mapRemoteOkJobsToRecommendations } from "@/lib/integrations/jobs/providers/remoteok/mapper";
 import { searchJobicyJobs } from "@/lib/integrations/jobs/providers/jobicy/client";
 import { mapJobicyJobsToRecommendations } from "@/lib/integrations/jobs/providers/jobicy/mapper";
+import { filterBrazilJobs } from "@/lib/jobs/brazil-only";
 
 export interface ExternalJobsSearchOptions {
   what?: string;
@@ -173,5 +174,5 @@ export async function fetchAllExternalJobs(
     withProviderTimeout("Jobicy", fetchJobicyJobs(options)),
   ]);
 
-  return mergeExternalJobLists(lists);
+  return filterBrazilJobs(mergeExternalJobLists(lists));
 }
