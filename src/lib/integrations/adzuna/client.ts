@@ -35,6 +35,13 @@ function buildSearchParams(
   return search;
 }
 
+function safeAdzunaUrl(url: string): string {
+  const parsed = new URL(url);
+  parsed.searchParams.delete("app_id");
+  parsed.searchParams.delete("app_key");
+  return parsed.toString();
+}
+
 async function adzunaFetch<T>(url: string): Promise<T> {
   const response = await fetch(url, {
     headers: { Accept: "application/json" },
@@ -49,6 +56,12 @@ async function adzunaFetch<T>(url: string): Promise<T> {
   }
 
   if (!response.ok) {
+    const body = (await response.text()).slice(0, 500);
+    console.error("[adzuna] API error", {
+      status: response.status,
+      url: safeAdzunaUrl(url),
+      body,
+    });
     throw new AdzunaApiError(
       `Não foi possível buscar vagas na Adzuna (${response.status}).`,
       response.status
