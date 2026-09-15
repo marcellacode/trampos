@@ -19,6 +19,8 @@ export interface ExternalJobsSearchOptions {
   perProvider?: number;
 }
 
+const PROVIDER_TIMEOUT_MS = 7_000;
+
 function normalizeKey(value: string): string {
   return value
     .normalize("NFD")
@@ -29,6 +31,31 @@ function normalizeKey(value: string): string {
 
 function jobDedupKey(job: JobRecommendation): string {
   return `${normalizeKey(job.company)}::${normalizeKey(job.role)}`;
+}
+
+async function withProviderTimeout(
+  label: string,
+  task: Promise<JobRecommendation[]>
+): Promise<JobRecommendation[]> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (jobs: JobRecommendation[]) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(jobs);
+    };
+
+    const timer = setTimeout(() => {
+      console.warn(`[discovery] ${label} timed out after ${PROVIDER_TIMEOUT_MS}ms`);
+      finish([]);
+    }, PROVIDER_TIMEOUT_MS);
+
+    task.then(finish).catch((error) => {
+      console.error(`[discovery] ${label} failed:`, error);
+      finish([]);
+    });
+  });
 }
 
 export function mergeExternalJobLists(
@@ -137,11 +164,11 @@ export async function fetchAllExternalJobs(
   defaults: { what?: string; where?: string } = {}
 ): Promise<JobRecommendation[]> {
   const lists = await Promise.all([
-    fetchAdzunaJobs(options, defaults),
-    fetchRemotiveJobs(options),
-    fetchArbeitnowJobs(options),
-    fetchRemoteOkJobs(options),
-    fetchJobicyJobs(options),
+    withProviderTimeout("Adzuna", fetchAdzunaJobs(options, defaults)),
+    withProviderTimeout("Remotive", fetchRemotiveJobs(options)),
+    withProviderTimeout("Arbeitnow", fetchArbeitnowJobs(options)),
+    withProviderTimeout("RemoteOK", fetchRemoteOkJobs(options)),
+    withProviderTimeout("Jobicy", fetchJobicyJobs(options)),
   ]);
 
   return mergeExternalJobLists(lists);

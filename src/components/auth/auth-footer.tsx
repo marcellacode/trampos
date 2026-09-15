@@ -12,8 +12,8 @@ interface AuthFooterProps {
 
 export function AuthFooter({
   prompt = "Não possui conta?",
-  actionLabel = "Criar conta gratuitamente",
-  actionHref = "/onboarding",
+  actionLabel = "Criar conta com login social",
+  actionHref = "#social-auth",
   className,
 }: AuthFooterProps) {
   return (
@@ -27,7 +27,7 @@ export function AuthFooter({
         {prompt}{" "}
         <Link
           href={actionHref}
-          className="font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background rounded"
+          className="rounded font-medium text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
         >
           {actionLabel}
         </Link>

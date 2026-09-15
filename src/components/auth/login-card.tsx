@@ -1,6 +1,5 @@
 "use client";
 
-import { Controller } from "react-hook-form";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Loader2, Lock, Mail } from "lucide-react";
 import Link from "next/link";
@@ -8,8 +7,6 @@ import { AuthHeader } from "@/components/auth/auth-header";
 import { AuthFooter } from "@/components/auth/auth-footer";
 import { SocialButtons } from "@/components/auth/social-buttons";
 import { FloatingField } from "@/components/auth/floating-field";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { useAuthForm } from "@/hooks/use-auth-form";
 import { useRipple } from "@/hooks/use-ripple";
 import { cn } from "@/lib/utils";
@@ -27,7 +24,6 @@ export function LoginCard() {
   const { ripples, addRipple } = useRipple();
   const {
     register,
-    control,
     formState: { errors, isValid },
     watch,
   } = form;
@@ -101,34 +97,10 @@ export function LoginCard() {
               onBlur={passwordRegister.onBlur}
             />
 
-            <div className="flex items-center justify-between gap-3 pt-0.5">
-              <div className="flex items-center gap-2.5">
-                <Controller
-                  name="rememberMe"
-                  control={control}
-                  render={({ field }) => (
-                    <Checkbox
-                      id="remember-me"
-                      checked={field.value}
-                      onCheckedChange={(checked) =>
-                        field.onChange(checked === true)
-                      }
-                      disabled={isSubmitting}
-                      className="border-white/20"
-                    />
-                  )}
-                />
-                <Label
-                  htmlFor="remember-me"
-                  className="cursor-pointer text-sm font-normal text-muted-foreground"
-                >
-                  Continuar conectado
-                </Label>
-              </div>
-
+            <div className="flex justify-end pt-0.5">
               <Link
                 href="/forgot-password"
-                className="text-sm text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded"
+                className="rounded text-sm text-primary transition-colors hover:text-primary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
               >
                 Esqueci minha senha
               </Link>

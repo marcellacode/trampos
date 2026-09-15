@@ -5,7 +5,6 @@ export type AuthStatus = "idle" | "loading" | "success" | "error";
 export interface LoginFormValues {
   email: string;
   password: string;
-  rememberMe: boolean;
 }
 
 export interface AuthError {
@@ -36,7 +35,6 @@ export interface OAuthSignInOptions {
 export interface SignInWithPasswordOptions {
   email: string;
   password: string;
-  rememberMe?: boolean;
 }
 
 export interface ResetPasswordForEmailOptions {

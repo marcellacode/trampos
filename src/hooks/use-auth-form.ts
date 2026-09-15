@@ -12,12 +12,15 @@ import type { AuthStatus } from "@/types/auth";
 function mapAuthError(message: string): string {
   const lower = message.toLowerCase();
   if (lower.includes("invalid login credentials")) {
-    return "E-mail ou senha incorretos. Use demo@jobera.app / demo123456.";
+    return "E-mail ou senha incorretos.";
   }
   if (lower.includes("email not confirmed")) {
     return "Confirme seu e-mail antes de entrar.";
   }
-  return message;
+  if (lower.includes("failed to fetch") || lower.includes("network")) {
+    return "Não foi possível conectar ao serviço de autenticação. Tente novamente.";
+  }
+  return "Não foi possível entrar. Confira seus dados e tente novamente.";
 }
 
 export function useAuthForm() {
@@ -32,7 +35,6 @@ export function useAuthForm() {
     defaultValues: {
       email: "",
       password: "",
-      rememberMe: true,
     },
   });
 
@@ -44,7 +46,6 @@ export function useAuthForm() {
       const { error } = await signInWithPassword({
         email: values.email,
         password: values.password,
-        rememberMe: values.rememberMe,
       });
 
       if (error) {
