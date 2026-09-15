@@ -10,9 +10,11 @@ export async function searchArbeitnowJobs(
   params: ArbeitnowSearchParams = {}
 ): Promise<ArbeitnowJob[]> {
   try {
+    // The Arbeitnow payload is currently larger than Next.js' 2 MB data-cache
+    // item limit, so fetch it without the framework data cache.
     const response = await fetch(BASE_URL, {
       headers: { Accept: "application/json" },
-      next: { revalidate: 300 },
+      cache: "no-store",
     });
 
     if (!response.ok) {
