@@ -64,25 +64,11 @@ export async function searchAdzunaJobsAction(
 ): Promise<ActionResult<DiscoveryData["jobs"]>> {
   try {
     const params = searchSchema.parse(input);
-    const { supabase, user } = await getOptionalAuth();
-
-    let what = params.what;
-    let where = params.where;
-
-    if (user && (!what || !where)) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("goal_role, goal_location")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      what = what || profile?.goal_role || undefined;
-      where = where || profile?.goal_location || undefined;
-    }
+    await getOptionalAuth();
 
     const response = await searchAdzunaJobs({
-      what: what || "desenvolvedor",
-      where: where || "Brasil",
+      what: params.what?.trim() || undefined,
+      where: params.where?.trim() || undefined,
       page: params.page ?? 1,
       resultsPerPage: 20,
     });
