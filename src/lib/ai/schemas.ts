@@ -13,20 +13,31 @@ const flexibleString = z.preprocess(
   z.string()
 );
 
+const flexibleStringArray = z.preprocess((value) => {
+  if (value == null) return [];
+  if (Array.isArray(value)) return value.map((item) => String(item).trim()).filter(Boolean);
+  if (typeof value === "string") {
+    return value.split(/[,;|]/).map((item) => item.trim()).filter(Boolean);
+  }
+  return [String(value)];
+}, z.array(z.string()));
+
 export const extractedProfileAiSchema = z.object({
   name: z.string().min(1),
-  currentRole: z.string().default(""),
-  summary: z.string().default(""),
-  avatarInitials: z.string().default(""),
-  seniority: z.string().default(""),
-  skills: z.array(z.string()).default([]),
+  currentRole: flexibleString.default(""),
+  summary: flexibleString.default(""),
+  avatarInitials: flexibleString.default(""),
+  seniority: flexibleString.default(""),
+  skills: flexibleStringArray.default([]),
   experiences: z.array(z.object({
-    company: z.string(), role: z.string(), period: flexibleString.default(""), description: z.string().default(""),
+    company: flexibleString, role: flexibleString, period: flexibleString.default(""), description: flexibleString.default(""),
   })).default([]),
-  languages: z.array(z.object({ name: z.string(), level: flexibleString.default("") })).default([]),
-  projects: z.array(z.object({ name: z.string(), description: z.string().default(""), tech: z.array(z.string()).default([]) })).default([]),
+  languages: z.array(z.object({ name: flexibleString, level: flexibleString.default("") })).default([]),
+  projects: z.array(z.object({
+    name: flexibleString, description: flexibleString.default(""), tech: flexibleStringArray.default([]),
+  })).default([]),
   certificates: z.array(z.object({
-    name: z.string(), issuer: z.string().default(""), year: flexibleString.default(""),
+    name: flexibleString, issuer: flexibleString.default(""), year: flexibleString.default(""),
   })).default([]),
 });
 
