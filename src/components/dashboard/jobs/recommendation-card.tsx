@@ -93,12 +93,12 @@ export function RecommendationCard({
       animate={{
         y: hovered ? -4 : 0,
         boxShadow: hovered
-          ? "0 0 48px rgba(79,124,255,0.12), 0 8px 32px rgba(0,0,0,0.3)"
+          ? "0 16px 34px rgba(90,53,232,0.14), 0 4px 10px rgba(32,24,65,0.06)"
           : "0 0 0 rgba(0,0,0,0)",
       }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className={cn(
-        "relative overflow-hidden rounded-2xl border bg-card p-5 sm:p-6",
+        "relative overflow-hidden rounded-2xl border bg-card p-5 shadow-sm transition-shadow sm:p-6",
         selected
           ? "border-primary/50 ring-1 ring-primary/30"
           : "border-border",
@@ -106,7 +106,7 @@ export function RecommendationCard({
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(79,124,255,0.06),transparent_55%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(90,53,232,0.08),transparent_55%)]"
         aria-hidden="true"
       />
 
@@ -152,7 +152,7 @@ export function RecommendationCard({
               "shrink-0 rounded-lg border px-2.5 py-1 text-[10px] font-medium transition-colors",
               selected
                 ? "border-primary bg-primary/15 text-primary"
-                : "border-border text-muted-foreground hover:border-white/[0.14] hover:text-foreground"
+                : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-primary"
             )}
           >
             {selected ? "Selecionada" : "Comparar"}
@@ -261,7 +261,7 @@ export function RecommendationCard({
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-lg border border-white/[0.04] bg-muted/30 px-3 py-2.5"
+            className="rounded-lg border border-border bg-muted/50 px-3 py-2.5"
           >
             <p className="text-[10px] text-muted-foreground">{stat.label}</p>
             <p className="mt-0.5 text-sm font-semibold text-foreground">
