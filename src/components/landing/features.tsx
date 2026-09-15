@@ -1,86 +1,15 @@
-"use client";
-
-import {
-  FileText,
-  LayoutDashboard,
-  MessageSquare,
-  Search,
-  TrendingUp,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
-import { motion } from "framer-motion";
+import { Briefcase, CalendarCheck, FileText, Search, Target, UserRoundCheck } from "lucide-react";
 import { Container } from "@/components/shared/container";
-import { SectionHeader } from "@/components/shared/section-header";
-import { FEATURES } from "@/lib/constants";
-import { cn } from "@/lib/utils";
 
-const iconMap: Record<string, LucideIcon> = {
-  Sparkles: Search,
-  FileText,
-  MessageSquare,
-  TrendingUp,
-  Zap,
-  LayoutDashboard,
-};
-
-const layoutClasses = [
-  "sm:col-span-2 lg:col-span-2",
-  "",
-  "",
-  "sm:col-span-2",
-  "",
-  "sm:col-span-2 lg:col-span-2",
+const features = [
+  { icon: Search, title: "Busca de vagas", text: "Pesquise oportunidades por cargo, empresa, localização e modelo de trabalho." },
+  { icon: Target, title: "Compatibilidade com seu perfil", text: "Entenda rapidamente quais oportunidades estão mais alinhadas às suas experiências e habilidades." },
+  { icon: FileText, title: "Currículo organizado", text: "Mantenha suas informações profissionais atualizadas e prepare versões adequadas para cada candidatura." },
+  { icon: Briefcase, title: "Candidaturas em um só lugar", text: "Acompanhe vagas de interesse e o andamento dos processos sem depender de planilhas." },
+  { icon: CalendarCheck, title: "Entrevistas e agenda", text: "Organize compromissos e prepare-se para as próximas etapas dos processos seletivos." },
+  { icon: UserRoundCheck, title: "Perfil profissional", text: "Apresente experiências, formação e habilidades para facilitar sua conexão com empresas." },
 ];
 
 export function Features() {
-  return (
-    <section
-      id="recursos"
-      className="landing-section"
-      aria-labelledby="features-heading"
-    >
-      <Container>
-        <SectionHeader
-          label="Recursos"
-          title="Por que o Jobera é diferente"
-          description="Ferramentas de IA pensadas para candidatos brasileiros — não só uma lista de vagas."
-          className="mb-12"
-        />
-
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {FEATURES.map((feature, index) => {
-            const Icon = iconMap[feature.icon];
-            return (
-              <motion.article
-                key={feature.title}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{
-                  duration: 0.5,
-                  delay: index * 0.07,
-                  ease: [0.22, 1, 0.36, 1],
-                }}
-                className={cn(
-                  "glass-card group p-6 transition-all hover:border-primary/25 hover:bg-white/[0.06]",
-                  layoutClasses[index]
-                )}
-              >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 ring-1 ring-primary/25 transition-all group-hover:glow-primary">
-                  <Icon className="h-5 w-5 text-primary" aria-hidden="true" />
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">
-                  {feature.title}
-                </h3>
-                <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                  {feature.description}
-                </p>
-              </motion.article>
-            );
-          })}
-        </div>
-      </Container>
-    </section>
-  );
+  return <section id="candidatos" className="border-b border-border bg-[#f7f9fc] py-16 text-slate-950 sm:py-20"><Container><div className="max-w-2xl"><p className="text-sm font-semibold text-primary">Para candidatos</p><h2 className="mt-2 text-3xl font-bold">Sua busca por trabalho, mais simples e organizada</h2><p className="mt-3 text-slate-600">O Jobera reúne as ferramentas essenciais da jornada profissional em uma experiência direta e fácil de entender.</p></div><div className="mt-10 grid gap-px overflow-hidden rounded-xl border border-slate-200 bg-slate-200 md:grid-cols-2 lg:grid-cols-3">{features.map(({icon: Icon,title,text}) => <article key={title} className="bg-white p-6"><div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary"><Icon className="h-5 w-5"/></div><h3 className="text-base font-semibold text-slate-900">{title}</h3><p className="mt-2 text-sm leading-6 text-slate-600">{text}</p></article>)}</div></Container></section>;
 }
