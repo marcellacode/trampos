@@ -1,213 +1,38 @@
 "use client";
 
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Pencil } from "lucide-react";
-import type { ExtractedProfile } from "@/types/onboarding";
+import { Pencil, Plus, X, Trash2 } from "lucide-react";
+import type { ExtractedProfile, Experience, Language, Project, Certificate } from "@/types/onboarding";
 import { cn } from "@/lib/utils";
 
-interface ProfileFieldProps {
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  multiline?: boolean;
+function Field({ label, value, onChange, multiline = false }: { label: string; value: string; onChange: (v: string) => void; multiline?: boolean }) {
+  const cls = "w-full rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20";
+  return <label className="block space-y-1"><span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</span>{multiline ? <textarea rows={3} value={value} onChange={e=>onChange(e.target.value)} className={cls+" resize-y"}/> : <input value={value} onChange={e=>onChange(e.target.value)} className={cls}/>}</label>;
 }
 
-function EditableField({
-  label,
-  value,
-  onChange,
-  multiline = false,
-}: ProfileFieldProps) {
-  const id = `field-${label.toLowerCase().replace(/\s+/g, "-")}`;
-
-  return (
-    <label className="group block space-y-1.5" htmlFor={id}>
-      <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-muted-foreground">
-        {label}
-        <Pencil
-          className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-60 group-focus-within:opacity-60"
-          aria-hidden="true"
-        />
-      </span>
-      {multiline ? (
-        <textarea
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          rows={3}
-          className="w-full resize-none rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/25"
-        />
-      ) : (
-        <input
-          id={id}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-primary/50 focus:ring-2 focus:ring-primary/25"
-        />
-      )}
-    </label>
-  );
+function Section({ title, onAdd, children }: { title: string; onAdd: () => void; children: React.ReactNode }) {
+  return <div className="space-y-3"><div className="flex items-center justify-between"><p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">{title}</p><button type="button" onClick={onAdd} className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs text-foreground hover:bg-muted"><Plus className="h-3.5 w-3.5"/>Adicionar</button></div>{children}</div>;
 }
 
-interface SummaryCardsProps {
-  profile: ExtractedProfile;
-  onChange: (profile: ExtractedProfile) => void;
-  onContinue: () => void;
-  className?: string;
-}
-
-export function SummaryCards({
-  profile,
-  onChange,
-  onContinue,
-  className,
-}: SummaryCardsProps) {
-  const update = <K extends keyof ExtractedProfile>(
-    key: K,
-    value: ExtractedProfile[K]
-  ) => onChange({ ...profile, [key]: value });
-
-  return (
-    <div className={cn("mx-auto w-full max-w-3xl space-y-8", className)}>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="space-y-3 text-center"
-      >
-        <p className="text-sm font-medium text-primary">Encontramos</p>
-        <h2 className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
-          Seu perfil preliminar
-        </h2>
-        <p className="mx-auto max-w-lg text-sm text-muted-foreground sm:text-base">
-          Revise e edite qualquer campo. A IA já fez o trabalho pesado.
-        </p>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        transition={{ delay: 0.1 }}
-        className="space-y-5 rounded-2xl border border-border bg-card/80 p-5 backdrop-blur-sm sm:p-7"
-      >
-        <div className="grid gap-4 sm:grid-cols-2">
-          <EditableField
-            label="Nome"
-            value={profile.name}
-            onChange={(v) => {
-              const initials =
-                v
-                  .split(" ")
-                  .filter(Boolean)
-                  .slice(0, 2)
-                  .map((p) => p[0]?.toUpperCase() ?? "")
-                  .join("") || "?";
-              onChange({ ...profile, name: v, avatarInitials: initials });
-            }}
-          />
-          <EditableField
-            label="Cargo atual"
-            value={profile.currentRole}
-            onChange={(v) => update("currentRole", v)}
-          />
-        </div>
-
-        <EditableField
-          label="Resumo"
-          value={profile.summary}
-          onChange={(v) => update("summary", v)}
-          multiline
-        />
-
-        <div className="space-y-2">
-          <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            Competências
-          </p>
-          <div className="flex flex-wrap gap-2" role="list" aria-label="Competências">
-            {profile.skills.map((skill) => (
-              <span
-                key={skill}
-                role="listitem"
-                className="rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-[#A8C0FF]"
-              >
-                {skill}
-              </span>
-            ))}
-          </div>
-          <input
-            type="text"
-            aria-label="Editar competências separadas por vírgula"
-            value={profile.skills.join(", ")}
-            onChange={(e) =>
-              update(
-                "skills",
-                e.target.value
-                  .split(",")
-                  .map((s) => s.trim())
-                  .filter(Boolean)
-              )
-            }
-            className="mt-2 w-full rounded-xl border border-border bg-muted/40 px-3.5 py-2.5 text-sm text-foreground outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/25"
-            placeholder="React, TypeScript, Next.js..."
-          />
-        </div>
-
-        <div className="grid gap-4 sm:grid-cols-2">
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Experiências ({profile.experiences.length})
-            </p>
-            <ul className="space-y-2">
-              {profile.experiences.map((exp) => (
-                <li
-                  key={exp.id}
-                  className="rounded-xl border border-border bg-muted/30 px-3 py-2.5"
-                >
-                  <p className="text-sm font-medium text-foreground">{exp.role}</p>
-                  <p className="text-xs text-muted-foreground">
-                    {exp.company} · {exp.period}
-                  </p>
-                </li>
-              ))}
-              {profile.experiences.length === 0 && (
-                <li className="text-sm text-muted-foreground">Nenhuma experiência detectada</li>
-              )}
-            </ul>
-          </div>
-
-          <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Idiomas · Projetos · Certificados
-            </p>
-            <ul className="space-y-1.5 text-sm text-[#C4C9D4]">
-              <li>
-                Idiomas:{" "}
-                {profile.languages.map((l) => l.name).join(", ") || "—"}
-              </li>
-              <li>Projetos: {profile.projects.length}</li>
-              <li>Certificados: {profile.certificates.length}</li>
-              <li>Senioridade: {profile.seniority || "—"}</li>
-            </ul>
-          </div>
-        </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.2 }}
-        className="flex justify-center"
-      >
-        <motion.button
-          type="button"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onContinue}
-          className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground shadow-[0_0_32px_rgba(79,124,255,0.35)] transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
-        >
-          Continuar
-        </motion.button>
-      </motion.div>
-    </div>
-  );
+export function SummaryCards({ profile, onChange, onContinue, className }: { profile: ExtractedProfile; onChange:(p:ExtractedProfile)=>void; onContinue:()=>void; className?:string }) {
+  const [newSkill,setNewSkill]=useState("");
+  const update=<K extends keyof ExtractedProfile>(key:K,value:ExtractedProfile[K])=>onChange({...profile,[key]:value});
+  const addSkill=()=>{const skill=newSkill.trim();if(!skill)return;if(!profile.skills.some(s=>s.toLowerCase()===skill.toLowerCase()))update("skills",[...profile.skills,skill]);setNewSkill("");};
+  const patchItem=<K extends "experiences"|"languages"|"projects"|"certificates">(key:K,index:number,patch:Record<string,unknown>)=>{const list=[...profile[key]] as unknown as Record<string,unknown>[];list[index]={...list[index],...patch};update(key,list as ExtractedProfile[K]);};
+  const removeItem=<K extends "experiences"|"languages"|"projects"|"certificates">(key:K,index:number)=>update(key,profile[key].filter((_,i)=>i!==index) as ExtractedProfile[K]);
+  const id=()=>`${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return <div className={cn("mx-auto w-full max-w-4xl space-y-6",className)}>
+    <div className="space-y-2 text-center"><p className="text-sm font-medium text-primary">Encontramos</p><h2 className="text-3xl font-semibold text-foreground">Seu perfil preliminar</h2><p className="text-sm text-muted-foreground">Tudo abaixo é editável. Adicione, altere ou remova qualquer informação antes de continuar.</p></div>
+    <motion.div initial={{opacity:0,y:16}} animate={{opacity:1,y:0}} className="space-y-7 rounded-2xl border border-border bg-card/80 p-5 sm:p-7">
+      <div className="grid gap-4 sm:grid-cols-2"><Field label="Nome" value={profile.name} onChange={v=>{const initials=v.split(/\s+/).filter(Boolean).slice(0,2).map(p=>p[0]?.toUpperCase()??"").join("");onChange({...profile,name:v,avatarInitials:initials});}}/><Field label="Cargo atual" value={profile.currentRole} onChange={v=>update("currentRole",v)}/><Field label="Senioridade" value={profile.seniority} onChange={v=>update("seniority",v)}/></div>
+      <Field label="Resumo" value={profile.summary} onChange={v=>update("summary",v)} multiline/>
+      <Section title={`Competências (${profile.skills.length})`} onAdd={addSkill}><div className="flex flex-wrap gap-2">{profile.skills.map((skill,i)=><span key={`${skill}-${i}`} className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-3 py-1 text-xs font-medium text-[#A8C0FF]">{skill}<button type="button" aria-label={`Remover ${skill}`} onClick={()=>update("skills",profile.skills.filter((_,x)=>x!==i))}><X className="h-3 w-3"/></button></span>)}</div><div className="flex gap-2"><input value={newSkill} onChange={e=>setNewSkill(e.target.value)} onKeyDown={e=>{if(e.key==="Enter"){e.preventDefault();addSkill();}}} placeholder="Digite uma competência e pressione Enter" className="flex-1 rounded-xl border border-border bg-muted/40 px-3 py-2 text-sm outline-none focus:border-primary/50"/><button type="button" onClick={addSkill} className="rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground">Adicionar</button></div></Section>
+      <Section title={`Experiências (${profile.experiences.length})`} onAdd={()=>update("experiences",[...profile.experiences,{id:id(),company:"",role:"",period:"",description:""} as Experience])}><div className="space-y-3">{profile.experiences.map((e,i)=><div key={e.id} className="relative grid gap-3 rounded-xl border border-border bg-muted/20 p-4 sm:grid-cols-2"><button type="button" onClick={()=>removeItem("experiences",i)} className="absolute right-3 top-3 text-muted-foreground hover:text-red-400"><Trash2 className="h-4 w-4"/></button><Field label="Cargo" value={e.role} onChange={v=>patchItem("experiences",i,{role:v})}/><Field label="Empresa" value={e.company} onChange={v=>patchItem("experiences",i,{company:v})}/><Field label="Período" value={e.period} onChange={v=>patchItem("experiences",i,{period:v})}/><div className="sm:col-span-2"><Field label="Descrição" value={e.description} onChange={v=>patchItem("experiences",i,{description:v})} multiline/></div></div>)}</div></Section>
+      <Section title={`Idiomas (${profile.languages.length})`} onAdd={()=>update("languages",[...profile.languages,{id:id(),name:"",level:""} as Language])}><div className="space-y-2">{profile.languages.map((l,i)=><div key={l.id} className="grid gap-2 rounded-xl border border-border bg-muted/20 p-3 sm:grid-cols-[1fr_1fr_auto]"><Field label="Idioma" value={l.name} onChange={v=>patchItem("languages",i,{name:v})}/><Field label="Nível" value={l.level} onChange={v=>patchItem("languages",i,{level:v})}/><button type="button" onClick={()=>removeItem("languages",i)} className="self-end p-2 text-muted-foreground hover:text-red-400"><Trash2 className="h-4 w-4"/></button></div>)}</div></Section>
+      <Section title={`Projetos (${profile.projects.length})`} onAdd={()=>update("projects",[...profile.projects,{id:id(),name:"",description:"",tech:[]} as Project])}><div className="space-y-3">{profile.projects.map((p,i)=><div key={p.id} className="relative space-y-3 rounded-xl border border-border bg-muted/20 p-4"><button type="button" onClick={()=>removeItem("projects",i)} className="absolute right-3 top-3 text-muted-foreground hover:text-red-400"><Trash2 className="h-4 w-4"/></button><Field label="Projeto" value={p.name} onChange={v=>patchItem("projects",i,{name:v})}/><Field label="Descrição" value={p.description} onChange={v=>patchItem("projects",i,{description:v})} multiline/><Field label="Tecnologias (separadas por vírgula)" value={p.tech.join(", ")} onChange={v=>patchItem("projects",i,{tech:v.split(",").map(x=>x.trim()).filter(Boolean)})}/></div>)}</div></Section>
+      <Section title={`Certificados (${profile.certificates.length})`} onAdd={()=>update("certificates",[...profile.certificates,{id:id(),name:"",issuer:"",year:""} as Certificate])}><div className="space-y-2">{profile.certificates.map((c,i)=><div key={c.id} className="grid gap-2 rounded-xl border border-border bg-muted/20 p-3 sm:grid-cols-[2fr_1.5fr_1fr_auto]"><Field label="Certificado" value={c.name} onChange={v=>patchItem("certificates",i,{name:v})}/><Field label="Instituição" value={c.issuer} onChange={v=>patchItem("certificates",i,{issuer:v})}/><Field label="Ano" value={c.year} onChange={v=>patchItem("certificates",i,{year:v})}/><button type="button" onClick={()=>removeItem("certificates",i)} className="self-end p-2 text-muted-foreground hover:text-red-400"><Trash2 className="h-4 w-4"/></button></div>)}</div></Section>
+    </motion.div>
+    <div className="flex justify-center"><button type="button" onClick={onContinue} className="inline-flex h-12 min-w-[220px] items-center justify-center rounded-xl bg-primary px-8 text-sm font-semibold text-primary-foreground">Salvar e continuar</button></div>
+  </div>;
 }
