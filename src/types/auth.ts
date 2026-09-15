@@ -37,6 +37,12 @@ export interface SignInWithPasswordOptions {
   password: string;
 }
 
+export interface SignUpWithPasswordOptions {
+  fullName: string;
+  email: string;
+  password: string;
+}
+
 export interface ResetPasswordForEmailOptions {
   email: string;
   redirectTo?: string;
