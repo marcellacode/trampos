@@ -12,8 +12,8 @@ interface AuthFooterProps {
 
 export function AuthFooter({
   prompt = "Não possui conta?",
-  actionLabel = "Criar conta com login social",
-  actionHref = "#social-auth",
+  actionLabel = "Criar conta",
+  actionHref = "/cadastro",
   className,
 }: AuthFooterProps) {
   return (
