@@ -65,12 +65,18 @@ export function useSignUpForm() {
     setStatus((current) => current === "error" ? "idle" : current);
   }, []);
 
+  const setAuthError = useCallback((message: string) => {
+    setStatus("error");
+    setRootError(message);
+  }, []);
+
   return {
     form,
     status,
     rootError,
     confirmationEmail,
     clearRootError,
+    setRootError: setAuthError,
     onSubmit: form.handleSubmit(onSubmit),
     isSubmitting: status === "loading",
   };
