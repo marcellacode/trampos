@@ -177,3 +177,117 @@ body {
   .jobera-hero .jobera-hero-orbit,
   .jobera-hero-mark .jobera-copilot-eye { animation: none; }
 }
+
+
+/* Larger 3D landing copilot with animated dialogue. */
+.jobera-hero-copilot {
+  width: 210px;
+  height: 175px;
+  margin-bottom: 0;
+  perspective: 800px;
+  transform-style: preserve-3d;
+}
+.jobera-hero-halo {
+  position: absolute;
+  inset: 26px 30px;
+  z-index: 0;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(103, 222, 255, .42) 0%, rgba(122, 82, 255, .22) 33%, transparent 69%);
+  filter: blur(8px);
+  animation: jobera-halo-pulse 3.8s ease-in-out infinite;
+}
+.jobera-hero-mark {
+  width: 142px;
+  height: 142px;
+  filter: drop-shadow(0 15px 16px rgba(0, 0, 0, .32)) drop-shadow(0 0 30px rgba(90, 218, 255, .54)) drop-shadow(0 0 56px rgba(130, 91, 255, .5));
+  transform-style: preserve-3d;
+}
+.jobera-hero-mark::before {
+  content: "";
+  position: absolute;
+  inset: 9px;
+  z-index: -1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 22%, rgba(255, 255, 255, .42), transparent 18%), linear-gradient(145deg, #a98bff, #5f48e8 47%, #161441 78%);
+  transform: translateZ(-14px) translateY(12px) scale(.95);
+  box-shadow: 0 18px 26px rgba(0, 0, 0, .46), inset 0 1px 8px rgba(255, 255, 255, .32);
+}
+.jobera-hero-mark .jobera-copilot-ring { stroke-width: 2; fill: rgba(123, 92, 255, .28); }
+.jobera-hero-mark .jobera-copilot-core { stroke-width: 1; fill: url(#jobera-copilot-depth); }
+.jobera-hero-mark svg { filter: saturate(1.2); }
+.jobera-hero-mark svg::before { content: ""; }
+.jobera-hero-orbit { width: 191px; height: 72px; border-width: 2px; }
+.jobera-hero-orbit--two { width: 169px; height: 62px; }
+.jobera-hero-orbit--three { width: 150px; height: 50px; border-color: rgba(181, 151, 255, .4); transform: rotate(84deg); animation: jobera-orbit-vertical 8s linear infinite; }
+.jobera-hero-spark--one { top: 15px; right: 9px; }
+.jobera-hero-spark--one svg { width: 23px; height: 23px; }
+.jobera-hero-spark--two { bottom: 16px; left: 16px; width: 7px; height: 7px; }
+.jobera-copilot-message {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  width: fit-content;
+  max-width: min(100%, 390px);
+  min-height: 38px;
+  align-items: center;
+  gap: 9px;
+  margin: -4px auto 17px;
+  padding: 8px 13px 8px 9px;
+  color: #e9e6ff;
+  background: rgba(20, 16, 56, .76);
+  border: 1px solid rgba(150, 124, 255, .37);
+  border-radius: 13px;
+  box-shadow: 0 13px 30px rgba(0, 0, 0, .22), inset 0 1px rgba(255, 255, 255, .09);
+  backdrop-filter: blur(16px);
+  text-align: left;
+}
+.jobera-copilot-message::after {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 23px;
+  width: 10px;
+  height: 10px;
+  background: rgba(20, 16, 56, .9);
+  border-right: 1px solid rgba(150, 124, 255, .37);
+  border-bottom: 1px solid rgba(150, 124, 255, .37);
+  transform: rotate(45deg);
+}
+.jobera-copilot-message-name {
+  position: relative;
+  z-index: 1;
+  padding: 4px 7px;
+  color: #0b0a20;
+  background: linear-gradient(135deg, #7ee9ff, #b393ff);
+  border-radius: 7px;
+  font-size: 10px;
+  font-weight: 800;
+}
+.jobera-copilot-message-text { position: relative; z-index: 1; font-size: 12px; line-height: 1.35; }
+.jobera-copilot-message-text i {
+  display: inline-block;
+  width: 1px;
+  height: 1em;
+  margin-left: 3px;
+  vertical-align: -2px;
+  background: #88eaff;
+  box-shadow: 0 0 7px #88eaff;
+  animation: jobera-cursor-blink .8s step-end infinite;
+}
+@keyframes jobera-halo-pulse { 0%, 100% { opacity: .65; transform: scale(.88); } 50% { opacity: 1; transform: scale(1.1); } }
+@keyframes jobera-orbit-vertical { from { transform: rotate(84deg) scale(1); } to { transform: rotate(444deg) scale(1.04); } }
+@keyframes jobera-cursor-blink { 50% { opacity: 0; } }
+
+@media (max-width: 640px) {
+  .jobera-hero-copilot { width: 170px; height: 142px; }
+  .jobera-hero-mark { width: 116px; height: 116px; }
+  .jobera-hero-orbit { width: 158px; height: 60px; }
+  .jobera-hero-orbit--two { width: 140px; height: 52px; }
+  .jobera-hero-orbit--three { width: 122px; height: 43px; }
+  .jobera-copilot-message { max-width: calc(100vw - 48px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .jobera-hero-halo,
+  .jobera-hero .jobera-hero-orbit--three,
+  .jobera-copilot-message-text i { animation: none; }
+}
