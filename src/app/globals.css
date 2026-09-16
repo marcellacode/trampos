@@ -52,3 +52,83 @@
 }
 
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; } }
+
+
+/* Jobera visual system — inspired by the copilot dashboard artwork. */
+:root {
+  --background: #08071a;
+  --foreground: #f7f5ff;
+  --card: #11102a;
+  --card-foreground: #f7f5ff;
+  --popover: #151135;
+  --popover-foreground: #f7f5ff;
+  --primary: #805cff;
+  --primary-foreground: #fff;
+  --secondary: #1a163c;
+  --secondary-foreground: #eeeaff;
+  --muted: #171433;
+  --muted-foreground: #aaa6c6;
+  --accent: #211b4a;
+  --accent-foreground: #eef1ff;
+  --surface: #0d0b21;
+  --border: #2c2754;
+  --input: #353064;
+  --ring: #70d9ff;
+  --glow: #805cff;
+  --sidebar: #0b0a20;
+  --sidebar-foreground: #f3f1ff;
+  --sidebar-primary: #805cff;
+  --sidebar-primary-foreground: #fff;
+  --sidebar-accent: #201b47;
+  --sidebar-accent-foreground: #fff;
+  --sidebar-border: #2b2651;
+  --sidebar-ring: #70d9ff;
+}
+
+body {
+  background:
+    radial-gradient(ellipse 55% 42% at 50% -8%, rgba(106, 72, 255, .30), transparent 72%),
+    radial-gradient(ellipse 34% 34% at 99% 19%, rgba(34, 211, 238, .12), transparent 72%),
+    #08071a;
+}
+.bg-\[\#f7f9fc\] { background: linear-gradient(180deg, rgba(16, 13, 41, .94), rgba(8, 7, 26, .98)) !important; }
+.bg-white { background: linear-gradient(145deg, rgba(22, 19, 55, .94), rgba(13, 11, 33, .94)) !important; }
+.border-b.border-border { border-color: rgba(135, 117, 255, .16); }
+
+.jobera-hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 52% 54% at 50% 18%, rgba(104, 70, 255, .35), transparent 74%),
+    radial-gradient(ellipse 24% 28% at 84% 42%, rgba(51, 206, 255, .12), transparent 75%),
+    linear-gradient(180deg, #0e0b29 0%, #08071a 100%);
+}
+.jobera-hero::before,
+.jobera-hero::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+  border: 1px solid rgba(163, 139, 255, .2);
+  border-radius: 999px;
+  filter: drop-shadow(0 0 22px rgba(116, 80, 255, .25));
+}
+.jobera-hero::before { width: 38rem; height: 13rem; left: 50%; top: 3rem; transform: translateX(-50%) rotate(-18deg); }
+.jobera-hero::after { width: 25rem; height: 9rem; left: 58%; top: 9rem; transform: rotate(35deg); opacity: .55; }
+
+.jobera-hero-copilot { position: relative; z-index: 1; width: 114px; height: 94px; margin: 0 auto 10px; display: grid; place-items: center; }
+.jobera-hero-mark { position: relative; z-index: 2; width: 74px; height: 74px; filter: drop-shadow(0 0 21px rgba(90, 218, 255, .52)) drop-shadow(0 0 30px rgba(130, 91, 255, .44)); }
+.jobera-hero-orbit { position: absolute; width: 112px; height: 42px; border: 2px solid rgba(115, 220, 255, .72); border-radius: 50%; transform: rotate(-22deg); box-shadow: 0 0 16px rgba(72, 199, 255, .28); }
+.jobera-hero-orbit--two { width: 98px; border-color: rgba(152, 102, 255, .7); transform: rotate(42deg); }
+.jobera-hero-spark { position: absolute; z-index: 3; color: #91ecff; filter: drop-shadow(0 0 8px #62d9ff); }
+.jobera-hero-spark svg { width: 16px; height: 16px; }
+.jobera-hero-spark--one { top: 5px; right: 7px; }
+.jobera-hero-spark--two { bottom: 7px; left: 7px; width: 5px; height: 5px; border-radius: 50%; background: #b28bff; box-shadow: 0 0 12px 3px rgba(178, 139, 255, .8); }
+
+.jobera-copilot-mark { position: relative; display: inline-flex; width: 34px; height: 34px; flex: none; border-radius: 50%; overflow: visible; }
+.jobera-copilot-mark svg { width: 100%; height: 100%; overflow: visible; }
+.jobera-copilot-ring { fill: rgba(116, 84, 255, .2); stroke: #9875ff; stroke-width: 2.4; }
+.jobera-copilot-core { fill: #121233; stroke: rgba(117, 232, 255, .54); stroke-width: 1.25; }
+.jobera-copilot-orbit { stroke: #67dcff; stroke-width: 2.4; stroke-linecap: round; }
+.jobera-copilot-orbit--soft { stroke: #b182ff; opacity: .78; }
+.jobera-copilot-eye { fill: #7de9ff; filter: drop-shadow(0 0 3px #66dfff); }
+.jobera-copilot-smile { stroke: #9aeaff; stroke-width: 1.6; stroke-linecap: round; }
