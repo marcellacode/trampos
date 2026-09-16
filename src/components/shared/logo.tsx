@@ -12,8 +12,8 @@ export function CopilotMark({ className }: { className?: string }) {
         <circle cx="32" cy="32" r="21" className="jobera-copilot-core" />
         <path d="M14 32c0-13.2 8-23.7 18-25.8" className="jobera-copilot-orbit" />
         <path d="M50 32c0 13.2-8 23.7-18 25.8" className="jobera-copilot-orbit jobera-copilot-orbit--soft" />
-        <circle cx="25.5" cy="31" r="3.1" className="jobera-copilot-eye" />
-        <circle cx="38.5" cy="31" r="3.1" className="jobera-copilot-eye" />
+        <path d="M21.8 30.2c1.9 2.9 5.6 2.9 7.5 0" className="jobera-copilot-eye jobera-copilot-eye--left" />
+        <path d="M34.7 30.2c1.9 2.9 5.6 2.9 7.5 0" className="jobera-copilot-eye jobera-copilot-eye--right" />
         <path d="M24 40c4.6 3.5 11.4 3.5 16 0" className="jobera-copilot-smile" />
       </svg>
     </span>
