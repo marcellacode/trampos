@@ -3,9 +3,10 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ArrowRight, BriefcaseBusiness, Building2, MapPin, Search } from "lucide-react";
+import { ArrowRight, BriefcaseBusiness, Building2, MapPin, Search, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/shared/container";
+import { CopilotMark } from "@/components/shared/logo";
 
 export interface HeroStat { value: string; label: string; }
 export interface HeroTerminalAction { id: string; label: string; }
@@ -17,11 +18,18 @@ export function Hero({ stats }: HeroProps) {
   const [location, setLocation] = useState("");
   function handleSearch(e: FormEvent) { e.preventDefault(); const p = new URLSearchParams(); if (keyword.trim()) p.set("q", keyword.trim()); if (location.trim()) p.set("loc", location.trim()); router.push(`/dashboard/vagas${p.toString() ? `?${p}` : ""}`); }
 
-  return <section className="border-b border-border bg-[#f7f9fc] pb-16 pt-28 text-slate-950 sm:pb-20 sm:pt-32">
+  return <section className="jobera-hero border-b border-border pb-16 pt-28 sm:pb-20 sm:pt-32">
     <Container>
       <div className="mx-auto max-w-4xl text-center">
-        <p className="mb-4 text-sm font-semibold text-primary">Oportunidades para todos os momentos da sua carreira</p>
-        <h1 className="text-4xl font-bold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">Conectando talentos a empresas que querem crescer</h1>
+        <div className="jobera-hero-copilot" aria-hidden="true">
+          <span className="jobera-hero-orbit jobera-hero-orbit--one" />
+          <span className="jobera-hero-orbit jobera-hero-orbit--two" />
+          <CopilotMark className="jobera-hero-mark" />
+          <span className="jobera-hero-spark jobera-hero-spark--one"><Sparkles /></span>
+          <span className="jobera-hero-spark jobera-hero-spark--two" />
+        </div>
+        <p className="mb-4 text-sm font-semibold text-primary">Seu copiloto inteligente para a carreira</p>
+        <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">Conectando talentos a empresas que querem crescer</h1>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600">Encontre vagas, organize suas candidaturas e desenvolva sua carreira. Empresas também podem publicar oportunidades e gerenciar candidatos em um só lugar.</p>
       </div>
 
