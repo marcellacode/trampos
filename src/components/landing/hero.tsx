@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowRight, BriefcaseBusiness, Building2, MapPin, Search, Sparkles } from "lucide-react";
@@ -12,10 +12,50 @@ export interface HeroStat { value: string; label: string; }
 export interface HeroTerminalAction { id: string; label: string; }
 interface HeroProps { stats: HeroStat[]; terminalActions?: HeroTerminalAction[]; featuredScore?: { score: number; role: string; company: string; }; }
 
+const COPILOT_PHRASES = [
+  "Vamos encontrar sua próxima oportunidade?",
+  "Analiso vagas que combinam com o seu perfil.",
+  "Sua carreira merece um copiloto inteligente.",
+] as const;
+
 export function Hero({ stats }: HeroProps) {
   const router = useRouter();
   const [keyword, setKeyword] = useState("");
   const [location, setLocation] = useState("");
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [typedPhrase, setTypedPhrase] = useState("");
+
+  useEffect(() => {
+    const phrase = COPILOT_PHRASES[phraseIndex];
+    let index = 0;
+    let deleting = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    const animate = () => {
+      if (!deleting) {
+        index += 1;
+        setTypedPhrase(phrase.slice(0, index));
+        if (index === phrase.length) {
+          deleting = true;
+          timer = setTimeout(animate, 1800);
+          return;
+        }
+        timer = setTimeout(animate, 42);
+        return;
+      }
+
+      index -= 1;
+      setTypedPhrase(phrase.slice(0, index));
+      if (index === 0) {
+        setPhraseIndex((current) => (current + 1) % COPILOT_PHRASES.length);
+        return;
+      }
+      timer = setTimeout(animate, 22);
+    };
+
+    timer = setTimeout(animate, 420);
+    return () => clearTimeout(timer);
+  }, [phraseIndex]);
   function handleSearch(e: FormEvent) { e.preventDefault(); const p = new URLSearchParams(); if (keyword.trim()) p.set("q", keyword.trim()); if (location.trim()) p.set("loc", location.trim()); router.push(`/dashboard/vagas${p.toString() ? `?${p}` : ""}`); }
 
   return <section className="jobera-hero border-b border-border pb-16 pt-28 sm:pb-20 sm:pt-32">
@@ -24,9 +64,15 @@ export function Hero({ stats }: HeroProps) {
         <div className="jobera-hero-copilot" aria-hidden="true">
           <span className="jobera-hero-orbit jobera-hero-orbit--one" />
           <span className="jobera-hero-orbit jobera-hero-orbit--two" />
+          <span className="jobera-hero-orbit jobera-hero-orbit--three" />
+          <span className="jobera-hero-halo" />
           <CopilotMark className="jobera-hero-mark" />
           <span className="jobera-hero-spark jobera-hero-spark--one"><Sparkles /></span>
           <span className="jobera-hero-spark jobera-hero-spark--two" />
+        </div>
+        <div className="jobera-copilot-message" role="status" aria-live="polite">
+          <span className="jobera-copilot-message-name">Jobe</span>
+          <span className="jobera-copilot-message-text">{typedPhrase}<i aria-hidden="true" /></span>
         </div>
         <p className="mb-4 text-sm font-semibold text-primary">Seu copiloto inteligente para a carreira</p>
         <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">Conectando talentos a empresas que querem crescer</h1>
