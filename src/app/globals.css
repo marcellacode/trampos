@@ -132,3 +132,48 @@ body {
 .jobera-copilot-orbit--soft { stroke: #b182ff; opacity: .78; }
 .jobera-copilot-eye { fill: #7de9ff; filter: drop-shadow(0 0 3px #66dfff); }
 .jobera-copilot-smile { stroke: #9aeaff; stroke-width: 1.6; stroke-linecap: round; }
+
+
+/* Animation is intentionally limited to the landing-page hero mascot. */
+.jobera-hero-mark {
+  animation: jobera-copilot-float 4.6s ease-in-out infinite;
+  transform-origin: center;
+}
+.jobera-hero .jobera-hero-orbit--one { animation: jobera-orbit-drift 6.5s linear infinite; }
+.jobera-hero .jobera-hero-orbit--two { animation: jobera-orbit-drift-reverse 7.4s linear infinite; }
+.jobera-hero-mark .jobera-copilot-eye {
+  fill: none;
+  stroke: #82edff;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 3px #66dfff);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: jobera-eye-blink 5.4s ease-in-out infinite;
+}
+.jobera-hero-mark .jobera-copilot-eye--right { animation-delay: .06s; }
+
+@keyframes jobera-copilot-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg) scale(1); }
+  50% { transform: translateY(-9px) rotate(1.5deg) scale(1.025); }
+}
+@keyframes jobera-orbit-drift {
+  from { transform: rotate(-22deg) scale(1); }
+  50% { transform: rotate(10deg) scale(1.05); }
+  to { transform: rotate(338deg) scale(1); }
+}
+@keyframes jobera-orbit-drift-reverse {
+  from { transform: rotate(42deg) scale(1); }
+  50% { transform: rotate(12deg) scale(.96); }
+  to { transform: rotate(-318deg) scale(1); }
+}
+@keyframes jobera-eye-blink {
+  0%, 42%, 48%, 100% { transform: scaleY(1); }
+  45% { transform: scaleY(.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .jobera-hero-mark,
+  .jobera-hero .jobera-hero-orbit,
+  .jobera-hero-mark .jobera-copilot-eye { animation: none; }
+}
