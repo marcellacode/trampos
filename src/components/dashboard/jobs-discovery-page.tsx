@@ -205,7 +205,7 @@ export function JobsDiscoveryPage() {
       )}
 
       {data && !isLoading && !isError && isEmpty && (
-        <div className="space-y-8">
+        <div className="space-y-6">
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               Descobrir oportunidades
@@ -231,14 +231,18 @@ export function JobsDiscoveryPage() {
             onChange={setFilters}
             onAiQuery={(q) => void handleAiFilter(q)}
           />
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border bg-card px-4 py-3 shadow-sm">
+            <div>
+              <p className="text-sm font-semibold text-foreground">Tipo de candidatura</p>
+              <p className="text-xs text-muted-foreground">Escolha vagas com inscrição diretamente pela Jobera.</p>
+            </div>
             <button
               type="button"
               onClick={() => setPlatformOnly((value) => !value)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`rounded-lg border px-3 py-2 text-xs font-semibold transition-colors ${
                 platformOnly
                   ? "border-primary bg-primary/10 text-primary"
-                  : "border-border bg-muted/30 text-muted-foreground hover:text-foreground"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/30 hover:text-primary"
               }`}
             >
               Só candidatura na plataforma
@@ -264,18 +268,15 @@ export function JobsDiscoveryPage() {
           )}
 
           <section aria-labelledby="recommended-heading">
-            <div className="mb-5">
-              <h2
-                id="recommended-heading"
-                className="text-base font-semibold text-foreground"
-              >
-                Recomendadas para você
-              </h2>
+            <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
+              <div><h2 id="recommended-heading" className="text-xl font-semibold text-foreground">Vagas recomendadas</h2>
               <p className="mt-0.5 text-sm text-muted-foreground">
                 {searchQuery
                   ? `Resultados para "${searchQuery}"`
                   : "Ordenadas por compatibilidade com o seu perfil"}
               </p>
+              </div>
+              <span className="rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">{visibleJobs.length} oportunidades</span>
             </div>
 
             {visibleJobs.length === 0 ? (
@@ -289,7 +290,7 @@ export function JobsDiscoveryPage() {
                 }}
               />
             ) : (
-              <div className="grid gap-5">
+              <div className="grid gap-4">
                 {visibleJobs.map((job) => (
                   <RecommendationCard
                     key={job.id}
