@@ -213,7 +213,7 @@ body {
   box-shadow: 0 18px 26px rgba(0, 0, 0, .46), inset 0 1px 8px rgba(255, 255, 255, .32);
 }
 .jobera-hero-mark .jobera-copilot-ring { stroke-width: 2; fill: rgba(123, 92, 255, .28); }
-.jobera-hero-mark .jobera-copilot-core { stroke-width: 1; fill: url(#jobera-copilot-depth); }
+.jobera-hero-mark .jobera-copilot-core { stroke-width: 1; fill: #151338; }
 .jobera-hero-mark svg { filter: saturate(1.2); }
 .jobera-hero-mark svg::before { content: ""; }
 .jobera-hero-orbit { width: 191px; height: 72px; border-width: 2px; }
